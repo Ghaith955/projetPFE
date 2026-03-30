@@ -1,0 +1,199 @@
+<div class="page-root">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="shield-badge">ST</div>
+      <div class="sidebar-title">Stade Tunisien<span>Section Natation</span></div>
+    </div>
+    <div class="nav-section">Menu</div>
+    <div class="nav-item" (click)="navigate('/dashboard')"><span>⊞</span> Dashboard</div>
+    <div class="nav-item" (click)="navigate('/nageurs')"><span>🏊</span> Nageurs</div>
+    <div class="nav-item" (click)="navigate('/entraineurs')"><span>🎽</span> Entraîneurs</div>
+    <div class="nav-item" (click)="navigate('/competitions')"><span>🏆</span> Compétitions</div>
+    <div class="nav-item" (click)="navigate('/planning')"><span>📅</span> Planning</div>
+    <div class="nav-item" (click)="navigate('/cotisations')"><span>💳</span> Cotisations</div>
+    <div class="nav-section">IDSS</div>
+    <div class="nav-item" (click)="navigate('/predictions')"><span>📈</span> Prédictions</div>
+    <div class="nav-item" (click)="navigate('/recommandations')"><span>🤖</span> Recommandations</div>
+    <div class="nav-item" (click)="navigate('/alertes')"><span>⚡</span> Alertes</div>
+    <div class="nav-item" (click)="navigate('/simulation')"><span>🔬</span> Simulation</div>
+    <div class="nav-section">Admin</div>
+    <div class="nav-item active"><span>👥</span> Utilisateurs</div>
+    <div class="nav-item" (click)="navigate('/parametres')"><span>⚙️</span> Paramètres</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Utilisateurs <span>— Administration</span></h1>
+      <div class="topbar-right">
+        <button class="btn-add" (click)="openAddModal()">+ Ajouter un utilisateur</button>
+        <div class="avatar-btn" (click)="logout()">AD</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="success-msg" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage && !showModal">⚠ {{ errorMessage }}</div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val">{{ getStats().total }}</div>
+          <div class="stat-label">Total utilisateurs</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-val">{{ getStats().actifs }}</div>
+          <div class="stat-label">Comptes actifs</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-val">{{ getStats().inactifs }}</div>
+          <div class="stat-label">Comptes inactifs</div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Rechercher un utilisateur..." [(ngModel)]="searchQuery" (input)="applyFilters()" />
+        </div>
+        <select class="filter-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+          <option value="">Tous les statuts</option>
+          <option value="actif">Actifs</option>
+          <option value="inactif">Inactifs</option>
+        </select>
+        <div class="count-badge">{{ filteredUsers.length }} utilisateur(s)</div>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">Chargement...</div>
+
+      <!-- EMPTY -->
+      <div class="empty-state" *ngIf="!isLoading && filteredUsers.length === 0">
+        <div class="empty-icon">👥</div>
+        <p>Aucun utilisateur trouvé</p>
+        <button class="btn-add" (click)="openAddModal()">+ Ajouter un utilisateur</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrapper" *ngIf="!isLoading && filteredUsers.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Email</th>
+              <th>Téléphone</th>
+              <th>Rôle</th>
+              <th>Statut</th>
+              <th>Créé le</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of filteredUsers">
+              <td>
+                <div class="user-cell">
+                  <div class="avatar" [style.background]="getAvatarColor(u)"
+                       *ngIf="!u.imageprofile">{{ getInitials(u) }}</div>
+                  <img *ngIf="u.imageprofile" [src]="u.imageprofile" class="avatar-img" />
+                  <div>
+                    <div class="user-name">{{ u.nom }} {{ u.prenom }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="email-cell">{{ u.email }}</td>
+              <td>{{ u.phone || '—' }}</td>
+              <td>
+                <span class="role-badge" *ngIf="u.role">{{ u.role }}</span>
+                <span class="role-none" *ngIf="!u.role">—</span>
+              </td>
+              <td>
+                <span class="status-badge" [class.active]="u.isActive" [class.inactive]="!u.isActive">
+                  {{ u.isActive ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="date-cell">{{ formatDate(u.dateCreation || u.createdAt) }}</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-toggle"
+                          [class.deactivate]="u.isActive"
+                          [class.activate]="!u.isActive"
+                          (click)="toggleActive(u)"
+                          [title]="u.isActive ? 'Désactiver' : 'Activer'">
+                    {{ u.isActive ? '🔒' : '🔓' }}
+                  </button>
+                  <button class="btn-edit" (click)="openEditModal(u)" title="Modifier">✏️</button>
+                  <button class="btn-delete" (click)="deleteUser(u._id, u.nom)" title="Supprimer">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? "Modifier l'utilisateur" : 'Ajouter un utilisateur' }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="success-msg" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Nom *</label>
+          <input type="text" [(ngModel)]="form.nom" placeholder="Ben Ali" />
+        </div>
+        <div class="field-group">
+          <label>Prénom *</label>
+          <input type="text" [(ngModel)]="form.prenom" placeholder="Ahmed" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="form.email" placeholder="ahmed@stade-tunisien.tn" />
+        </div>
+        <div class="field-group">
+          <label>Téléphone</label>
+          <input type="text" [(ngModel)]="form.phone" placeholder="+216 XX XXX XXX" />
+        </div>
+      </div>
+      <div class="form-row" *ngIf="!isEditMode">
+        <div class="field-group">
+          <label>Mot de passe *</label>
+          <input type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Rôle</label>
+          <select [(ngModel)]="form.role">
+            <option value="">-- Choisir un rôle --</option>
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Statut</label>
+          <select [(ngModel)]="form.isActive">
+            <option [ngValue]="true">Actif</option>
+            <option [ngValue]="false">Inactif</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">
+        {{ isEditMode ? 'Enregistrer' : 'Créer' }}
+      </button>
+    </div>
+  </div>
+</div>

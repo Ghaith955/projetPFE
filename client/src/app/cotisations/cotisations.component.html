@@ -1,0 +1,214 @@
+<div class="page-root">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="shield-badge">ST</div>
+      <div class="sidebar-title">Stade Tunisien<span>Section Natation</span></div>
+    </div>
+    <div class="nav-section">Menu</div>
+    <div class="nav-item" (click)="navigate('/dashboard')"><span>⊞</span> Dashboard</div>
+    <div class="nav-item" (click)="navigate('/nageurs')"><span>🏊</span> Nageurs</div>
+    <div class="nav-item" (click)="navigate('/entraineurs')"><span>🎽</span> Entraîneurs</div>
+    <div class="nav-item" (click)="navigate('/competitions')"><span>🏆</span> Compétitions</div>
+    <div class="nav-item" (click)="navigate('/planning')"><span>📅</span> Planning</div>
+    <div class="nav-item active"><span>💳</span> Cotisations</div>
+    <div class="nav-section">IDSS</div>
+    <div class="nav-item" (click)="navigate('/predictions')"><span>📈</span> Prédictions</div>
+    <div class="nav-item" (click)="navigate('/recommandations')"><span>🤖</span> Recommandations</div>
+    <div class="nav-item" (click)="navigate('/alertes')"><span>⚡</span> Alertes</div>
+    <div class="nav-item" (click)="navigate('/simulation')"><span>🔬</span> Simulation</div>
+    <div class="nav-section">Admin</div>
+    <div class="nav-item" (click)="navigate('/utilisateurs')"><span>👥</span> Utilisateurs</div>
+    <div class="nav-item" (click)="navigate('/parametres')"><span>⚙️</span> Paramètres</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Cotisations <span>— Adhésions</span></h1>
+      <div class="topbar-right">
+        <button class="btn-add" (click)="openAddModal()">+ Nouvelle cotisation</button>
+        <div class="avatar-btn" (click)="logout()">AD</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="success-msg" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage && !showModal">⚠ {{ errorMessage }}</div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">💳</div>
+          <div class="stat-info">
+            <div class="stat-val">{{ stats.total }}</div>
+            <div class="stat-label">Total cotisations</div>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <div class="stat-val">{{ stats.paye }}</div>
+            <div class="stat-label">Payées</div>
+          </div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <div class="stat-val">{{ stats.enAttente }}</div>
+            <div class="stat-label">En attente</div>
+          </div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info">
+            <div class="stat-val">{{ stats.enRetard }}</div>
+            <div class="stat-label">En retard</div>
+          </div>
+        </div>
+        <div class="stat-card dark">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <div class="stat-val">{{ stats.montantPercu }} DT</div>
+            <div class="stat-label">Montant perçu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Rechercher un nageur..." [(ngModel)]="searchQuery" (input)="applyFilters()" />
+        </div>
+        <select class="filter-select" [(ngModel)]="filterStatut" (change)="applyFilters()">
+          <option value="">Tous les statuts</option>
+          <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+        </select>
+        <div class="count-badge">{{ filteredCotisations.length }} cotisation(s)</div>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">Chargement...</div>
+
+      <!-- EMPTY -->
+      <div class="empty-state" *ngIf="!isLoading && filteredCotisations.length === 0">
+        <div class="empty-icon">💳</div>
+        <p>Aucune cotisation trouvée</p>
+        <button class="btn-add" (click)="openAddModal()">+ Nouvelle cotisation</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrapper" *ngIf="!isLoading && filteredCotisations.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Nageur</th>
+              <th>Montant</th>
+              <th>Période</th>
+              <th>Mode paiement</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of filteredCotisations" [class.expiring]="isExpiringSoon(c.dateFin)">
+              <td>
+                <div class="nageur-cell">
+                  <div class="avatar">{{ getNageurName(c.nageur)[0] || '?' }}</div>
+                  <span>{{ getNageurName(c.nageur) }}</span>
+                </div>
+              </td>
+              <td><strong>{{ c.montant }} DT</strong></td>
+              <td>
+                <div class="periode">
+                  <span>{{ formatDate(c.dateDebut) }}</span>
+                  <span class="periode-sep">→</span>
+                  <span>{{ formatDate(c.dateFin) }}</span>
+                </div>
+                <div class="expiring-warn" *ngIf="isExpiringSoon(c.dateFin)">⚠ Expire bientôt</div>
+              </td>
+              <td>
+                <span class="mode-badge">{{ c.modePaiement }}</span>
+              </td>
+              <td>
+                <span class="statut-badge" [class]="getStatutClass(c.statut)">{{ c.statut }}</span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-pay" *ngIf="c.statut !== 'Payé'" (click)="markAsPaid(c)" title="Marquer comme payé">✅</button>
+                  <button class="btn-edit" (click)="openEditModal(c)" title="Modifier">✏️</button>
+                  <button class="btn-delete" (click)="deleteCotisation(c._id)" title="Supprimer">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Modifier la cotisation' : 'Nouvelle cotisation' }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="success-msg" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+      <div class="field-group">
+        <label>Nageur *</label>
+        <select [(ngModel)]="form.nageur">
+          <option value="">-- Choisir un nageur --</option>
+          <option *ngFor="let n of nageurs" [value]="n._id">
+            {{ n.utilisateur?.nom }} {{ n.utilisateur?.prenom }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Montant (DT) *</label>
+          <input type="number" [(ngModel)]="form.montant" placeholder="150" />
+        </div>
+        <div class="field-group">
+          <label>Mode de paiement</label>
+          <select [(ngModel)]="form.modePaiement">
+            <option *ngFor="let m of modesPaiement" [value]="m">{{ m }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Date début *</label>
+          <input type="date" [(ngModel)]="form.dateDebut" />
+        </div>
+        <div class="field-group">
+          <label>Date fin *</label>
+          <input type="date" [(ngModel)]="form.dateFin" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Statut</label>
+        <select [(ngModel)]="form.statut">
+          <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label>Notes</label>
+        <textarea [(ngModel)]="form.notes" placeholder="Remarques..." rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</button>
+    </div>
+  </div>
+</div>

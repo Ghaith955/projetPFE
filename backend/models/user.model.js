@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose');// module yorbet mabin lbase de donne w server
 const Schema = mongoose.Schema;  // Ajouter cette ligne pour référencer Schema
 
 const userSchema = new Schema({

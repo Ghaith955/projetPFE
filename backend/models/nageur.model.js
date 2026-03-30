@@ -30,6 +30,10 @@ utilisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true
       classement: Number,
     },
   ],
+  entraineur: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Entraineur",
+  },
  
 });
 

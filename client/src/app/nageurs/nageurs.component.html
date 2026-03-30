@@ -1,0 +1,199 @@
+<div class="page-root">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="shield-badge">ST</div>
+      <div class="sidebar-title">Stade Tunisien<span>Section Natation</span></div>
+    </div>
+    <div class="nav-section">Menu</div>
+    <div class="nav-item" (click)="navigate('/dashboard')"><span>⊞</span> Dashboard</div>
+    <div class="nav-item active"><span>🏊</span> Nageurs</div>
+    <div class="nav-item" (click)="navigate('/entraineurs')"><span>🎽</span> Entraîneurs</div>
+    <div class="nav-item" (click)="navigate('/competitions')"><span>🏆</span> Compétitions</div>
+    <div class="nav-item" (click)="navigate('/planning')"><span>📅</span> Planning</div>
+    <div class="nav-item" (click)="navigate('/cotisations')"><span>💳</span> Cotisations</div>
+    <div class="nav-section">IDSS</div>
+    <div class="nav-item" (click)="navigate('/predictions')"><span>📈</span> Prédictions</div>
+    <div class="nav-item" (click)="navigate('/recommandations')"><span>🤖</span> Recommandations</div>
+    <div class="nav-item" (click)="navigate('/alertes')"><span>⚡</span> Alertes</div>
+    <div class="nav-item" (click)="navigate('/simulation')"><span>🔬</span> Simulation</div>
+    <div class="nav-section">Admin</div>
+    <div class="nav-item" (click)="navigate('/utilisateurs')"><span>👥</span> Utilisateurs</div>
+    <div class="nav-item" (click)="navigate('/parametres')"><span>⚙️</span> Paramètres</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <h1>Nageurs <span>— Gestion</span></h1>
+      <div class="topbar-right">
+        <button class="btn-add" (click)="openAddModal()">+ Ajouter un nageur</button>
+        <div class="avatar-btn" (click)="logout()">AD</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- SUCCESS / ERROR -->
+      <div class="success-msg" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage && !showModal">⚠ {{ errorMessage }}</div>
+
+      <!-- SEARCH BAR -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Rechercher un nageur..."
+            [(ngModel)]="searchQuery"
+            (input)="search()" />
+        </div>
+        <div class="count-badge">{{ filteredNageurs.length }} nageur(s)</div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="loading" *ngIf="isLoading">Chargement...</div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state" *ngIf="!isLoading && filteredNageurs.length === 0">
+        <div class="empty-icon">🏊</div>
+        <p>Aucun nageur trouvé</p>
+        <button class="btn-add" (click)="openAddModal()">+ Ajouter le premier nageur</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrapper" *ngIf="!isLoading && filteredNageurs.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Nageur</th>
+              <th>Email</th>
+              <th>Âge</th>
+              <th>Sexe</th>
+              <th>Poids</th>
+              <th>Spécialité</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let n of filteredNageurs">
+              <td>
+                <div class="nageur-cell">
+                  <div class="avatar" *ngIf="!n.utilisateur?.imageprofile">
+                    {{ getInitials(n) }}
+                  </div>
+                  <img *ngIf="n.utilisateur?.imageprofile"
+                       [src]="n.utilisateur.imageprofile"
+                       class="avatar-img" />
+                  <div>
+                    <div class="nageur-name">{{ n.utilisateur?.nom }} {{ n.utilisateur?.prenom }}</div>
+                    <div class="nageur-phone">{{ n.utilisateur?.phone || '—' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ n.utilisateur?.email }}</td>
+              <td>{{ n.age }} ans</td>
+              <td>
+                <span class="badge" [class.male]="n.sexe === 'Homme'" [class.female]="n.sexe === 'Femme'">
+                  {{ n.sexe }}
+                </span>
+              </td>
+              <td>{{ n.poid }} kg</td>
+              <td>
+                <span class="spec-tag" *ngFor="let s of n.specialite">{{ s }}</span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-edit" (click)="openEditModal(n)">✏️</button>
+                  <button class="btn-delete" (click)="deleteNageur(n._id, n.utilisateur?.nom)">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Modifier le nageur' : 'Ajouter un nageur' }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="success-msg" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Nom *</label>
+          <input type="text" [(ngModel)]="form.nom" placeholder="Ben Ali" />
+        </div>
+        <div class="field-group">
+          <label>Prénom *</label>
+          <input type="text" [(ngModel)]="form.prenom" placeholder="Ahmed" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="form.email" placeholder="ahmed@example.com" />
+        </div>
+        <div class="field-group">
+          <label>Téléphone</label>
+          <input type="text" [(ngModel)]="form.phone" placeholder="+216 XX XXX XXX" />
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="!isEditMode">
+        <div class="field-group">
+          <label>Mot de passe *</label>
+          <input type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Âge *</label>
+          <input type="number" [(ngModel)]="form.age" placeholder="18" />
+        </div>
+        <div class="field-group">
+          <label>Sexe</label>
+          <select [(ngModel)]="form.sexe">
+            <option *ngFor="let s of sexeOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Poids (kg)</label>
+          <input type="text" [(ngModel)]="form.poid" placeholder="70" />
+        </div>
+        <div class="field-group">
+          <label>Spécialité</label>
+          <select [(ngModel)]="form.specialite">
+            <option value="">-- Choisir --</option>
+            <option *ngFor="let s of specialiteOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">
+        {{ isEditMode ? 'Enregistrer' : 'Ajouter' }}
+      </button>
+    </div>
+  </div>
+</div>

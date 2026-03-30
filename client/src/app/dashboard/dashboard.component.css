@@ -1,0 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.dash-root {
+  display: flex;
+  height: 100vh;
+  font-family: 'Outfit', sans-serif;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 215px;
+  background: #0d4228;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  background: #0a3320;
+  padding: 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 3px solid #c8102e;
+  flex-shrink: 0;
+}
+
+.shield-badge {
+  width: 38px; height: 38px;
+  background: #fff;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #c8102e;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sidebar-title span {
+  color: rgba(255,255,255,0.45);
+  font-size: 10px;
+  font-weight: 400;
+  display: block;
+}
+
+.nav-section {
+  padding: 14px 14px 4px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 14px;
+  margin: 1px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: #c8102e;
+  color: #fff;
+  font-weight: 500;
+}
+
+.nav-icon {
+  width: 16px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ─── MAIN ─── */
+.main {
+  flex: 1;
+  background: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  background: #fff;
+  border-bottom: 0.5px solid #e0e0e0;
+  border-left: 4px solid #c8102e;
+  padding: 13px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.topbar h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d4228;
+}
+
+.topbar h1 span {
+  font-weight: 400;
+  color: #999;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.date-label {
+  font-size: 11px;
+  color: #aaa;
+  text-transform: capitalize;
+}
+
+.notif-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: #fff0f2;
+  border: 1px solid #f5c0c8;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; cursor: pointer;
+  position: relative;
+}
+
+.notif-dot {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 7px; height: 7px;
+  background: #c8102e;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+
+.avatar-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #c8102e;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; font-weight: 600;
+  cursor: pointer;
+}
+
+.avatar-btn:hover { background: #a50d25; }
+
+/* ─── CONTENT ─── */
+.content {
+  flex: 1;
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+
+/* ─── KPI GRID ─── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi {
+  background: #fff;
+  border-radius: 10px;
+  border: 0.5px solid #e8e8e8;
+  padding: 16px;
+  border-top: 3px solid transparent;
+}
+
+.kpi.green { border-top-color: #0d4228; }
+.kpi.red   { border-top-color: #c8102e; }
+.kpi.amber { border-top-color: #e07b00; }
+
+.kpi-label {
+  font-size: 10px;
+  color: #888;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.kpi-sub { font-size: 11px; margin-top: 6px; }
+.green-text { color: #0d4228; }
+.red-text   { color: #c8102e; }
+.amber-text { color: #e07b00; }
+.muted-text { color: #aaa; }
+
+/* ─── GRID 2 ─── */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* ─── CARD ─── */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  border: 0.5px solid #e8e8e8;
+  padding: 18px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0d4228;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title::before {
+  content: '';
+  width: 3px; height: 14px;
+  background: #c8102e;
+  border-radius: 2px;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ─── BAR CHART ─── */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.bar-fill {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s;
+}
+
+.bar-label {
+  font-size: 10px;
+  color: #aaa;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 0.5px solid #f0f0f0;
+}
+
+.legend-item { font-size: 11px; font-weight: 500; }
+.green-legend { color: #0d4228; }
+.red-legend   { color: #c8102e; }
+
+/* ─── ALERTS ─── */
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 0.5px solid #f5f5f5;
+}
+
+.alert-item:last-child { border-bottom: none; }
+
+.alert-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.dot-danger  { background: #c8102e; }
+.dot-warning { background: #e07b00; }
+.dot-success { background: #0d4228; }
+
+.alert-name   { font-size: 12px; color: #222; font-weight: 500; }
+.alert-detail { font-size: 11px; color: #999; }
+
+/* ─── PERF BARS ─── */
+.perf-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.perf-name {
+  font-size: 12px;
+  color: #333;
+  width: 85px;
+  flex-shrink: 0;
+}
+
+.perf-bar-bg {
+  flex: 1;
+  height: 7px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.perf-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.perf-val {
+  font-size: 12px;
+  color: #555;
+  width: 34px;
+  text-align: right;
+  font-weight: 500;
+}

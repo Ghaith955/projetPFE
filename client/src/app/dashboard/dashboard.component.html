@@ -1,0 +1,135 @@
+<div class="dash-root">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="shield-badge">ST</div>
+      <div class="sidebar-title">
+        Stade Tunisien
+        <span>Section Natation</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Menu</div>
+    <div *ngFor="let item of getMenuItems('menu')"
+         class="nav-item"
+         [class.active]="item.active"
+         (click)="navigate(item.route)">
+      <span class="nav-icon">{{ item.icon }}</span>
+      {{ item.label }}
+    </div>
+
+    <div class="nav-section">IDSS</div>
+    <div *ngFor="let item of getMenuItems('idss')"
+         class="nav-item"
+         [class.active]="item.active"
+         (click)="navigate(item.route)">
+      <span class="nav-icon">{{ item.icon }}</span>
+      {{ item.label }}
+    </div>
+
+    <div class="nav-section">Admin</div>
+    <div *ngFor="let item of getMenuItems('admin')"
+         class="nav-item"
+         [class.active]="item.active"
+         (click)="navigate(item.route)">
+      <span class="nav-icon">{{ item.icon }}</span>
+      {{ item.label }}
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <h1>Dashboard <span>— Vue générale</span></h1>
+      <div class="topbar-right">
+        <span class="date-label">{{ currentDate }}</span>
+        <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+        <div class="avatar-btn" title="Déconnexion" (click)="logout()">
+          {{ getUserInitials() }}
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- KPI CARDS -->
+      <div class="kpi-grid">
+        <div class="kpi green">
+          <div class="kpi-label">Nageurs actifs</div>
+          <div class="kpi-value">{{ stats.nageurs }}</div>
+          <div class="kpi-sub green-text">↑ +3 ce mois</div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">Entraîneurs</div>
+          <div class="kpi-value">{{ stats.entraineurs }}</div>
+          <div class="kpi-sub muted-text">Actifs</div>
+        </div>
+        <div class="kpi amber">
+          <div class="kpi-label">Compétitions</div>
+          <div class="kpi-value">{{ stats.competitions }}</div>
+          <div class="kpi-sub amber-text">À venir</div>
+        </div>
+        <div class="kpi red">
+          <div class="kpi-label">Alertes IDSS</div>
+          <div class="kpi-value">{{ stats.alertes }}</div>
+          <div class="kpi-sub red-text">⚠ Attention</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="grid2">
+
+        <!-- Bar Chart -->
+        <div class="card">
+          <div class="card-title">Performances moyennes — 2025/2026</div>
+          <div class="bar-chart">
+            <div class="bar-col" *ngFor="let b of barData">
+              <div class="bar-fill"
+                   [style.height.px]="b.val"
+                   [style.background]="getBarColor(b.mois)"
+                   [style.opacity]="getBarOpacity(b.val)">
+              </div>
+              <span class="bar-label">{{ b.mois }}</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item green-legend">● Score équipe</span>
+            <span class="legend-item red-legend">● Mois actuel</span>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="card">
+          <div class="card-title">Alertes IDSS</div>
+          <div class="alert-item" *ngFor="let a of alertes" [class]="'alert-item ' + a.level">
+            <div class="alert-dot" [class]="'dot-' + a.level"></div>
+            <div>
+              <div class="alert-name">{{ a.nom }} — {{ a.type }}</div>
+              <div class="alert-detail">{{ a.detail }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP NAGEURS -->
+      <div class="card">
+        <div class="card-title">Top nageurs — Indice de performance</div>
+        <div class="perf-row" *ngFor="let n of topNageurs">
+          <div class="perf-name">{{ n.nom }}</div>
+          <div class="perf-bar-bg">
+            <div class="perf-bar-fill"
+                 [style.width.%]="n.score"
+                 [style.background]="getScoreColor(n.score)">
+            </div>
+          </div>
+          <div class="perf-val">{{ n.score }}%</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

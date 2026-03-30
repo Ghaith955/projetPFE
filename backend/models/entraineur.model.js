@@ -14,10 +14,7 @@ const EntraineurSchema = new mongoose.Schema({
     type: [String], // ex: ["Papillon", "Brasse", "Nage libre"]
     required: true,
   },
-  club: {
-    type: String,
-    required: true,
-  },
+
  
   certifications: [
     {
@@ -29,6 +26,13 @@ const EntraineurSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+nageurs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Nageur",
+    },
+  ],
 });
+
 
 module.exports= mongoose.model("Entraineur", EntraineurSchema);
