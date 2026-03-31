@@ -1,12 +1,16 @@
 const express = require('express');
-const router = express.Router();
 const competitionController = require('../controllers/competition.Controller');
-const authenticateToken = require('../midelwars/auth');
+const authenticateToken = require('../middleware/auth');
+const roleMiddleware = require('../middleware/rbac');
 
-router.get('/', authenticateToken, competitionController.getAllCompetitions);
-router.get('/:id', authenticateToken, competitionController.getCompetitionById);
-router.post('/', authenticateToken, competitionController.createCompetition);
-router.put('/:id', authenticateToken, competitionController.updateCompetition);
-router.delete('/:id', authenticateToken, competitionController.deleteCompetition);
+const router = express.Router();
+
+router.use(authenticateToken);
+
+router.get('/', competitionController.getAllCompetitions);
+router.get('/:id', competitionController.getCompetitionById);
+router.post('/', roleMiddleware('RESPONSABLE'), competitionController.createCompetition);
+router.put('/:id', roleMiddleware('RESPONSABLE'), competitionController.updateCompetition);
+router.delete('/:id', roleMiddleware('RESPONSABLE'), competitionController.deleteCompetition);
 
 module.exports = router;

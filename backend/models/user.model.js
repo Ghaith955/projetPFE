@@ -1,18 +1,24 @@
-const mongoose = require('mongoose');// module yorbet mabin lbase de donne w server
-const Schema = mongoose.Schema;  // Ajouter cette ligne pour référencer Schema
+const mongoose = require('mongoose');
 
-const userSchema = new Schema({
-    nom: { type: String, required: true },
-    prenom: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    phone: { type: Number, required: true },
-    imageprofile: { type: String },
-    role: { type: Schema.Types.ObjectId, ref: 'Role', default: null },
-    isActive: { type: Boolean, default: false },  // Nouveau champ pour savoir si le compte est activé
-    dateCreation: { type: Date, default: Date.now },
-    resetPasswordToken: { type: String, default: null }, // Champ pour le token de réinitialisation
-    resetPasswordExpires: { type: Date, default: null }  // Champ pour l'expiration du token
+const userSchema = new mongoose.Schema({
+  nom: { type: String, required: true },
+  prenom: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  phone: { type: Number },
+  imageprofile: { type: String, default: '' },
+  role: {
+    type: String,
+    enum: ['RESPONSABLE', 'ENTRAINEUR', 'NAGEUR'],
+    required: true
+  },
+  isActive: { type: Boolean, default: false },
+  dateCreation: { type: Date, default: Date.now },
+  preferences: {
+    theme: { type: String, enum: ['light', 'dark'], default: 'light' }
+  },
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null }
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);  // Le modèle est bien 'User'
+module.exports = mongoose.model('User', userSchema);

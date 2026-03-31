@@ -1,0 +1,201 @@
+<div class="auth-container">
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.15)" />
+            <path d="M8 16C8 11.58 11.58 8 16 8V24C11.58 24 8 20.42 8 16Z" fill="white" />
+            <path d="M16 8C20.42 8 24 11.58 24 16C24 20.42 20.42 24 16 24V8Z" fill="rgba(255,255,255,0.6)" />
+          </svg>
+        </div>
+        <span class="brand-name">IDSS Natation</span>
+      </div>
+
+      <div class="hero-visual">
+        <div class="wave-circle c1"></div>
+        <div class="wave-circle c2"></div>
+        <div class="wave-circle c3"></div>
+        <div class="swimmer-icon">
+          <svg class="icon-animated icon-swim-hero" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/>
+            <path d="M5 17c2-1 4-2 7-2s5 1 7 2"/><line x1="12" y1="9" x2="12" y2="15"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="hero-title">Rejoignez la<br>Section Natation</h1>
+      <p class="hero-subtitle">
+        Créez votre compte et accédez à votre<br>
+        espace personnel IDSS.
+      </p>
+
+      <div class="slide-dots">
+        <span class="dot"></span>
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-form-wrapper">
+      <!-- Back button -->
+      <a routerLink="/login" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour à la connexion
+      </a>
+
+      <h2 class="form-title">Créer un compte</h2>
+      <p class="form-subtitle">Votre inscription sera soumise à l'approbation de l'administrateur</p>
+
+      <!-- Role Selector -->
+      <div class="role-tabs">
+        <button *ngFor="let r of roles" class="role-tab" [class.active]="selectedRole === r.value"
+          (click)="selectRole(r.value)">
+          <span class="role-icon" [innerHTML]="r.icon"></span>
+          {{ r.label }}
+        </button>
+      </div>
+
+      <!-- Photo Upload -->
+      <div class="photo-upload-wrapper">
+        <label for="file-upload" class="photo-upload-btn" [class.has-image]="imagePreview">
+          <img *ngIf="imagePreview" [src]="imagePreview" alt="Aperçu" class="preview-img">
+          <div class="upload-placeholder" *ngIf="!imagePreview">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </div>
+        </label>
+        <span class="photo-label">Photo</span>
+        <input id="file-upload" type="file" accept="image/*" (change)="onFileChange($event)" hidden>
+      </div>
+
+      <!-- Nam and Prenom -->
+      <div class="form-row">
+        <div class="form-group half-width">
+          <label class="form-label">Nom</label>
+          <input type="text" class="form-input" [(ngModel)]="nom" />
+        </div>
+        <div class="form-group half-width">
+          <label class="form-label">Prénom</label>
+          <input type="text" class="form-input" [(ngModel)]="prenom" />
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" [(ngModel)]="email" />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" class="form-input" [(ngModel)]="password" />
+      </div>
+
+      <!-- Nageur Fields -->
+      <ng-container *ngIf="selectedRole === 'NAGEUR'">
+        <div class="form-row">
+          <div class="form-group third-width">
+            <label class="form-label">Âge</label>
+            <input type="number" class="form-input" [(ngModel)]="age" />
+          </div>
+          <div class="form-group third-width">
+            <label class="form-label">Sexe</label>
+            <select class="form-input" [(ngModel)]="sexe">
+              <option value="Masculin">Masculin</option>
+              <option value="Féminin">Féminin</option>
+            </select>
+          </div>
+          <div class="form-group third-width">
+            <label class="form-label">Poids (kg)</label>
+            <input type="number" class="form-input" [(ngModel)]="poids" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Spécialités</label>
+          <div class="chips-container">
+            <button *ngFor="let spec of availableSpecialites" class="chip" [class.active]="specialites.includes(spec)"
+              (click)="toggleSpecialite(spec)">
+              {{ spec }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Entraîneur Fields -->
+      <ng-container *ngIf="selectedRole === 'ENTRAINEUR'">
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label class="form-label">N° Certification *</label>
+            <input type="text" class="form-input" [(ngModel)]="numeroCertification" placeholder="CERT-XXXX-XXX" />
+          </div>
+          <div class="form-group half-width">
+            <label class="form-label">Diplôme</label>
+            <select class="form-input" [(ngModel)]="diplome">
+              <option value="">Sélectionner</option>
+              <option value="Licence">Licence</option>
+              <option value="Master">Master</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label class="form-label">Années d'expérience</label>
+            <input type="number" class="form-input" [(ngModel)]="experience" placeholder="0" />
+          </div>
+          <div class="form-group half-width">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" [(ngModel)]="phone" placeholder="06 XX XX XX XX" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Spécialités</label>
+          <div class="chips-container">
+            <button *ngFor="let spec of availableSpecialites" class="chip" [class.active]="specialites.includes(spec)"
+              (click)="toggleSpecialite(spec)">
+              {{ spec }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Responsable Fields -->
+      <ng-container *ngIf="selectedRole === 'RESPONSABLE'">
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-input" [(ngModel)]="phone" />
+        </div>
+      </ng-container>
+
+      <!-- Messages -->
+      <div class="error-message" *ngIf="errorMessage">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        {{ errorMessage }}
+      </div>
+      <div class="success-message" *ngIf="successMessage">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ successMessage }}
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-primary" (click)="onRegister()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Soumettre la demande</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <p class="form-footer">
+        Déjà un compte? <a routerLink="/login" class="link-accent">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</div>

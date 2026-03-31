@@ -1,0 +1,209 @@
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1 class="page-title">Planning</h1>
+    <span class="page-subtitle">Entraînements</span>
+  </div>
+  <div class="topbar-right">
+    <div class="view-toggle">
+      <button [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'">📅 Calendrier</button>
+      <button [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">☰ Liste</button>
+    </div>
+    <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter</button>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="content-area">
+  <div class="alert alert-success" *ngIf="successMessage"><span>✓</span> {{ successMessage }}</div>
+  <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span>⚠</span> {{ errorMessage }}</div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div class="calendar-layout" *ngIf="!isLoading && viewMode === 'calendar'">
+
+    <div class="calendar-panel">
+      <div class="cal-header">
+        <button class="cal-nav" (click)="prevMonth()">‹</button>
+        <h2>{{ monthNames[currentMonth] }} {{ currentYear }}</h2>
+        <button class="cal-nav" (click)="nextMonth()">›</button>
+      </div>
+
+      <div class="cal-days-header">
+        <div *ngFor="let d of dayNames" class="cal-day-name">{{ d }}</div>
+      </div>
+
+      <div class="cal-grid">
+        <div *ngFor="let day of calendarDays"
+             class="cal-cell"
+             [class.empty]="day.empty"
+             [class.today]="day.isToday"
+             [class.selected]="selectedDay?.date === day.date"
+             [class.has-events]="day.events?.length > 0"
+             (click)="selectDay(day)">
+          <span class="cal-num" *ngIf="!day.empty">{{ day.day }}</span>
+          <div class="cal-dots" *ngIf="day.events?.length > 0">
+            <span class="cal-dot"
+                  *ngFor="let e of day.events.slice(0, 3)"
+                  [style.background]="getTypeColor(e.type)">
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cal-legend">
+        <div class="legend-item" *ngFor="let t of types">
+          <span class="legend-dot" [style.background]="getTypeColor(t)"></span>
+          <span>{{ t }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day Detail -->
+    <div class="day-detail">
+      <div class="day-detail-empty" *ngIf="!selectedDay">
+        <div class="empty-icon">📅</div>
+        <p>Sélectionnez un jour pour voir les entraînements</p>
+        <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter un entraînement</button>
+      </div>
+
+      <div *ngIf="selectedDay">
+        <div class="day-detail-header">
+          <h3>{{ formatDate(selectedDay.date) }}</h3>
+          <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal(selectedDay.date)">+ Ajouter</button>
+        </div>
+
+        <div class="no-events" *ngIf="selectedDay.events?.length === 0">
+          <p>Aucun entraînement ce jour</p>
+        </div>
+
+        <div class="event-card" *ngFor="let e of selectedDay.events">
+          <div class="event-color-bar" [style.background]="getTypeColor(e.type)"></div>
+          <div class="event-body">
+            <div class="event-top">
+              <div class="event-title">{{ e.titre }}</div>
+              <div class="event-actions" *ngIf="canEdit">
+                <button class="btn-icon edit" (click)="openEditModal(e)">✏️</button>
+                <button class="btn-icon delete" (click)="deleteEntrainement(e._id)">🗑️</button>
+              </div>
+            </div>
+            <div class="event-meta">
+              <span class="event-time">🕐 {{ e.heureDebut }} — {{ e.heureFin }}</span>
+              <span class="event-duration">{{ e.duree }} min</span>
+            </div>
+            <div class="event-tags">
+              <span class="type-tag" [style.background]="getTypeBg(e.type)" [style.color]="getTypeColor(e.type)">{{ e.type }}</span>
+              <span class="int-tag" [class]="getIntensiteClass(e.intensite)">{{ e.intensite }}</span>
+              <span class="lieu-tag">📍 {{ e.lieu }}</span>
+            </div>
+            <div class="event-desc" *ngIf="e.description">{{ e.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div class="list-view" *ngIf="!isLoading && viewMode === 'list'">
+    <div class="empty-state" *ngIf="entrainements.length === 0">
+      <div class="empty-icon">📅</div>
+      <p>Aucun entraînement planifié</p>
+      <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter le premier entraînement</button>
+    </div>
+    <div class="list-card" *ngFor="let e of entrainements">
+      <div class="list-color" [style.background]="getTypeColor(e.type)"></div>
+      <div class="list-body">
+        <div class="list-top">
+          <div class="list-title">{{ e.titre }}</div>
+          <div class="list-date">{{ formatDate(e.date) }} · {{ e.heureDebut }}–{{ e.heureFin }}</div>
+        </div>
+        <div class="event-tags" style="margin-top:8px">
+          <span class="type-tag" [style.background]="getTypeBg(e.type)" [style.color]="getTypeColor(e.type)">{{ e.type }}</span>
+          <span class="int-tag" [class]="getIntensiteClass(e.intensite)">{{ e.intensite }}</span>
+          <span class="lieu-tag">📍 {{ e.lieu }}</span>
+        </div>
+      </div>
+      <div class="list-actions" *ngIf="canEdit">
+        <button class="btn-icon edit" (click)="openEditModal(e)">✏️</button>
+        <button class="btn-icon delete" (click)="deleteEntrainement(e._id)">🗑️</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? "Modifier l'entraînement" : 'Nouvel entraînement' }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-success" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="alert alert-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+      <div class="field-group full">
+        <label>Titre *</label>
+        <input type="text" [(ngModel)]="form.titre" placeholder="Séance endurance" />
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Date *</label>
+          <input type="date" [(ngModel)]="form.date" />
+        </div>
+        <div class="field-group">
+          <label>Durée (min)</label>
+          <input type="number" [(ngModel)]="form.duree" placeholder="120" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Heure début</label>
+          <input type="time" [(ngModel)]="form.heureDebut" />
+        </div>
+        <div class="field-group">
+          <label>Heure fin</label>
+          <input type="time" [(ngModel)]="form.heureFin" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Type</label>
+          <select [(ngModel)]="form.type">
+            <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Intensité</label>
+          <select [(ngModel)]="form.intensite">
+            <option *ngFor="let i of intensites" [value]="i">{{ i }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Lieu</label>
+          <input type="text" [(ngModel)]="form.lieu" placeholder="Piscine principale" />
+        </div>
+        <div class="field-group">
+          <label>Statut</label>
+          <select [(ngModel)]="form.statut">
+            <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group full">
+        <label>Description</label>
+        <textarea [(ngModel)]="form.description" placeholder="Détails de la séance..." rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</button>
+    </div>
+  </div>
+</div>

@@ -1,13 +1,17 @@
 const express = require('express');
-const router = express.Router();
 const entraineurController = require('../controllers/entraineur.Controller');
-const uploadImage = require('../midelwars/multer');
-const authenticateToken = require('../midelwars/auth');
+const authenticateToken = require('../middleware/auth');
+const roleMiddleware = require('../middleware/rbac');
+const upload = require('../middleware/multer');
 
-router.get('/', authenticateToken, entraineurController.getAllEntraineurs);
-router.get('/:id', authenticateToken, entraineurController.getEntraineurById);
-router.post('/register_entraineur', uploadImage.single('imageprofile'), entraineurController.registerEntraineur);
-router.put('/:id', authenticateToken, entraineurController.updateEntraineur);
-router.delete('/:id', authenticateToken, entraineurController.deleteEntraineur);
+const router = express.Router();
+
+router.use(authenticateToken);
+
+router.get('/', entraineurController.getAllEntraineurs);
+router.get('/:id', entraineurController.getEntraineurById);
+router.post('/register', roleMiddleware('RESPONSABLE'), upload.single('imageprofile'), entraineurController.registerEntraineur);
+router.put('/:id', roleMiddleware('RESPONSABLE'), upload.single('imageprofile'), entraineurController.updateEntraineur);
+router.delete('/:id', roleMiddleware('RESPONSABLE'), entraineurController.deleteEntraineur);
 
 module.exports = router;

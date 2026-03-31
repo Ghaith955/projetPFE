@@ -1,0 +1,223 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">
+      <svg class="icon-animated icon-settings-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      Paramètres
+    </h1>
+    <p class="page-subtitle">Gérez vos informations personnelles, vos préférences et la sécurité de votre compte.</p>
+  </div>
+
+  <div class="profile-grid">
+    <!-- Main Profile Settings -->
+    <div class="card profile-card">
+      <div class="card-header">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Informations du profil
+        </h2>
+      </div>
+      <div class="card-body" *ngIf="user; else loading">
+        
+        <!-- Photo Upload -->
+        <div class="photo-upload-wrapper">
+          <label for="profile-upload" class="photo-upload-btn" [class.has-image]="imagePreview">
+            <img *ngIf="imagePreview" [src]="imagePreview" alt="Aperçu" class="preview-img">
+            <div class="upload-placeholder" *ngIf="!imagePreview">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+          </label>
+          <span class="photo-label">Modifier la photo</span>
+          <input id="profile-upload" type="file" accept="image/*" (change)="onFileChange($event)" hidden>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-input" [(ngModel)]="nom" />
+          </div>
+          <div class="form-group half-width">
+            <label class="form-label">Prénom</label>
+            <input type="text" class="form-input" [(ngModel)]="prenom" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" [value]="user.email" disabled />
+            <small class="form-text text-muted">L'email ne peut pas être modifié.</small>
+          </div>
+          <div class="form-group half-width">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-input" [(ngModel)]="phone" />
+          </div>
+        </div>
+
+        <!-- NAGEUR -->
+        <ng-container *ngIf="user.role === 'NAGEUR'">
+          <div class="section-divider">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><path d="M5 17c2-1 4-2 7-2s5 1 7 2"/></svg>
+            Informations Nageur
+          </div>
+          <div class="form-row">
+            <div class="form-group third-width">
+              <label class="form-label">Âge</label>
+              <input type="number" class="form-input" [(ngModel)]="age" />
+            </div>
+            <div class="form-group third-width">
+              <label class="form-label">Sexe</label>
+              <select class="form-input" [(ngModel)]="sexe">
+                <option value="Masculin">Masculin</option>
+                <option value="Féminin">Féminin</option>
+              </select>
+            </div>
+            <div class="form-group third-width">
+              <label class="form-label">Poids (kg)</label>
+              <input type="number" class="form-input" [(ngModel)]="poids" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Club / Équipe</label>
+            <input type="text" class="form-input" [(ngModel)]="club" placeholder="Votre club actuel" />
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Spécialités</label>
+            <div class="chips-container">
+              <button *ngFor="let spec of availableSpecialites" class="chip" 
+                      [class.active]="specialites.includes(spec)" 
+                      (click)="toggleSpecialite(spec)">
+                {{ spec }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- ENTRAÎNEUR -->
+        <ng-container *ngIf="user.role === 'ENTRAINEUR'">
+          <div class="section-divider">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            Informations Entraîneur
+          </div>
+          <div class="form-row">
+            <div class="form-group half-width">
+              <label class="form-label">N° Certification</label>
+              <input type="text" class="form-input" [(ngModel)]="numeroCertification" />
+            </div>
+            <div class="form-group half-width">
+              <label class="form-label">Diplôme</label>
+              <select class="form-input" [(ngModel)]="diplome">
+                <option value="Licence">Licence</option>
+                <option value="Master">Master</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Années d'expérience</label>
+            <input type="number" class="form-input" [(ngModel)]="experience" />
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Spécialités</label>
+            <div class="chips-container">
+              <button *ngFor="let spec of availableSpecialites" class="chip" 
+                      [class.active]="specialites.includes(spec)" 
+                      (click)="toggleSpecialite(spec)">
+                {{ spec }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- RESPONSABLE -->
+        <ng-container *ngIf="user.role === 'RESPONSABLE'">
+          <div class="section-divider">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Informations Administrateur
+          </div>
+          <div class="admin-info-box">
+            <p>En tant qu'administrateur, vous avez un accès complet à toutes les fonctionnalités de la plateforme.</p>
+          </div>
+        </ng-container>
+
+        <!-- Messages -->
+        <div class="alert alert-success" *ngIf="successMessage">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ successMessage }}
+        </div>
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" (click)="onSaveProfile()" [disabled]="isLoading">
+            <svg *ngIf="!isLoading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span *ngIf="!isLoading">Sauvegarder les modifications</span>
+            <span *ngIf="isLoading">Chargement...</span>
+          </button>
+        </div>
+
+      </div>
+    </div> <!-- /card -->
+
+    <!-- Security Card -->
+    <div class="card security-card">
+      <div class="card-header">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Sécurité
+        </h2>
+      </div>
+      <div class="card-body">
+        <h3 class="section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Changer le mot de passe
+        </h3>
+        
+        <div class="form-group">
+          <label class="form-label">Mot de passe actuel</label>
+          <input type="password" class="form-input" [(ngModel)]="currentPassword" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nouveau mot de passe</label>
+          <input type="password" class="form-input" [(ngModel)]="newPassword" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmer le mot de passe</label>
+          <input type="password" class="form-input" [(ngModel)]="confirmPassword" />
+        </div>
+
+        <div class="alert alert-success" *ngIf="pwdSuccess">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ pwdSuccess }}
+        </div>
+        <div class="alert alert-danger" *ngIf="pwdError">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          {{ pwdError }}
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-secondary" (click)="onChangePassword()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Mettre à jour le mot de passe
+          </button>
+        </div>
+      </div>
+    </div> <!-- /card -->
+
+  </div> <!-- /profile-grid -->
+  
+  <ng-template #loading>
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement du profil...</p>
+    </div>
+  </ng-template>
+</div>

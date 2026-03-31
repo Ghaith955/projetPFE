@@ -1,13 +1,17 @@
 const express = require('express');
-const router = express.Router();
 const cotisationController = require('../controllers/cotisation.Controller');
-const authenticateToken = require('../midelwars/auth');
+const authenticateToken = require('../middleware/auth');
+const roleMiddleware = require('../middleware/rbac');
 
-router.get('/stats', authenticateToken, cotisationController.getStats);
-router.get('/', authenticateToken, cotisationController.getAllCotisations);
-router.get('/:id', authenticateToken, cotisationController.getCotisationById);
-router.post('/', authenticateToken, cotisationController.createCotisation);
-router.put('/:id', authenticateToken, cotisationController.updateCotisation);
-router.delete('/:id', authenticateToken, cotisationController.deleteCotisation);
+const router = express.Router();
+
+router.use(authenticateToken);
+
+router.get('/', cotisationController.getAllCotisations);
+router.get('/stats', cotisationController.getStats);
+router.get('/:id', cotisationController.getCotisationById);
+router.post('/', roleMiddleware('RESPONSABLE'), cotisationController.createCotisation);
+router.put('/:id', roleMiddleware('RESPONSABLE'), cotisationController.updateCotisation);
+router.delete('/:id', roleMiddleware('RESPONSABLE'), cotisationController.deleteCotisation);
 
 module.exports = router;

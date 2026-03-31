@@ -1,0 +1,127 @@
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1 class="page-title">Compétitions</h1>
+    <span class="page-subtitle">Gestion des compétitions</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-primary-sm" *ngIf="isAdmin" (click)="openAddModal()">+ Ajouter une compétition</button>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="content-area">
+  <div class="alert alert-success" *ngIf="successMessage"><span>✓</span> {{ successMessage }}</div>
+  <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span>⚠</span> {{ errorMessage }}</div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="Rechercher..." [(ngModel)]="searchQuery" (input)="applyFilters()" />
+    </div>
+    <select class="filter-select" [(ngModel)]="filterStatut" (change)="applyFilters()">
+      <option value="">Tous les statuts</option>
+      <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+    </select>
+    <div class="count-badge">{{ filteredCompetitions.length }} compétition(s)</div>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && filteredCompetitions.length === 0">
+    <div class="empty-icon">🏆</div>
+    <p>Aucune compétition trouvée</p>
+    <button class="btn-primary-sm" *ngIf="isAdmin" (click)="openAddModal()">+ Ajouter une compétition</button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards-grid" *ngIf="!isLoading && filteredCompetitions.length > 0">
+    <div class="comp-card" *ngFor="let c of filteredCompetitions">
+      <div class="comp-card-top">
+        <div class="comp-icon">🏆</div>
+        <div class="comp-badges">
+          <span class="statut-badge" [class]="getStatutClass(c.statut)">{{ c.statut }}</span>
+          <span class="niveau-badge" [class]="getNiveauClass(c.niveauRequis)">{{ c.niveauRequis }}</span>
+        </div>
+        <div class="comp-actions" *ngIf="isAdmin">
+          <button class="btn-icon edit" (click)="openEditModal(c)">✏️</button>
+          <button class="btn-icon delete" (click)="deleteCompetition(c._id, c.nom)">🗑️</button>
+        </div>
+      </div>
+
+      <div class="comp-name">{{ c.nom }}</div>
+      <div class="comp-desc" *ngIf="c.description">{{ c.description }}</div>
+
+      <div class="comp-details">
+        <div class="comp-detail-item">
+          <span class="detail-icon">📅</span>
+          <span>{{ formatDate(c.date) }}</span>
+        </div>
+        <div class="comp-detail-item">
+          <span class="detail-icon">📍</span>
+          <span>{{ c.lieu }}</span>
+        </div>
+      </div>
+
+      <div class="days-left" *ngIf="c.statut === 'À venir'">
+        <span *ngIf="getDaysLeft(c.date) > 0">Dans {{ getDaysLeft(c.date) }} jour(s)</span>
+        <span *ngIf="getDaysLeft(c.date) <= 0" class="today">Aujourd'hui !</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Modifier la compétition' : 'Nouvelle compétition' }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-success" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="alert alert-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+      <div class="field-group full">
+        <label>Nom *</label>
+        <input type="text" [(ngModel)]="form.nom" placeholder="Championnat National de Natation" />
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Date *</label>
+          <input type="date" [(ngModel)]="form.date" />
+        </div>
+        <div class="field-group">
+          <label>Lieu *</label>
+          <input type="text" [(ngModel)]="form.lieu" placeholder="Tunis, Complexe El Menzah" />
+        </div>
+      </div>
+      <div class="field-group full">
+        <label>Description</label>
+        <textarea [(ngModel)]="form.description" placeholder="Description de la compétition..." rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Niveau requis</label>
+          <select [(ngModel)]="form.niveauRequis">
+            <option *ngFor="let n of niveaux" [value]="n">{{ n }}</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Statut</label>
+          <select [(ngModel)]="form.statut">
+            <option *ngFor="let s of statuts" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,199 @@
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1 class="page-title">Utilisateurs</h1>
+    <span class="page-subtitle">Administration</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-primary-sm" (click)="openAddModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un utilisateur
+    </button>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="content-area">
+  <div class="alert alert-success" *ngIf="successMessage">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    {{ successMessage }}
+  </div>
+  <div class="alert alert-error" *ngIf="errorMessage && !showModal">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    {{ errorMessage }}
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="stat-info"><div class="stat-val">{{ getStats().total }}</div><div class="stat-label">Total utilisateurs</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="stat-info"><div class="stat-val">{{ getStats().actifs }}</div><div class="stat-label">Comptes actifs</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      </div>
+      <div class="stat-info"><div class="stat-val">{{ getStats().inactifs }}</div><div class="stat-label">Comptes inactifs</div></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Rechercher un utilisateur..." [(ngModel)]="searchQuery" (input)="applyFilters()" />
+    </div>
+    <select class="filter-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+      <option value="">Tous les statuts</option>
+      <option value="actif">Actifs</option>
+      <option value="inactif">Inactifs</option>
+    </select>
+    <div class="count-badge">{{ filteredUsers.length }} utilisateur(s)</div>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading"><div class="spinner"></div><p>Chargement...</p></div>
+
+  <div class="empty-state" *ngIf="!isLoading && filteredUsers.length === 0">
+    <svg class="empty-icon-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <p>Aucun utilisateur trouvé</p>
+    <button class="btn-primary-sm" (click)="openAddModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un utilisateur
+    </button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card" *ngIf="!isLoading && filteredUsers.length > 0">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Créé le</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of filteredUsers">
+          <td>
+            <div class="user-cell">
+              <div class="avatar" *ngIf="!u.imageprofile">{{ getInitials(u) }}</div>
+              <img *ngIf="u.imageprofile" [src]="'http://localhost:3300' + u.imageprofile" class="avatar-img" />
+              <div class="user-name">{{ u.nom }} {{ u.prenom }}</div>
+            </div>
+          </td>
+          <td class="cell-muted">{{ u.email }}</td>
+          <td>{{ u.phone || '—' }}</td>
+          <td>
+            <span class="role-badge" *ngIf="u.role" [attr.data-role]="u.role?.toLowerCase()">{{ u.role }}</span>
+            <span class="cell-muted" *ngIf="!u.role">—</span>
+          </td>
+          <td>
+            <span class="status-badge" [class.active]="u.isActive" [class.inactive]="!u.isActive">
+              {{ u.isActive ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td class="cell-muted">{{ formatDate(u.dateCreation || u.createdAt) }}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-icon toggle"
+                      [class.deactivate]="u.isActive"
+                      [class.activate]="!u.isActive"
+                      (click)="toggleActive(u)"
+                      [title]="u.isActive ? 'Désactiver' : 'Activer'">
+                <svg *ngIf="u.isActive" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <svg *ngIf="!u.isActive" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              </button>
+              <button class="btn-icon edit" (click)="openEditModal(u)" title="Modifier">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-icon delete" (click)="deleteUser(u._id, u.nom)" title="Supprimer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? "Modifier l'utilisateur" : 'Ajouter un utilisateur' }}</h3>
+      <button class="modal-close" (click)="closeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-success" *ngIf="successMessage">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ successMessage }}
+      </div>
+      <div class="alert alert-error" *ngIf="errorMessage">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Nom *</label>
+          <input type="text" [(ngModel)]="form.nom" placeholder="Ben Ali" />
+        </div>
+        <div class="field-group">
+          <label>Prénom *</label>
+          <input type="text" [(ngModel)]="form.prenom" placeholder="Ahmed" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="form.email" placeholder="ahmed@stade-tunisien.tn" />
+        </div>
+        <div class="field-group">
+          <label>Téléphone</label>
+          <input type="text" [(ngModel)]="form.phone" placeholder="+216 XX XXX XXX" />
+        </div>
+      </div>
+      <div class="form-row" *ngIf="!isEditMode">
+        <div class="field-group">
+          <label>Mot de passe *</label>
+          <input type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Rôle</label>
+          <select [(ngModel)]="form.role">
+            <option value="">-- Choisir un rôle --</option>
+            <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Statut</label>
+          <select [(ngModel)]="form.isActive">
+            <option [ngValue]="true">Actif</option>
+            <option [ngValue]="false">Inactif</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</button>
+    </div>
+  </div>
+</div>

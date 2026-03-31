@@ -1,0 +1,102 @@
+<div class="auth-container">
+  <!-- LEFT PANEL - Decorative -->
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.15)"/>
+            <path d="M8 16C8 11.58 11.58 8 16 8V24C11.58 24 8 20.42 8 16Z" fill="white"/>
+            <path d="M16 8C20.42 8 24 11.58 24 16C24 20.42 20.42 24 16 24V8Z" fill="rgba(255,255,255,0.6)"/>
+          </svg>
+        </div>
+        <span class="brand-name">IDSS Natation</span>
+      </div>
+
+      <div class="hero-visual">
+        <div class="wave-circle c1"></div>
+        <div class="wave-circle c2"></div>
+        <div class="wave-circle c3"></div>
+        <div class="swimmer-icon">🏊</div>
+      </div>
+
+      <h1 class="hero-title">Système Intelligent<br>d'Aide à la Décision</h1>
+      <p class="hero-subtitle">
+        Gérez les performances, planifiez les entraînements<br>
+        et optimisez les résultats de votre section natation.
+      </p>
+
+      <div class="hero-badges">
+        <span class="hero-badge">Performances</span>
+        <span class="hero-badge">Planification</span>
+        <span class="hero-badge">Analyse</span>
+      </div>
+
+      <div class="slide-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL - Form -->
+  <div class="auth-right">
+    <div class="auth-form-wrapper">
+      <h2 class="form-title">Bienvenue !</h2>
+      <p class="form-subtitle">Connectez-vous à votre espace IDSS Natation.</p>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="email"
+          placeholder="admin"
+          autocomplete="email" />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <div class="input-with-icon">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-input"
+            [(ngModel)]="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            (keyup.enter)="onLogin()" />
+          <button class="toggle-password" (click)="togglePassword()" type="button">
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <a class="forgot-link" routerLink="/forgot-password">Mot de passe oublié ?</a>
+      </div>
+
+      <!-- Error -->
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="error-icon">⚠</span> {{ errorMessage }}
+      </div>
+
+      <!-- Submit -->
+      <button class="btn-primary" (click)="onLogin()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Se connecter</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <div class="form-divider">
+        <span>ou</span>
+      </div>
+
+      <p class="form-footer">
+        Pas encore de compte ?
+        <a routerLink="/register" class="link-accent">Créer un compte</a>
+      </p>
+    </div>
+  </div>
+</div>

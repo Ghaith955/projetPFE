@@ -1,0 +1,149 @@
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1 class="page-title">Entraîneurs</h1>
+    <span class="page-subtitle">Gestion des entraîneurs</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-primary-sm" (click)="openAddModal()">+ Ajouter un entraîneur</button>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<div class="content-area">
+
+  <div class="alert alert-success" *ngIf="successMessage">
+    <span>✓</span> {{ successMessage }}
+  </div>
+  <div class="alert alert-error" *ngIf="errorMessage && !showModal">
+    <span>⚠</span> {{ errorMessage }}
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="Rechercher un entraîneur..." [(ngModel)]="searchQuery" (input)="search()" />
+    </div>
+    <div class="count-badge">{{ filteredEntraineurs.length }} entraîneur(s)</div>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && filteredEntraineurs.length === 0">
+    <div class="empty-icon">📋</div>
+    <p>Aucun entraîneur trouvé</p>
+    <button class="btn-primary-sm" (click)="openAddModal()">+ Ajouter le premier entraîneur</button>
+  </div>
+
+  <!-- CARDS GRID -->
+  <div class="cards-grid" *ngIf="!isLoading && filteredEntraineurs.length > 0">
+    <div class="ent-card" *ngFor="let e of filteredEntraineurs">
+      <div class="ent-card-header">
+        <div class="avatar" *ngIf="!e.utilisateur?.imageprofile">{{ getInitials(e) }}</div>
+        <img *ngIf="e.utilisateur?.imageprofile" [src]="e.utilisateur.imageprofile" class="avatar-img" />
+        <div class="ent-card-info">
+          <div class="ent-card-name">{{ e.utilisateur?.nom }} {{ e.utilisateur?.prenom }}</div>
+          <div class="ent-card-email">{{ e.utilisateur?.email }}</div>
+        </div>
+        <div class="ent-card-actions">
+          <button class="btn-icon edit" (click)="openEditModal(e)" title="Modifier">✏️</button>
+          <button class="btn-icon delete" (click)="deleteEntraineur(e._id, e.utilisateur?.nom)" title="Supprimer">🗑️</button>
+        </div>
+      </div>
+
+      <div class="ent-card-body">
+        <div class="info-row">
+          <span class="info-label">Club</span>
+          <span class="info-val">{{ e.club || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Expérience</span>
+          <span class="info-val">{{ e.experience }} ans
+            <span class="exp-badge" [class]="'exp-' + getExperienceLabel(e.experience).toLowerCase()">
+              {{ getExperienceLabel(e.experience) }}
+            </span>
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Téléphone</span>
+          <span class="info-val">{{ e.utilisateur?.phone || '—' }}</span>
+        </div>
+      </div>
+
+      <div class="ent-card-footer">
+        <span class="spec-tag" *ngFor="let s of e.specialites">{{ s }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? "Modifier l'entraîneur" : 'Ajouter un entraîneur' }}</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert alert-success" *ngIf="successMessage">✓ {{ successMessage }}</div>
+      <div class="alert alert-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label>Nom *</label>
+          <input type="text" [(ngModel)]="form.nom" placeholder="Ben Ali" />
+        </div>
+        <div class="field-group">
+          <label>Prénom *</label>
+          <input type="text" [(ngModel)]="form.prenom" placeholder="Ahmed" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="form.email" placeholder="ahmed@example.com" />
+        </div>
+        <div class="field-group">
+          <label>Téléphone</label>
+          <input type="text" [(ngModel)]="form.phone" placeholder="+216 XX XXX XXX" />
+        </div>
+      </div>
+      <div class="form-row" *ngIf="!isEditMode">
+        <div class="field-group">
+          <label>Mot de passe *</label>
+          <input type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Expérience (ans)</label>
+          <input type="number" [(ngModel)]="form.experience" placeholder="5" />
+        </div>
+        <div class="field-group">
+          <label>Club</label>
+          <input type="text" [(ngModel)]="form.club" placeholder="Stade Tunisien" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Spécialité</label>
+          <select [(ngModel)]="form.specialites">
+            <option value="">-- Choisir --</option>
+            <option *ngFor="let s of specialiteOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+      <button class="btn-save" (click)="onSubmit()">
+        {{ isEditMode ? 'Enregistrer' : 'Ajouter' }}
+      </button>
+    </div>
+  </div>
+</div>

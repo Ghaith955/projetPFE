@@ -1,12 +1,16 @@
 const express = require('express');
-const router = express.Router();
 const entrainementController = require('../controllers/entrainement.Controller');
-const authenticateToken = require('../midelwars/auth');
+const authenticateToken = require('../middleware/auth');
+const roleMiddleware = require('../middleware/rbac');
 
-router.get('/', authenticateToken, entrainementController.getAllEntrainements);
-router.get('/:id', authenticateToken, entrainementController.getEntrainementById);
-router.post('/', authenticateToken, entrainementController.createEntrainement);
-router.put('/:id', authenticateToken, entrainementController.updateEntrainement);
-router.delete('/:id', authenticateToken, entrainementController.deleteEntrainement);
+const router = express.Router();
+
+router.use(authenticateToken);
+
+router.get('/', entrainementController.getAllEntrainements);
+router.get('/:id', entrainementController.getEntrainementById);
+router.post('/', roleMiddleware('RESPONSABLE', 'ENTRAINEUR'), entrainementController.createEntrainement);
+router.put('/:id', roleMiddleware('RESPONSABLE', 'ENTRAINEUR'), entrainementController.updateEntrainement);
+router.delete('/:id', roleMiddleware('RESPONSABLE'), entrainementController.deleteEntrainement);
 
 module.exports = router;

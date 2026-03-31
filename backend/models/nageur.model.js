@@ -1,40 +1,22 @@
-const mongoose=require("mongoose") ;
-const Schema = mongoose.Schema;  // Ajouter cette ligne pour référencer Schema
+const mongoose = require('mongoose');
 
 const NageurSchema = new mongoose.Schema({
-utilisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-
-  
-  age: {
-    type: Number,
-    required: true,
-  },
+  utilisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  age: { type: Number, default: 18 },
   sexe: {
     type: String,
-    enum: ["Homme", "Femme", "Autre"],
-    required: true,
+    enum: ['Masculin', 'Féminin', 'Autre'],
+    default: 'Masculin'
   },
-  poid: {
-    type: String,
-    required: true,
-  },
-  specialite: {
-    type: [String], 
-    required: true,
-  },
- 
-  competitions: [
-    {
-      nom: String,
-      date: Date,
-      classement: Number,
-    },
-  ],
-  entraineur: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Entraineur",
-  },
- 
-});
+  poid: { type: String, default: '0' },
+  specialite: { type: [String], default: [] },
+  club: { type: String, default: '' },
+  competitions: [{
+    nom: String,
+    date: Date,
+    classement: Number
+  }],
+  entraineur: { type: mongoose.Schema.Types.ObjectId, ref: 'Entraineur' }
+}, { timestamps: true });
 
-module.exports=mongoose.model('Nageur', NageurSchema); 
+module.exports = mongoose.model('Nageur', NageurSchema);

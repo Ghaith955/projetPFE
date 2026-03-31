@@ -1,13 +1,17 @@
 const express = require('express');
-const router = express.Router();
 const nageurController = require('../controllers/nageur.Controller');
-const uploadImage = require('../midelwars/multer');
-const authenticateToken = require('../midelwars/auth');
+const authenticateToken = require('../middleware/auth');
+const roleMiddleware = require('../middleware/rbac');
+const upload = require('../middleware/multer');
 
-router.get('/', authenticateToken, nageurController.getAllNageurs);
-router.get('/:id', authenticateToken, nageurController.getNageurById);
-router.post('/register_Nageur', uploadImage.single('imageprofile'), nageurController.registerNageur);
-router.put('/:id', authenticateToken, nageurController.updateNageur);
-router.delete('/:id', authenticateToken, nageurController.deleteNageur);
+const router = express.Router();
+
+router.use(authenticateToken);
+
+router.get('/', nageurController.getAllNageurs);
+router.get('/:id', nageurController.getNageurById);
+router.post('/register', roleMiddleware('RESPONSABLE'), upload.single('imageprofile'), nageurController.registerNageur);
+router.put('/:id', roleMiddleware('RESPONSABLE', 'ENTRAINEUR'), upload.single('imageprofile'), nageurController.updateNageur);
+router.delete('/:id', roleMiddleware('RESPONSABLE'), nageurController.deleteNageur);
 
 module.exports = router;
