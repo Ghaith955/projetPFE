@@ -78,4 +78,7 @@ export class ApiService {
   // Password
   requestPasswordReset(email: string): Observable<any> { return this.http.post(`${this.baseUrl}/password/request-reset`, { email }); }
   resetPassword(token: string, data: any): Observable<any> { return this.http.post(`${this.baseUrl}/password/reset/${token}`, data); }
+
+  // Chatbot
+  sendChatMessage(messages: any[]): Observable<any> { return this.http.post(`${this.baseUrl}/chat`, { messages }); }
 }

@@ -1,0 +1,63 @@
+<!-- Floating Action Button -->
+<button class="chatbot-fab" (click)="toggleChat()" [class.active]="isOpen" id="chatbot-toggle">
+  <span class="fab-pulse" *ngIf="!isOpen"></span>
+  <!-- Chat icon -->
+  <svg *ngIf="!isOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <!-- Close icon -->
+  <svg *ngIf="isOpen" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+</button>
+
+<!-- Chat Window -->
+<div class="chatbot-window" *ngIf="isOpen" id="chatbot-window">
+  <!-- Header -->
+  <div class="chatbot-header">
+    <div class="chatbot-header-avatar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="6" r="3"/>
+        <path d="M5 20c2-1 4-2 7-2s5 1 7 2"/>
+        <path d="M5 17c2-1 4-2 7-2s5 1 7 2"/>
+        <line x1="12" y1="9" x2="12" y2="15"/>
+      </svg>
+    </div>
+    <div class="chatbot-header-info">
+      <div class="chatbot-header-name">IDSS Assistant</div>
+      <div class="chatbot-header-status">En ligne</div>
+    </div>
+    <button class="chatbot-close" (click)="toggleChat()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div class="chatbot-messages" id="chatbot-messages">
+    <div *ngFor="let msg of messages" class="chat-msg" [class.bot]="msg.sender === 'bot'" [class.user]="msg.sender === 'user'">
+      {{ msg.text }}
+    </div>
+    <div class="chat-msg bot typing" *ngIf="isTyping">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chatbot-input-area">
+    <input
+      type="text"
+      [(ngModel)]="userInput"
+      placeholder="Tapez votre message..."
+      (keydown)="onKeydown($event)"
+      id="chatbot-input"
+    />
+    <button class="chatbot-send-btn" (click)="sendMessage()" [disabled]="!userInput.trim()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>

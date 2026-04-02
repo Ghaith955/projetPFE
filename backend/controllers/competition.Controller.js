@@ -26,8 +26,8 @@ competitionController.getCompetitionById = async (req, res) => {
 // POST create competition
 competitionController.createCompetition = async (req, res) => {
   try {
-    const { nom, date, lieu, description, niveauRequis, statut } = req.body;
-    const competition = new Competition({ nom, date, lieu, description, niveauRequis, statut });
+    const { nom, date, lieu, description, niveauRequis, statut, nageurs } = req.body;
+    const competition = new Competition({ nom, date, lieu, description, niveauRequis, statut, nageurs });
     await competition.save();
     res.status(201).json({ message: 'Compétition créée avec succès!', competition });
   } catch (error) {
@@ -38,10 +38,10 @@ competitionController.createCompetition = async (req, res) => {
 // PUT update competition
 competitionController.updateCompetition = async (req, res) => {
   try {
-    const { nom, date, lieu, description, niveauRequis, statut } = req.body;
+    const { nom, date, lieu, description, niveauRequis, statut, nageurs } = req.body;
     const competition = await Competition.findByIdAndUpdate(
       req.params.id,
-      { nom, date, lieu, description, niveauRequis, statut },
+      { nom, date, lieu, description, niveauRequis, statut, nageurs },
       { new: true }
     );
     if (!competition) return res.status(404).json({ message: 'Compétition non trouvée.' });

@@ -22,6 +22,7 @@ import { CotisationsComponent } from './cotisations/cotisations.component';
 import { InterfaceEntaineurComponent } from './interface-entaineur/interface-entaineur.component';
 import { InterfaceNageurComponent } from './interface-nageur/interface-nageur.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ChatbotComponent } from './chatbot/chatbot.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ProfileComponent } from './profile/profile.component';
     CotisationsComponent,
     InterfaceEntaineurComponent,
     InterfaceNageurComponent,
-    ProfileComponent
+    ProfileComponent,
+    ChatbotComponent
   ],
   imports: [
     BrowserModule,

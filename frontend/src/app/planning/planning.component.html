@@ -6,8 +6,14 @@
   </div>
   <div class="topbar-right">
     <div class="view-toggle">
-      <button [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'">📅 Calendrier</button>
-      <button [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">☰ Liste</button>
+      <button [class.active]="viewMode === 'calendar'" (click)="viewMode = 'calendar'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier
+      </button>
+      <button [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Liste
+      </button>
     </div>
     <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter</button>
   </div>
@@ -15,8 +21,8 @@
 
 <!-- CONTENT -->
 <div class="content-area">
-  <div class="alert alert-success" *ngIf="successMessage"><span>✓</span> {{ successMessage }}</div>
-  <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span>⚠</span> {{ errorMessage }}</div>
+  <div class="alert alert-success" *ngIf="successMessage"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span> {{ successMessage }}</div>
+  <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> {{ errorMessage }}</div>
 
   <div class="loading-state" *ngIf="isLoading">
     <div class="spinner"></div>
@@ -66,7 +72,9 @@
     <!-- Day Detail -->
     <div class="day-detail">
       <div class="day-detail-empty" *ngIf="!selectedDay">
-        <div class="empty-icon">📅</div>
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
         <p>Sélectionnez un jour pour voir les entraînements</p>
         <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter un entraînement</button>
       </div>
@@ -87,18 +95,28 @@
             <div class="event-top">
               <div class="event-title">{{ e.titre }}</div>
               <div class="event-actions" *ngIf="canEdit">
-                <button class="btn-icon edit" (click)="openEditModal(e)">✏️</button>
-                <button class="btn-icon delete" (click)="deleteEntrainement(e._id)">🗑️</button>
+                <button class="svg-icon-btn edit" (click)="openEditModal(e)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="svg-icon-btn delete" (click)="deleteEntrainement(e._id)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
               </div>
             </div>
             <div class="event-meta">
-              <span class="event-time">🕐 {{ e.heureDebut }} — {{ e.heureFin }}</span>
+              <span class="event-time">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                {{ e.heureDebut }} — {{ e.heureFin }}
+              </span>
               <span class="event-duration">{{ e.duree }} min</span>
             </div>
             <div class="event-tags">
               <span class="type-tag" [style.background]="getTypeBg(e.type)" [style.color]="getTypeColor(e.type)">{{ e.type }}</span>
               <span class="int-tag" [class]="getIntensiteClass(e.intensite)">{{ e.intensite }}</span>
-              <span class="lieu-tag">📍 {{ e.lieu }}</span>
+              <span class="lieu-tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ e.lieu }}
+              </span>
             </div>
             <div class="event-desc" *ngIf="e.description">{{ e.description }}</div>
           </div>
@@ -110,7 +128,9 @@
   <!-- LIST VIEW -->
   <div class="list-view" *ngIf="!isLoading && viewMode === 'list'">
     <div class="empty-state" *ngIf="entrainements.length === 0">
-      <div class="empty-icon">📅</div>
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
       <p>Aucun entraînement planifié</p>
       <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter le premier entraînement</button>
     </div>
@@ -124,12 +144,19 @@
         <div class="event-tags" style="margin-top:8px">
           <span class="type-tag" [style.background]="getTypeBg(e.type)" [style.color]="getTypeColor(e.type)">{{ e.type }}</span>
           <span class="int-tag" [class]="getIntensiteClass(e.intensite)">{{ e.intensite }}</span>
-          <span class="lieu-tag">📍 {{ e.lieu }}</span>
+          <span class="lieu-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ e.lieu }}
+          </span>
         </div>
       </div>
       <div class="list-actions" *ngIf="canEdit">
-        <button class="btn-icon edit" (click)="openEditModal(e)">✏️</button>
-        <button class="btn-icon delete" (click)="deleteEntrainement(e._id)">🗑️</button>
+        <button class="svg-icon-btn edit" (click)="openEditModal(e)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="svg-icon-btn delete" (click)="deleteEntrainement(e._id)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -140,11 +167,13 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>{{ isEditMode ? "Modifier l'entraînement" : 'Nouvel entraînement' }}</h3>
-      <button class="modal-close" (click)="closeModal()">✕</button>
+      <button class="modal-close" (click)="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="modal-body">
-      <div class="alert alert-success" *ngIf="successMessage">✓ {{ successMessage }}</div>
-      <div class="alert alert-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+      <div class="alert alert-success" *ngIf="successMessage"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> {{ successMessage }}</div>
+      <div class="alert alert-error" *ngIf="errorMessage"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> {{ errorMessage }}</div>
 
       <div class="field-group full">
         <label>Titre *</label>
@@ -199,6 +228,14 @@
       <div class="field-group full">
         <label>Description</label>
         <textarea [(ngModel)]="form.description" placeholder="Détails de la séance..." rows="3"></textarea>
+      </div>
+      <div class="field-group full">
+        <label>Nageurs concernés (maintenez Ctrl/Cmd pour sélection multiple)</label>
+        <select multiple [(ngModel)]="form.nageurs" class="multi-select" style="height: 120px;">
+          <option *ngFor="let n of allNageurs" [value]="n._id">
+            {{ n.utilisateur?.nom }} {{ n.utilisateur?.prenom }}
+          </option>
+        </select>
       </div>
     </div>
     <div class="modal-footer">

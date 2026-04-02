@@ -12,6 +12,7 @@ const cotisationRoutes = require('./routes/cotisationRoutes');
 const demandeRoutes = require('./routes/demandeRoutes');
 const performanceRoutes = require('./routes/performanceRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/cotisations', cotisationRoutes);
 app.use('/demandes', demandeRoutes);
 app.use('/performances', performanceRoutes);
 app.use('/password', passwordRoutes);
+app.use('/chat', chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

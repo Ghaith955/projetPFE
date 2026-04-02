@@ -3,11 +3,18 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="brand-logo">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="rgba(99,102,241,0.2)"/>
-          <path d="M8 16C8 11.58 11.58 8 16 8V24C11.58 24 8 20.42 8 16Z" fill="#6366f1"/>
-          <path d="M16 8C20.42 8 24 11.58 24 16C24 20.42 20.42 24 16 24V8Z" fill="rgba(99,102,241,0.5)"/>
+      <div class="brand-logo-wrapper">
+        <div class="brand-logo">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="rgba(99,102,241,0.2)"/>
+            <path d="M8 16C8 11.58 11.58 8 16 8V24C11.58 24 8 20.42 8 16Z" fill="#6366f1"/>
+            <path d="M16 8C20.42 8 24 11.58 24 16C24 20.42 20.42 24 16 24V8Z" fill="rgba(99,102,241,0.5)"/>
+          </svg>
+        </div>
+        <!-- Mini wave animation in sidebar logo -->
+        <svg class="brand-wave-mini" *ngIf="!sidebarCollapsed" width="40" height="12" viewBox="0 0 80 16">
+          <path class="mini-wave-1" d="M0,8 Q10,2 20,8 Q30,14 40,8 Q50,2 60,8 Q70,14 80,8" fill="none" stroke="rgba(99,102,241,0.4)" stroke-width="1.5"/>
+          <path class="mini-wave-2" d="M0,8 Q10,4 20,8 Q30,12 40,8 Q50,4 60,8 Q70,12 80,8" fill="none" stroke="rgba(6,182,212,0.3)" stroke-width="1"/>
         </svg>
       </div>
       <div class="brand-info" *ngIf="!sidebarCollapsed">
@@ -90,5 +97,8 @@
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
+
+  <!-- CHATBOT -->
+  <app-chatbot></app-chatbot>
 
 </div>

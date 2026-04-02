@@ -1,42 +1,54 @@
 <div class="auth-container">
   <!-- LEFT PANEL - Decorative -->
   <div class="auth-left">
+    <!-- Swimmer Video Background -->
+    <video autoplay loop muted playsinline class="bg-video">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-swimmer-underwater-in-a-pool-1956-large.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+
     <div class="auth-left-content">
+      <!-- Top Left Logo -->
       <div class="brand">
         <div class="brand-icon">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.15)"/>
-            <path d="M8 16C8 11.58 11.58 8 16 8V24C11.58 24 8 20.42 8 16Z" fill="white"/>
-            <path d="M16 8C20.42 8 24 11.58 24 16C24 20.42 20.42 24 16 24V8Z" fill="rgba(255,255,255,0.6)"/>
+          <!-- Modern semi-circle icon from the image -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="rgba(255,255,255,0.2)" />
+            <circle cx="12" cy="12" r="6" fill="white" clip-path="url(#half-clip)" />
+            <defs>
+              <clipPath id="half-clip">
+                <rect x="0" y="0" width="12" height="24" />
+              </clipPath>
+            </defs>
           </svg>
         </div>
         <span class="brand-name">IDSS Natation</span>
       </div>
 
-      <div class="hero-visual">
-        <div class="wave-circle c1"></div>
-        <div class="wave-circle c2"></div>
-        <div class="wave-circle c3"></div>
-        <div class="swimmer-icon">🏊</div>
+      <!-- Center Content -->
+      <div class="hero-center">
+        <div class="shield-container">
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="shield-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+        </div>
+
+        <h1 class="hero-title">Espace sécurisé pour<br>vos performances</h1>
+        <p class="hero-subtitle">
+          Accédez à votre plateforme IDSS Natation et gérez vos entraînements,<br>vos statistiques et vos objectifs en toute simplicité.
+        </p>
+
+        <div class="hero-badges">
+          <span class="hero-badge">✔ Données protégées</span>
+          <span class="hero-badge">✔ Accès rapide</span>
+          <span class="hero-badge">✔ Suivi intelligent</span>
+        </div>
       </div>
 
-      <h1 class="hero-title">Système Intelligent<br>d'Aide à la Décision</h1>
-      <p class="hero-subtitle">
-        Gérez les performances, planifiez les entraînements<br>
-        et optimisez les résultats de votre section natation.
-      </p>
-
-      <div class="hero-badges">
-        <span class="hero-badge">Performances</span>
-        <span class="hero-badge">Planification</span>
-        <span class="hero-badge">Analyse</span>
-      </div>
-
-      <div class="slide-dots">
-        <span class="dot active"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-      </div>
     </div>
   </div>
 
@@ -49,27 +61,41 @@
       <!-- Email -->
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input
-          type="text"
-          class="form-input"
-          [(ngModel)]="email"
-          placeholder="admin"
-          autocomplete="email" />
+        <div class="input-with-icon">
+          <span class="input-icon-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+          </span>
+          <input type="text" class="form-input has-left-icon" [(ngModel)]="email" placeholder="exemple@idss-natation.com" autocomplete="email" />
+        </div>
       </div>
 
       <!-- Password -->
       <div class="form-group">
         <label class="form-label">Mot de passe</label>
         <div class="input-with-icon">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            class="form-input"
-            [(ngModel)]="password"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            (keyup.enter)="onLogin()" />
+          <span class="input-icon-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </span>
+          <input [type]="showPassword ? 'text' : 'password'" class="form-input has-left-icon" [(ngModel)]="password" placeholder="••••••••" autocomplete="current-password" (keyup.enter)="onLogin()" />
           <button class="toggle-password" (click)="togglePassword()" type="button">
-            {{ showPassword ? '🙈' : '👁️' }}
+            <!-- Eye open -->
+            <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <!-- Eye closed -->
+            <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+              <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
           </button>
         </div>
       </div>
@@ -80,7 +106,14 @@
 
       <!-- Error -->
       <div class="error-message" *ngIf="errorMessage">
-        <span class="error-icon">⚠</span> {{ errorMessage }}
+        <span class="error-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </span>
+        {{ errorMessage }}
       </div>
 
       <!-- Submit -->

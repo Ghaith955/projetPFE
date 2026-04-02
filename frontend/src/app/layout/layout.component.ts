@@ -52,11 +52,13 @@ export class LayoutComponent implements OnInit {
       error: () => {}
     });
 
-    // Restore dark mode
+    // Restore theme preference (dark is default)
     const savedTheme = localStorage.getItem('idss-theme');
-    if (savedTheme === 'dark') {
+    if (savedTheme === 'light') {
+      this.darkMode = false;
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
       this.darkMode = true;
-      document.documentElement.setAttribute('data-theme', 'dark');
     }
   }
 
@@ -108,7 +110,7 @@ export class LayoutComponent implements OnInit {
 
   getRoleBadge(): string {
     switch (this.currentUser?.role) {
-      case 'RESPONSABLE': return 'Administrateur';
+      case 'RESPONSABLE': return 'Admin';
       case 'ENTRAINEUR': return 'Entraîneur';
       case 'NAGEUR': return 'Nageur';
       default: return '';
@@ -122,10 +124,10 @@ export class LayoutComponent implements OnInit {
   toggleDarkMode() {
     this.darkMode = !this.darkMode;
     if (this.darkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.removeAttribute('data-theme');
       localStorage.setItem('idss-theme', 'dark');
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', 'light');
       localStorage.setItem('idss-theme', 'light');
     }
   }

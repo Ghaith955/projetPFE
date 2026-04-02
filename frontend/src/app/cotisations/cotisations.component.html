@@ -11,29 +11,29 @@
 
 <!-- CONTENT -->
 <div class="content-area">
-  <div class="alert alert-success" *ngIf="successMessage"><span>✓</span> {{ successMessage }}</div>
-  <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span>⚠</span> {{ errorMessage }}</div>
+  <div class="alert alert-success" *ngIf="successMessage"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span> {{ successMessage }}</div>
+  <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> {{ errorMessage }}</div>
 
   <!-- STATS -->
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-icon blue">💳</div>
+      <div class="stat-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
       <div class="stat-info"><div class="stat-val">{{ stats.total }}</div><div class="stat-label">Total cotisations</div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon green">✅</div>
+      <div class="stat-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
       <div class="stat-info"><div class="stat-val">{{ stats.paye }}</div><div class="stat-label">Payées</div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon amber">⏳</div>
+      <div class="stat-icon amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
       <div class="stat-info"><div class="stat-val">{{ stats.enAttente }}</div><div class="stat-label">En attente</div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon red">⚠️</div>
+      <div class="stat-icon red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
       <div class="stat-info"><div class="stat-val">{{ stats.enRetard }}</div><div class="stat-label">En retard</div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon purple">💰</div>
+      <div class="stat-icon purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
       <div class="stat-info"><div class="stat-val">{{ stats.montantPercu }} DT</div><div class="stat-label">Montant perçu</div></div>
     </div>
   </div>
@@ -41,7 +41,7 @@
   <!-- TOOLBAR -->
   <div class="toolbar">
     <div class="search-box">
-      <span>🔍</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" placeholder="Rechercher un nageur..." [(ngModel)]="searchQuery" (input)="applyFilters()" />
     </div>
     <select class="filter-select" [(ngModel)]="filterStatut" (change)="applyFilters()">
@@ -54,7 +54,7 @@
   <div class="loading-state" *ngIf="isLoading"><div class="spinner"></div><p>Chargement...</p></div>
 
   <div class="empty-state" *ngIf="!isLoading && filteredCotisations.length === 0">
-    <div class="empty-icon">💳</div>
+    <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
     <p>Aucune cotisation trouvée</p>
     <button class="btn-primary-sm" (click)="openAddModal()">+ Nouvelle cotisation</button>
   </div>
@@ -87,15 +87,24 @@
               <span class="periode-sep">→</span>
               <span>{{ formatDate(c.dateFin) }}</span>
             </div>
-            <div class="expiring-warn" *ngIf="isExpiringSoon(c.dateFin)">⚠ Expire bientôt</div>
+            <div class="expiring-warn" *ngIf="isExpiringSoon(c.dateFin)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Expire bientôt
+            </div>
           </td>
           <td><span class="mode-badge">{{ c.modePaiement }}</span></td>
           <td><span class="statut-badge" [class]="getStatutClass(c.statut)">{{ c.statut }}</span></td>
           <td>
             <div class="action-btns">
-              <button class="btn-icon pay" *ngIf="c.statut !== 'Payé'" (click)="markAsPaid(c)" title="Marquer comme payé">✅</button>
-              <button class="btn-icon edit" (click)="openEditModal(c)" title="Modifier">✏️</button>
-              <button class="btn-icon delete" (click)="deleteCotisation(c._id)" title="Supprimer">🗑️</button>
+              <button class="svg-icon-btn pay" *ngIf="c.statut !== 'Payé'" (click)="markAsPaid(c)" title="Marquer comme payé">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="svg-icon-btn edit" (click)="openEditModal(c)" title="Modifier">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="svg-icon-btn delete" (click)="deleteCotisation(c._id)" title="Supprimer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
             </div>
           </td>
         </tr>
@@ -109,11 +118,13 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>{{ isEditMode ? 'Modifier la cotisation' : 'Nouvelle cotisation' }}</h3>
-      <button class="modal-close" (click)="closeModal()">✕</button>
+      <button class="modal-close" (click)="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="modal-body">
-      <div class="alert alert-success" *ngIf="successMessage">✓ {{ successMessage }}</div>
-      <div class="alert alert-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
+      <div class="alert alert-success" *ngIf="successMessage"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> {{ successMessage }}</div>
+      <div class="alert alert-error" *ngIf="errorMessage"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> {{ errorMessage }}</div>
 
       <div class="field-group full">
         <label>Nageur *</label>

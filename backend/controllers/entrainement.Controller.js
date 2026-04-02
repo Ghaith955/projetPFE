@@ -31,9 +31,9 @@ entrainementController.getEntrainementById = async (req, res) => {
 // POST create
 entrainementController.createEntrainement = async (req, res) => {
   try {
-    const { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut } = req.body;
+    const { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut, nageurs } = req.body;
     const entrainement = new Entrainement({
-      titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut
+      titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut, nageurs
     });
     await entrainement.save();
     res.status(201).json({ message: 'Entraînement créé avec succès!', entrainement });
@@ -45,10 +45,10 @@ entrainementController.createEntrainement = async (req, res) => {
 // PUT update
 entrainementController.updateEntrainement = async (req, res) => {
   try {
-    const { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, statut } = req.body;
+    const { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, statut, nageurs } = req.body;
     const entrainement = await Entrainement.findByIdAndUpdate(
       req.params.id,
-      { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, statut },
+      { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, statut, nageurs },
       { new: true }
     );
     if (!entrainement) return res.status(404).json({ message: 'Entraînement non trouvé.' });

@@ -16,6 +16,7 @@ export class PlanningComponent implements OnInit {
   showModal = false;
   isEditMode = false;
   selectedId = '';
+  allNageurs: any[] = [];
 
   // Calendar
   currentDate = new Date();
@@ -28,7 +29,7 @@ export class PlanningComponent implements OnInit {
   form = {
     titre: '', date: '', heureDebut: '08:00', heureFin: '10:00',
     type: 'Endurance', intensite: 'Modérée', duree: 120,
-    lieu: 'Piscine principale', description: '', statut: 'Planifié'
+    lieu: 'Piscine principale', description: '', statut: 'Planifié', nageurs: [] as string[]
   };
 
   types = ['Endurance', 'Vitesse', 'Technique', 'Force', 'Récupération'];
@@ -47,7 +48,18 @@ export class PlanningComponent implements OnInit {
   get isEntraineur() { return this.auth.role === 'ENTRAINEUR'; }
   get canEdit() { return this.isAdmin || this.isEntraineur; }
 
-  ngOnInit() { this.loadEntrainements(); }
+  ngOnInit() { 
+    this.loadEntrainements(); 
+    this.loadNageurs();
+  }
+
+  loadNageurs() {
+    this.api.getAllNageurs().subscribe({
+      next: (data) => {
+        this.allNageurs = Array.isArray(data) ? data : [];
+      }
+    });
+  }
 
   loadEntrainements() {
     this.isLoading = true;
@@ -124,7 +136,8 @@ export class PlanningComponent implements OnInit {
       duree: e.duree || 120,
       lieu: e.lieu || 'Piscine principale',
       description: e.description || '',
-      statut: e.statut || 'Planifié'
+      statut: e.statut || 'Planifié',
+      nageurs: e.nageurs ? e.nageurs.map((n: any) => n._id || n) : []
     };
     this.showModal = true;
   }
@@ -132,7 +145,7 @@ export class PlanningComponent implements OnInit {
   closeModal() { this.showModal = false; this.resetForm(); }
 
   resetForm() {
-    this.form = { titre: '', date: '', heureDebut: '08:00', heureFin: '10:00', type: 'Endurance', intensite: 'Modérée', duree: 120, lieu: 'Piscine principale', description: '', statut: 'Planifié' };
+    this.form = { titre: '', date: '', heureDebut: '08:00', heureFin: '10:00', type: 'Endurance', intensite: 'Modérée', duree: 120, lieu: 'Piscine principale', description: '', statut: 'Planifié', nageurs: [] };
     this.errorMessage = '';
     this.successMessage = '';
   }
@@ -146,6 +159,7 @@ export class PlanningComponent implements OnInit {
     if (this.isEditMode) {
       this.api.updateEntrainement(this.selectedId, this.form).subscribe({
         next: () => {
+          this.closeModal();
           this.successMessage = 'Entraînement mis à jour !';
           this.loadEntrainements();
           if (this.selectedDay) {
@@ -153,16 +167,17 @@ export class PlanningComponent implements OnInit {
               this.selectedDay = this.calendarDays.find(d => d.date === this.selectedDay?.date);
             }, 100);
           }
-          setTimeout(() => this.closeModal(), 1500);
+          setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });
     } else {
       this.api.createEntrainement(this.form).subscribe({
         next: () => {
+          this.closeModal();
           this.successMessage = 'Entraînement ajouté !';
           this.loadEntrainements();
-          setTimeout(() => this.closeModal(), 1500);
+          setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });

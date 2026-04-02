@@ -18,12 +18,12 @@ authController.login = async (req, res) => {
       return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
     }
 
-    // Temporarily disabled to bypass admin activation obligation
-    /*
+    // enabling bypass wa9teyan yaani
+
     if (!user.isActive) {
       return res.status(403).json({ message: 'Votre compte n\'est pas encore activé.' });
     }
-    */
+
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -115,7 +115,7 @@ authController.updateProfile = async (req, res) => {
       if (req.body.club) nageurUpdate.club = req.body.club;
       if (req.body.poids) nageurUpdate.poid = req.body.poids;
       if (req.body.specialites) {
-        try { nageurUpdate.specialite = JSON.parse(req.body.specialites); } catch(e){}
+        try { nageurUpdate.specialite = JSON.parse(req.body.specialites); } catch (e) { }
       }
       updatedRoleData = await Nageur.findOneAndUpdate({ utilisateur: user._id }, nageurUpdate, { new: true });
     } else if (user.role === 'ENTRAINEUR') {
@@ -125,7 +125,7 @@ authController.updateProfile = async (req, res) => {
       if (req.body.numeroCertification) entraineurUpdate.numeroCertification = req.body.numeroCertification;
       if (req.body.diplome) entraineurUpdate.diplome = req.body.diplome;
       if (req.body.specialites) {
-        try { entraineurUpdate.specialites = JSON.parse(req.body.specialites); } catch(e){}
+        try { entraineurUpdate.specialites = JSON.parse(req.body.specialites); } catch (e) { }
       }
       updatedRoleData = await Entraineur.findOneAndUpdate({ utilisateur: user._id }, entraineurUpdate, { new: true });
     }
@@ -200,8 +200,8 @@ authController.register = async (req, res) => {
       phone: phone || null,
       imageprofile,
       role,
-      // Temporarily set to true to bypass admin activation
-      isActive: true 
+      // Require admin activation
+      isActive: false
     });
 
     await newUser.save();

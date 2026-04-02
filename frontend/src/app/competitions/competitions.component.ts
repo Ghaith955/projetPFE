@@ -19,10 +19,11 @@ export class CompetitionsComponent implements OnInit {
   showModal = false;
   isEditMode = false;
   selectedId = '';
+  allNageurs: any[] = [];
 
   form = {
     nom: '', date: '', lieu: '',
-    description: '', niveauRequis: 'Intermédiaire', statut: 'À venir'
+    description: '', niveauRequis: 'Intermédiaire', statut: 'À venir', nageurs: [] as string[]
   };
 
   niveaux = ['Débutant', 'Intermédiaire', 'Confirmé', 'Expert'];
@@ -36,7 +37,18 @@ export class CompetitionsComponent implements OnInit {
 
   get isAdmin() { return this.auth.role === 'RESPONSABLE'; }
 
-  ngOnInit() { this.loadCompetitions(); }
+  ngOnInit() { 
+    this.loadCompetitions(); 
+    this.loadNageurs();
+  }
+
+  loadNageurs() {
+    this.api.getAllNageurs().subscribe({
+      next: (data) => {
+        this.allNageurs = Array.isArray(data) ? data : [];
+      }
+    });
+  }
 
   loadCompetitions() {
     this.isLoading = true;
@@ -80,7 +92,8 @@ export class CompetitionsComponent implements OnInit {
       lieu: c.lieu || '',
       description: c.description || '',
       niveauRequis: c.niveauRequis || 'Intermédiaire',
-      statut: c.statut || 'À venir'
+      statut: c.statut || 'À venir',
+      nageurs: c.nageurs ? c.nageurs.map((n: any) => n._id || n) : []
     };
     this.showModal = true;
   }
@@ -88,7 +101,7 @@ export class CompetitionsComponent implements OnInit {
   closeModal() { this.showModal = false; this.resetForm(); }
 
   resetForm() {
-    this.form = { nom: '', date: '', lieu: '', description: '', niveauRequis: 'Intermédiaire', statut: 'À venir' };
+    this.form = { nom: '', date: '', lieu: '', description: '', niveauRequis: 'Intermédiaire', statut: 'À venir', nageurs: [] };
     this.errorMessage = '';
     this.successMessage = '';
   }
@@ -102,18 +115,20 @@ export class CompetitionsComponent implements OnInit {
     if (this.isEditMode) {
       this.api.updateCompetition(this.selectedId, this.form).subscribe({
         next: () => {
+          this.closeModal();
           this.successMessage = 'Compétition mise à jour !';
           this.loadCompetitions();
-          setTimeout(() => this.closeModal(), 1500);
+          setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });
     } else {
       this.api.createCompetition(this.form).subscribe({
         next: () => {
+          this.closeModal();
           this.successMessage = 'Compétition créée !';
           this.loadCompetitions();
-          setTimeout(() => this.closeModal(), 1500);
+          setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });
