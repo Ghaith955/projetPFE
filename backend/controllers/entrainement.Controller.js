@@ -1,11 +1,20 @@
 const Entrainement = require('../models/entrainement.model');
+const Nageur = require('../models/nageur.model');
+const { notifyNageurs } = require('../utils/notificationHelper');
 
 const entrainementController = {};
 
 // GET all
 entrainementController.getAllEntrainements = async (req, res) => {
   try {
-    const entrainements = await Entrainement.find()
+    const filter = {};
+    if (req.user?.role === 'NAGEUR') {
+      const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
+      if (!nageur) return res.status(200).json([]);
+      filter.nageurs = nageur._id;
+    }
+
+    const entrainements = await Entrainement.find(filter)
       .populate('entraineur')
       .populate('nageurs')
       .sort({ date: 1 });
@@ -18,7 +27,14 @@ entrainementController.getAllEntrainements = async (req, res) => {
 // GET by id
 entrainementController.getEntrainementById = async (req, res) => {
   try {
-    const entrainement = await Entrainement.findById(req.params.id)
+    const filter = { _id: req.params.id };
+    if (req.user?.role === 'NAGEUR') {
+      const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
+      if (!nageur) return res.status(404).json({ message: 'Entraînement non trouvé.' });
+      filter.nageurs = nageur._id;
+    }
+
+    const entrainement = await Entrainement.findOne(filter)
       .populate('entraineur')
       .populate('nageurs');
     if (!entrainement) return res.status(404).json({ message: 'Entraînement non trouvé.' });
@@ -36,6 +52,17 @@ entrainementController.createEntrainement = async (req, res) => {
       titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut, nageurs
     });
     await entrainement.save();
+
+    await notifyNageurs({
+      nageurIds: Array.isArray(nageurs) ? nageurs : [],
+      title: 'Nouvel entrainement',
+      message: `Vous etes ajoute a l'entrainement "${titre}" le ${new Date(date).toLocaleDateString('fr-FR')} de ${heureDebut} a ${heureFin}.`,
+      type: 'planning',
+      resourceType: 'Entrainement',
+      resourceId: entrainement._id,
+      createdBy: req.user.userId
+    });
+
     res.status(201).json({ message: 'Entraînement créé avec succès!', entrainement });
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la création.', error: error.message });

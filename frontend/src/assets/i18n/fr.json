@@ -1,0 +1,239 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "users": "Utilisateurs",
+    "swimmers": "Nageurs",
+    "coaches": "Entraineurs",
+    "competitions": "Competitions",
+    "planning": "Planning",
+    "trainingResults": "Resultats",
+    "trainingAnalytics": "Analytique",
+    "myPerformance": "Ma Performance",
+    "cotisations": "Cotisations",
+    "settings": "Parametres",
+    "mySwimmers": "Mes Nageurs",
+    "themeDark": "Mode sombre",
+    "themeLight": "Mode clair",
+    "language": "Langue"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Fev",
+    "mar": "Mar",
+    "apr": "Avr",
+    "may": "Mai",
+    "jun": "Juin",
+    "jul": "Juil"
+  },
+  "dashboard": {
+    "actions": {
+      "filters": "Filtres",
+      "search": "Recherche",
+      "copy": "Copier"
+    },
+    "common": {
+      "fatigueHigh": "Fatigue elevee",
+      "fatigueMedium": "Fatigue moderee"
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "welcomeTitle": "Bonjour Admin",
+      "welcomeSubtitle": "Vue d'ensemble de la section natation",
+      "stats": {
+        "swimmers": "Nageurs",
+        "swimmersSub": "{{count}} nageurs",
+        "trainings": "Entrainements",
+        "trainingsSub": "Semestre en cours",
+        "competitions": "Competitions",
+        "competitionsSub": "Competitions actives"
+      },
+      "globalPerformance": "Performance Globale",
+      "attendanceRate": "Taux d'assiduite",
+      "progressLabel": "Progression",
+      "accountRequests": "Demandes de Comptes",
+      "seeAll": "Voir Tous",
+      "emptyRequests": "Aucune demande en attente",
+      "swimmerPerformance": "Nageurs suivis",
+      "levelEstimate": "Estimatif de niveau",
+      "dss": {
+        "title": "DSS Insights",
+        "alerts": "Alertes",
+        "alertsSub": "{{count}} nageurs en baisse",
+        "topPerformers": "Top Performers",
+        "fatigueRisks": "Risques de Fatigue",
+        "explanation": "Explication",
+        "explanationText": "Selection basee sur amelioration et fatigue moyenne",
+        "competitionBadgeTitle": "Competition regionale",
+        "competitionBadgeDate": "Avril 2024"
+      }
+    },
+    "coach": {
+      "title": "Bonjour Coach {{name}}.",
+      "welcomeTitle": "Bonjour Coach {{name}}",
+      "welcomeSubtitle": "Voici un apercu de vos nageurs et outils d'entrainement.",
+      "swimmerCategory": "Junior",
+      "distanceLabel": "au 100m",
+      "attendance": "Assiduite {{date}}",
+      "ctaTraining": "Planifier Entrainement",
+      "ctaCompetition": "Ajouter Competition",
+      "toolsTitle": "Outils du Coach",
+      "tableCoach": "Coach {{name}}",
+      "tableEmail": "Email",
+      "tableExpiry": "Expiration de statut",
+      "dss": {
+        "decisions": "Decisions Suggerees",
+        "followup": "Suivi Nageurs",
+        "topPerformers": "Top Performers",
+        "fatigueRisks": "Risques de Fatigue",
+        "explanation": "Explication"
+      },
+      "decisions": {
+        "trophy": "Selectionner Adam Smith pour competition regionale",
+        "alert": "Reduire charge entrainement pour Nour Louati",
+        "calendar": "Planifier seance recuperation cette semaine"
+      },
+      "feedback": {
+        "status": {
+          "progress": "En progression",
+          "stable": "Stable",
+          "watch": "A surveiller"
+        },
+        "note": {
+          "up": "Performance en hausse +2.3s",
+          "steady": "Maintien du niveau",
+          "down": "Baisse de regularite"
+        }
+      }
+    },
+    "swimmer": {
+      "title": "Dashboard Nageur",
+      "age": "18 ans",
+      "badgeJunior": "Junior",
+      "badgeCategory": "Categorie",
+      "bestTime": "Meilleur Temps",
+      "bestTimeUnit": "au 100m",
+      "bestTimeUpdated": "Mis a jour {{date}}",
+      "trainingLoad": "Charge Entrainement",
+      "trainingDate": "Janvier 2024",
+      "trainingTrendDown": "En baisse",
+      "attendance": "Assiduite",
+      "attendanceDate": "7 jours depuis 2024",
+      "performanceAttendance": "Performance & Assiduite",
+      "periodQuarter": "Dernier trimestre",
+      "periodSemester": "Dernier semestre",
+      "periodYear": "Cette annee",
+      "legendPerformance": "Performance au 100m",
+      "legendAttendance": "Assiduite",
+      "coachFeedback": "Feedback du Coach",
+      "coachMeta": "Coach Biernot | Il y a 3 heures",
+      "ageLabel": "Age",
+      "addNotePlaceholder": "Ajouter une remarque...",
+      "send": "Envoyer",
+      "competitionTag": "Competition regionale",
+      "dss": {
+        "title": "DSS Insights",
+        "trend": "Tendance Performance",
+        "fatigue": "Risque Fatigue",
+        "recommendation": "Recommendation",
+        "recommendationText": "Selectionner pour competition prochaine",
+        "improving": "En Amelioration",
+        "fatigueLevel": "Moyen",
+        "trainedSessions": "Entraine: 9 seances",
+        "bodyMetrics": "Mesures corporelles",
+        "healthy": "Sain",
+        "weight": "Poids",
+        "height": "Taille",
+        "bmi": "BMI",
+        "shape": "Triangle inverse\nMorphologie",
+        "explanation": "Explication",
+        "explanationText": "Selection basee sur amelioration et fatigue moderee"
+      }
+    },
+    "modals": {
+      "trainingTitle": "Planifier un Entrainement",
+      "trainingTitleLabel": "Titre",
+      "trainingTitlePlaceholder": "Ex: Seance endurance",
+      "trainingDate": "Date",
+      "trainingTime": "Heure",
+      "trainingDuration": "Duree (min)",
+      "trainingSwimmers": "Nageurs",
+      "trainingNotes": "Notes",
+      "trainingNotesPlaceholder": "Notes supplementaires...",
+      "competitionTitle": "Ajouter une Competition",
+      "competitionName": "Nom",
+      "competitionNamePlaceholder": "Ex: Competition regionale",
+      "competitionDate": "Date",
+      "competitionPlace": "Lieu",
+      "competitionPlacePlaceholder": "Lieu",
+      "competitionLevel": "Niveau Requis",
+      "competitionSwimmers": "Nageurs Selectionnes",
+      "levelJunior": "Junior",
+      "levelSenior": "Senior",
+      "levelElite": "Elite",
+      "feedbackTitle": "Envoyer un Feedback",
+      "feedbackSwimmer": "Nageur",
+      "feedbackSelect": "Selectionner...",
+      "feedbackRating": "Note",
+      "feedbackType": "Type",
+      "feedbackTypeGeneral": "General",
+      "feedbackTypeTechnique": "Technique",
+      "feedbackTypePhysical": "Physique",
+      "feedbackTypeMental": "Mental",
+      "feedbackComment": "Commentaire",
+      "feedbackCommentPlaceholder": "Votre feedback...",
+      "cancel": "Annuler",
+      "submit": "Envoyer",
+      "submitAdd": "Ajouter",
+      "submitPlan": "Planifier",
+      "submitWorking": "En cours..."
+    }
+  },
+  "roleDash": {
+    "nageur": {
+      "title": "Dashboard Nageur",
+      "subtitle": "Vue synthese de vos objectifs, performances et prochaines seances.",
+      "pill": "NAGEUR",
+      "kpiTime": "Temps 100m",
+      "kpiTimeNote": "amelioration de 1.8%",
+      "kpiSessions": "Seances cette semaine",
+      "kpiSessionsNote": "objectif: 6 seances",
+      "kpiProgress": "Taux de progression",
+      "kpiProgressNote": "sur les 30 derniers jours",
+      "panelCompetitions": "Prochaines competitions",
+      "panelTraining": "Focus entrainement",
+      "panelTrainingItems": {
+        "item1": "Travail de virage haute intensite",
+        "item2": "Bloc endurance aerobie zone 2",
+        "item3": "Recuperation active + mobilite"
+      },
+      "panelCompetitionsItems": {
+        "item1": "Championnat Regional - 100m Libre",
+        "item2": "Meeting National - 200m Papillon",
+        "item3": "Coupe Interclubs - Relais"
+      }
+    },
+    "coach": {
+      "title": "Dashboard Entraineur",
+      "subtitle": "Pilotage des groupes, charges d'entrainement et progression collective.",
+      "pill": "ENTRAINEUR",
+      "kpiSwimmers": "Nageurs suivis",
+      "kpiSwimmersNote": "3 nouveaux cette semaine",
+      "kpiSessions": "Seances planifiees",
+      "kpiSessionsNote": "sur les 7 prochains jours",
+      "kpiAdherence": "Adherence globale",
+      "kpiAdherenceNote": "presence moyenne des nageurs",
+      "panelAlerts": "Alertes performance",
+      "panelActions": "Actions recommandees",
+      "panelAlertsItems": {
+        "item1": "U17 Libre - baisse de rythme sur les 50m finaux",
+        "item2": "Senior Mixte - fatigue elevee detectee sur 4 athletes",
+        "item3": "U15 Papillon - progression notable sur le depart"
+      },
+      "panelActionsItems": {
+        "item1": "Adapter les volumes jeudi/vendredi",
+        "item2": "Recalibrer les objectifs de sprint court",
+        "item3": "Planifier 2 ateliers techniques supplementaires"
+      }
+    }
+  }
+}

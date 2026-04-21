@@ -1,0 +1,33 @@
+<button
+  type="button"
+  class="feature-card"
+  (click)="onSelect()"
+  [attr.aria-label]="'Ouvrir les details de ' + feature.title"
+>
+  <span class="feature-icon" aria-hidden="true">
+    <svg *ngIf="feature.icon === 'brain'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M9.2 7.5a2.8 2.8 0 1 1 4.1-2.3 2.9 2.9 0 0 1 3.5 3.5A3.3 3.3 0 0 1 19 14a3 3 0 0 1-4.1 3.8A3.5 3.5 0 0 1 9 20a3 3 0 0 1-4.7-3 2.9 2.9 0 0 1-1.8-3.9 3.3 3.3 0 0 1 1.7-4.4A3 3 0 0 1 7.5 5"/>
+      <path d="M12 9v6M9 12h6"/>
+    </svg>
+
+    <svg *ngIf="feature.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M12 3 5 6v6c0 4.8 2.9 7.8 7 9 4.1-1.2 7-4.2 7-9V6l-7-3Z"/>
+    </svg>
+
+    <svg *ngIf="feature.icon === 'trend'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="m4 16 5-5 4 4 7-7"/>
+      <path d="M15 8h5v5"/>
+    </svg>
+
+    <svg *ngIf="feature.icon === 'target'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="12" cy="12" r="8"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="12" cy="12" r="1.6"/>
+    </svg>
+  </span>
+
+  <div class="feature-copy">
+    <h3>{{ feature.title }}</h3>
+    <p>{{ feature.subtitle }}</p>
+  </div>
+</button>

@@ -1,1 +1,47 @@
-<p>interface-nageur works!</p>
+<section class="role-dashboard role-dashboard--nageur">
+	<header class="role-header">
+		<div>
+			<h1>{{ 'roleDash.nageur.title' | translate }}</h1>
+			<p>{{ 'roleDash.nageur.subtitle' | translate }}</p>
+		</div>
+		<span class="role-pill">{{ 'roleDash.nageur.pill' | translate }}</span>
+	</header>
+
+	<div class="role-kpis">
+		<article class="role-card">
+			<h3>{{ 'roleDash.nageur.kpiTime' | translate }}</h3>
+			<strong>59.42s</strong>
+			<small>{{ 'roleDash.nageur.kpiTimeNote' | translate }}</small>
+		</article>
+		<article class="role-card">
+			<h3>{{ 'roleDash.nageur.kpiSessions' | translate }}</h3>
+			<strong>5</strong>
+			<small>{{ 'roleDash.nageur.kpiSessionsNote' | translate }}</small>
+		</article>
+		<article class="role-card">
+			<h3>{{ 'roleDash.nageur.kpiProgress' | translate }}</h3>
+			<strong>86%</strong>
+			<small>{{ 'roleDash.nageur.kpiProgressNote' | translate }}</small>
+		</article>
+	</div>
+
+	<div class="role-grid">
+		<article class="panel">
+			<h3>{{ 'roleDash.nageur.panelCompetitions' | translate }}</h3>
+			<ul>
+				<li><span>12 Mai</span> {{ 'roleDash.nageur.panelCompetitionsItems.item1' | translate }}</li>
+				<li><span>27 Mai</span> {{ 'roleDash.nageur.panelCompetitionsItems.item2' | translate }}</li>
+				<li><span>03 Juin</span> {{ 'roleDash.nageur.panelCompetitionsItems.item3' | translate }}</li>
+			</ul>
+		</article>
+
+		<article class="panel">
+			<h3>{{ 'roleDash.nageur.panelTraining' | translate }}</h3>
+			<ul>
+				<li>{{ 'roleDash.nageur.panelTrainingItems.item1' | translate }}</li>
+				<li>{{ 'roleDash.nageur.panelTrainingItems.item2' | translate }}</li>
+				<li>{{ 'roleDash.nageur.panelTrainingItems.item3' | translate }}</li>
+			</ul>
+		</article>
+	</div>
+</section>

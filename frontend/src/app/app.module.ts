@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -23,6 +25,16 @@ import { InterfaceEntaineurComponent } from './interface-entaineur/interface-ent
 import { InterfaceNageurComponent } from './interface-nageur/interface-nageur.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ChatbotComponent } from './chatbot/chatbot.component';
+import { LandingComponent } from './landing/landing.component';
+import { FeatureCardComponent } from './landing/feature-card/feature-card.component';
+import { FeatureModalComponent } from './landing/feature-modal/feature-modal.component';
+import { TrainingResultsComponent } from './training-results/training-results.component';
+import { MyPerformanceComponent } from './my-performance/my-performance.component';
+import { TrainingAnalyticsComponent } from './training-analytics/training-analytics.component';
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 @NgModule({
   declarations: [
@@ -32,7 +44,6 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
     RegisterComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
-    DashboardComponent,
     NageursComponent,
     EntraineursComponent,
     CompetitionsComponent,
@@ -42,13 +53,28 @@ import { ChatbotComponent } from './chatbot/chatbot.component';
     InterfaceEntaineurComponent,
     InterfaceNageurComponent,
     ProfileComponent,
-    ChatbotComponent
+    ChatbotComponent,
+    TrainingResultsComponent,
+    MyPerformanceComponent,
+    TrainingAnalyticsComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'fr',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
+    DashboardComponent,
+    LandingComponent,
+    FeatureCardComponent,
+    FeatureModalComponent
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

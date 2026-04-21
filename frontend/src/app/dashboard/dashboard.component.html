@@ -1,215 +1,485 @@
-<!-- TOPBAR -->
-<header class="topbar">
-  <div class="topbar-left">
-    <h1 class="page-title">Dashboard</h1>
-    <span class="page-subtitle">Vue d'ensemble</span>
-  </div>
-  <div class="topbar-right">
-    <span class="date-text">{{ currentDate }}</span>
-    <button class="notif-btn" title="Notifications">
-      <svg class="icon-animated icon-bell" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      <span class="notif-badge" *ngIf="pendingDemandes > 0">{{ pendingDemandes }}</span>
-    </button>
-  </div>
-</header>
-
-<!-- CONTENT -->
-<div class="content-area">
-
-  <!-- Welcome -->
-  <div class="welcome-card">
-    <div class="welcome-text">
-      <h2>Bonjour, {{ currentUser?.prenom }}
-        <svg class="icon-animated icon-wave" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/><path d="M5.7 15.5A5 5 0 0 0 12 19a5 5 0 0 0 6.3-3.5"/>
-          <line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
-        </svg>
-      </h2>
-      <p>Bienvenue sur votre espace IDSS Natation. Voici un résumé de votre activité.</p>
-    </div>
-  </div>
-
-  <!-- PENDING REGISTRATIONS (ADMIN) -->
-  <div class="pending-registrations-card" *ngIf="isAdmin && pendingRegistrations.length > 0">
-    <div class="card-header">
-      <div class="card-header-left">
-        <svg class="icon-animated icon-pulse" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
-          <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
-        </svg>
-        <h3 class="card-title">Demandes d'inscription en attente</h3>
-        <span class="pending-count-badge">{{ pendingRegistrations.length }}</span>
+<!-- ╔══════════════════════════════════════════════════════════════╗
+     ║                    ADMIN DASHBOARD                          ║
+     ╚══════════════════════════════════════════════════════════════╝ -->
+<div class="dashboard-container" *ngIf="isAdmin">
+  <div class="dashboard-main">
+    <header class="dash-header">
+      <h1 class="dash-title">{{ 'dashboard.admin.title' | translate }}</h1>
+      <div class="header-actions">
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.filters' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg></button>
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.search' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.copy' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
       </div>
-    </div>
-    <div class="pending-list">
-      <div class="pending-item" *ngFor="let u of pendingRegistrations">
-        <div class="pending-user-info">
-          <div class="pending-avatar">
-            <img *ngIf="u.imageprofile" [src]="'http://localhost:3300' + u.imageprofile" class="pending-avatar-img" />
-            <span *ngIf="!u.imageprofile" class="pending-avatar-initials">{{ (u.nom?.[0] || '') + (u.prenom?.[0] || '') | uppercase }}</span>
-          </div>
-          <div class="pending-details">
-            <span class="pending-name">{{ u.prenom }} {{ u.nom }}</span>
-            <span class="pending-email">{{ u.email }}</span>
-          </div>
-          <span class="role-chip" [attr.data-role]="u.role?.toLowerCase()">{{ getRoleLabel(u.role) }}</span>
-          <span class="pending-time">{{ getTimeAgo(u.createdAt) }}</span>
-        </div>
-        <div class="pending-actions">
-          <button class="btn-approve" (click)="approveRegistration(u._id)" [disabled]="actionLoading[u._id]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Approuver
-          </button>
-          <button class="btn-reject" (click)="rejectRegistration(u._id)" [disabled]="actionLoading[u._id]">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Rejeter
-          </button>
+    </header>
+
+    <!-- Welcome -->
+    <section class="welcome-block">
+      <div class="welcome-ava admin-ava">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div><h2 class="welcome-h">{{ 'dashboard.admin.welcomeTitle' | translate }}</h2><p class="welcome-p">{{ 'dashboard.admin.welcomeSubtitle' | translate }}</p></div>
+    </section>
+
+    <!-- Stats Row -->
+    <section class="stats-row">
+      <div class="stat-card">
+        <div class="stat-ico teal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><path d="M5 17c2-1 4-2 7-2s5 1 7 2"/></svg></div>
+        <div class="stat-data"><span class="stat-num">{{ stats.nageurs || 58 }}</span><span class="stat-lbl">{{ 'dashboard.admin.stats.swimmers' | translate }}</span><span class="stat-sub">{{ 'dashboard.admin.stats.swimmersSub' | translate: { count: (stats.nageurs || 45) } }}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-ico amber"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="stat-data"><span class="stat-num">{{ stats.entrainements || '24' }}s</span><span class="stat-lbl">{{ 'dashboard.admin.stats.trainings' | translate }}</span><span class="stat-sub">{{ 'dashboard.admin.stats.trainingsSub' | translate }}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-ico blue-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
+        <div class="stat-data"><span class="stat-num">{{ stats.competitions || 3 }}</span><span class="stat-lbl">{{ 'dashboard.admin.stats.competitions' | translate }}</span><span class="stat-sub">{{ 'dashboard.admin.stats.competitionsSub' | translate }}</span></div>
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section class="card chart-card">
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.globalPerformance' | translate }}</h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M4 19h16"/><path d="M6 16V8"/><path d="M12 16V4"/><path d="M18 16V12"/></svg></div>
+      <div class="bar-chart">
+        <div class="bar-y"><span>90%</span><span>60%</span><span>30%</span></div>
+        <div class="bar-group" *ngFor="let m of chartMonths; let i = index">
+          <div class="bars"><div class="bar b-att" [style.height.%]="chartAtt[i]"></div><div class="bar b-perf" [style.height.%]="chartPerf[i]"></div></div>
+          <span class="bar-lbl">{{ m | translate }}</span>
         </div>
       </div>
-    </div>
-  </div>
+      <div class="chart-leg"><span class="leg-i"><span class="leg-d att"></span> {{ 'dashboard.swimmer.legendAttendance' | translate }}</span><span class="leg-i"><span class="leg-d perf"></span> {{ 'dashboard.swimmer.legendPerformance' | translate }}</span></div>
+    </section>
 
-  <!-- KPI CARDS (ADMIN) -->
-  <div class="kpi-grid" *ngIf="isAdmin">
-    <div class="kpi-card">
-      <div class="kpi-icon blue">
-        <svg class="icon-animated icon-float" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-      </div>
-      <div class="kpi-data">
-        <span class="kpi-value">{{ stats.users }}</span>
-        <span class="kpi-label">Utilisateurs</span>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon cyan">
-        <svg class="icon-animated icon-swim" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/>
-          <path d="M5 17c2-1 4-2 7-2s5 1 7 2"/><line x1="12" y1="9" x2="12" y2="15"/>
-        </svg>
-      </div>
-      <div class="kpi-data">
-        <span class="kpi-value">{{ stats.nageurs }}</span>
-        <span class="kpi-label">Nageurs</span>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon purple">
-        <svg class="icon-animated icon-float" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/>
-          <path d="M9 3v18"/>
-        </svg>
-      </div>
-      <div class="kpi-data">
-        <span class="kpi-value">{{ stats.entraineurs }}</span>
-        <span class="kpi-label">Entraîneurs</span>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon gold">
-        <svg class="icon-animated icon-trophy" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-          <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-        </svg>
-      </div>
-      <div class="kpi-data">
-        <span class="kpi-value">{{ stats.competitions }}</span>
-        <span class="kpi-label">Compétitions</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Secondary stats -->
-  <div class="grid-2" *ngIf="isAdmin">
-    <!-- Recent Users -->
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Derniers inscrits</h3>
-        <a class="card-action" (click)="navigate('/utilisateurs')">Voir tout →</a>
-      </div>
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Statut</th></tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let u of recentUsers">
-              <td class="cell-name">{{ u.prenom }} {{ u.nom }}</td>
-              <td class="cell-muted">{{ u.email }}</td>
-              <td><span class="badge" [class]="'badge-' + u.role?.toLowerCase()">{{ getRoleLabel(u.role) }}</span></td>
-              <td><span class="status-dot" [class.active]="u.isActive"></span>{{ u.isActive ? 'Actif' : 'Inactif' }}</td>
-            </tr>
-            <tr *ngIf="recentUsers.length === 0"><td colspan="4" class="empty-cell">Aucun utilisateur</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Upcoming Competitions -->
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Compétitions à venir</h3>
-        <a class="card-action" (click)="navigate('/competitions')">Voir tout →</a>
-      </div>
-      <div class="competition-list">
-        <div class="comp-item" *ngFor="let c of upcomingCompetitions">
-          <div class="comp-date">
-            <span class="comp-day">{{ c.date | date:'dd' }}</span>
-            <span class="comp-month">{{ c.date | date:'MMM' }}</span>
+    <!-- Demandes de Comptes -->
+    <section class="card">
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.accountRequests' | translate }}</h3><a class="see-all" (click)="navigate('/utilisateurs')">{{ 'dashboard.admin.seeAll' | translate }} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a></div>
+      <div class="dem-list">
+        <div class="dem-row" *ngFor="let u of pendingRegistrations.slice(0,3)">
+          <div class="dem-user"><div class="ava sm"><img *ngIf="avatarUrl(u)" [src]="avatarUrl(u)"/><span *ngIf="!avatarUrl(u)">{{ getInitials(u) }}</span></div><div class="dem-info"><span class="dem-name">{{ u.prenom }} {{ u.nom }}</span><span class="dem-email">{{ u.email }}</span></div></div>
+          <div class="dem-acts">
+            <button class="act-btn acc" (click)="approveRegistration(u._id)" [disabled]="actionLoading[u._id]"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button class="act-btn edt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="act-btn rej" (click)="rejectRegistration(u._id)" [disabled]="actionLoading[u._id]"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
-          <div class="comp-info">
-            <span class="comp-name">{{ c.nom }}</span>
-            <span class="comp-lieu">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ c.lieu }}
-            </span>
-          </div>
-          <span class="comp-level">{{ c.niveauRequis }}</span>
         </div>
-        <div class="empty-state" *ngIf="upcomingCompetitions.length === 0">
-          Aucune compétition à venir
+        <div class="empty-msg" *ngIf="pendingRegistrations.length===0">{{ 'dashboard.admin.emptyRequests' | translate }}</div>
+      </div>
+    </section>
+
+    <!-- Nageurs Perf -->
+    <section class="card">
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.swimmerPerformance' | translate }}</h3><a class="see-all" (click)="navigate('/nageurs')">{{ 'dashboard.admin.seeAll' | translate }} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a></div>
+      <div class="dem-list">
+        <div class="dem-row" *ngFor="let n of nageurs.slice(0,3)">
+          <div class="dem-user"><div class="ava sm"><img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)"/><span *ngIf="!avatarUrl(n)">{{ getInitials(n) }}</span></div><div class="dem-info"><span class="dem-name">{{ fullName(n) }}</span><span class="dem-email">{{ 'dashboard.admin.levelEstimate' | translate }}</span></div></div>
+          <div class="perf-vals"><span class="pv-time">{{ n.poid || '57.5' }}s</span><span class="pv-badge red">0%</span></div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 
-  <!-- Entraineur/Nageur Simple Dashboard -->
-  <div class="grid-2" *ngIf="!isAdmin">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Actions rapides</h3>
-      </div>
-      <div class="quick-actions">
-        <button class="quick-btn" (click)="navigate('/competitions')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-          Compétitions
-        </button>
-        <button class="quick-btn" (click)="navigate('/planning')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Planning
-        </button>
-        <button class="quick-btn" *ngIf="isEntraineur" (click)="navigate('/nageurs')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><path d="M5 17c2-1 4-2 7-2s5 1 7 2"/></svg>
-          Mes Nageurs
-        </button>
+  <!-- ── ADMIN DSS PANEL ── -->
+  <aside class="dss">
+    <div class="dss-head"><span class="dss-t">{{ 'dashboard.admin.dss.title' | translate }}</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+
+    <div class="dss-sec">
+      <div class="dss-st warn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> {{ 'dashboard.admin.dss.alerts' | translate }}</div>
+      <p class="dss-sub">{{ 'dashboard.admin.dss.alertsSub' | translate: { count: dssAlerts.length } }}</p>
+      <div class="dss-alert" *ngFor="let a of dssAlerts" [attr.data-sev]="a.rank">
+        <div class="al-rank" [class]="'rk-'+a.rank">#{{ a.rank }}</div>
+        <div class="ava xs"><img *ngIf="a.avatar" [src]="a.avatar"/><span *ngIf="!a.avatar">{{ a.name?.[0] }}</span></div>
+        <div class="al-info"><span class="al-name">{{ a.name }}</span><span class="al-det">{{ a.prev }}</span></div>
+        <span class="al-chg">{{ a.change }}</span>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Demandes</h3>
-      </div>
-      <div class="pending-info">
-        <div class="pending-count">{{ pendingDemandes }}</div>
-        <p>demande(s) en attente</p>
+    <div class="dss-sec">
+      <div class="dss-st green-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> {{ 'dashboard.admin.dss.topPerformers' | translate }} <svg class="chev-r" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="dss-perf" *ngFor="let p of dssTopPerformers">
+        <span class="pk" [class]="'rk-'+p.rank">{{ p.rank }}</span>
+        <div class="ava xs"><img *ngIf="p.avatar" [src]="p.avatar"/><span *ngIf="!p.avatar">{{ p.name?.[0] }}</span></div>
+        <div class="pk-info"><span class="pk-n">{{ p.name }}</span><span class="pk-d">{{ p.detail }}</span></div>
+        <span class="pk-t">{{ p.time }}</span>
       </div>
     </div>
+
+    <div class="dss-sec">
+      <div class="dss-st muted-t">| {{ 'dashboard.admin.dss.fatigueRisks' | translate }}</div>
+      <div class="dss-fat" *ngFor="let f of dssFatigueRisks">
+        <div class="fat-bar" [class]="'sv-'+f.severity"></div>
+        <div class="ava xs"><img *ngIf="f.avatar" [src]="f.avatar"/><span *ngIf="!f.avatar">{{ f.name?.[0] }}</span></div>
+        <div class="pk-info"><span class="pk-n">{{ f.name }}</span><span class="pk-d">{{ f.detailKey | translate }}</span></div>
+        <span class="pk-t">{{ f.time }}</span>
+      </div>
+    </div>
+
+    <div class="dss-sec dss-exp">
+      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> {{ 'dashboard.admin.dss.explanation' | translate }}</div>
+      <p class="dss-exp-txt">{{ 'dashboard.admin.dss.explanationText' | translate }}</p>
+    </div>
+
+    <div class="dss-comp-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><div><span class="cb-t">{{ 'dashboard.admin.dss.competitionBadgeTitle' | translate }}</span><span class="cb-d">{{ 'dashboard.admin.dss.competitionBadgeDate' | translate }}</span></div></div>
+  </aside>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════╗
+     ║                   COACH DASHBOARD                          ║
+     ╚══════════════════════════════════════════════════════════════╝ -->
+<div class="dashboard-container" *ngIf="isEntraineur">
+  <div class="dashboard-main">
+    <header class="dash-header">
+      <h1 class="dash-title">{{ 'dashboard.coach.title' | translate: { name: currentUser?.prenom } }}</h1>
+      <div class="header-actions">
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.filters' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg></button>
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.search' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.copy' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>
+    </header>
+
+    <section class="coach-welcome">
+      <div class="ava lg"><img *ngIf="currentUser?.imageprofile" [src]="'http://localhost:3300'+currentUser?.imageprofile"/><span *ngIf="!currentUser?.imageprofile">{{ (currentUser?.prenom?.[0]||'')+(currentUser?.nom?.[0]||'')|uppercase }}</span></div>
+      <div><h2 class="welcome-h">{{ 'dashboard.coach.welcomeTitle' | translate: { name: currentUser?.prenom } }}</h2><p class="welcome-p">{{ 'dashboard.coach.welcomeSubtitle' | translate }}</p></div>
+    </section>
+
+    <!-- Swimmers Grid -->
+    <section class="sw-grid">
+      <div class="sw-card" *ngFor="let n of nageurs.slice(0,6)">
+        <div class="sw-top"><div class="ava md"><img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)"/><span *ngIf="!avatarUrl(n)">{{ getInitials(n) }}</span></div><div class="sw-info"><span class="sw-name">{{ fullName(n) }}</span><span class="sw-cat">{{ 'dashboard.coach.swimmerCategory' | translate }}</span></div><div class="score-circ">{{ cachedScore(n._id||n.utilisateur?._id||'') }}</div></div>
+        <div class="sw-stats"><span class="sw-time">{{ n.poid||'58.4' }}s</span><span class="sw-unit">{{ 'dashboard.coach.distanceLabel' | translate }}</span></div>
+        <div class="sw-foot"><span class="sw-ass">{{ 'dashboard.coach.attendance' | translate: { date: fmtDate(n.createdAt||'2024-04-10') } }}</span><div class="prog-wrap"><div class="prog-fill" [style.width.%]="cachedScore(n._id||'')>95?100:cachedScore(n._id||'')"></div></div></div>
+      </div>
+    </section>
+
+    <!-- CTA Buttons -->
+    <section class="coach-ctas">
+      <button class="cta blue-cta" (click)="openTrainingModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> {{ 'dashboard.coach.ctaTraining' | translate }} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <button class="cta amber-cta" (click)="openCompetitionModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> {{ 'dashboard.coach.ctaCompetition' | translate }} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </section>
+
+    <!-- Coach Tools -->
+    <section class="card">
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.coach.toolsTitle' | translate }}</h3></div>
+      <div class="ct-sub"><span>{{ 'dashboard.coach.tableCoach' | translate: { name: currentUser?.prenom } }}</span><span>{{ 'dashboard.coach.tableEmail' | translate }}</span><span>{{ 'dashboard.coach.tableExpiry' | translate }}</span></div>
+      <div class="ct-list">
+        <div class="ct-row" *ngFor="let e of entraineurs.slice(0,5)">
+          <div class="dem-user"><div class="ava sm"><img *ngIf="avatarUrl(e)" [src]="avatarUrl(e)"/><span *ngIf="!avatarUrl(e)">{{ getInitials(e) }}</span></div><span class="dem-name">{{ fullName(e) }}</span></div>
+          <span class="ct-email">{{ e.utilisateur?.email||'email@gmail.com' }}</span>
+          <span class="ct-date">{{ fmtDate(e.createdAt||'2024-04-24') }}</span>
+          <span class="ct-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+        </div>
+      </div>
+    </section>
   </div>
 
+  <!-- ── COACH DSS PANEL ── -->
+  <aside class="dss">
+    <div class="dss-head"><span class="dss-t">{{ 'dashboard.admin.dss.title' | translate }}</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+
+    <!-- Decisions -->
+    <div class="dss-sec">
+      <div class="dss-st amber-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="12" r="10"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> {{ 'dashboard.coach.dss.decisions' | translate }}</div>
+      <div class="dss-decision" *ngFor="let d of coachDecisions" [class]="'priority-'+d.priority">
+        <svg *ngIf="d.icon==='trophy'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <svg *ngIf="d.icon==='alert'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        <svg *ngIf="d.icon==='calendar'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        <span>{{ d.textKey | translate }}</span>
+      </div>
+    </div>
+
+    <!-- Feedback per Swimmer -->
+    <div class="dss-sec">
+      <div class="dss-st green-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> {{ 'dashboard.coach.dss.followup' | translate }}</div>
+      <div class="dss-fb" *ngFor="let f of coachFeedbacks">
+        <div class="ava xs"><img *ngIf="f.avatar" [src]="f.avatar"/><span *ngIf="!f.avatar">{{ f.name?.[0] }}</span></div>
+        <div class="fb-info"><span class="fb-name">{{ f.name }}</span><span class="fb-note">{{ f.noteKey | translate }}</span></div>
+        <span class="fb-status" [class]="'fs-'+f.statusClass">{{ f.statusKey | translate }}</span>
+      </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="dss-sec">
+      <div class="dss-st green-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> {{ 'dashboard.coach.dss.topPerformers' | translate }}</div>
+      <div class="dss-perf" *ngFor="let p of dssTopPerformers">
+        <span class="pk" [class]="'rk-'+p.rank">{{ p.rank }}</span>
+        <div class="ava xs"><img *ngIf="p.avatar" [src]="p.avatar"/><span *ngIf="!p.avatar">{{ p.name?.[0] }}</span></div>
+        <div class="pk-info"><span class="pk-n">{{ p.name }}</span><span class="pk-d">{{ p.detail }}</span></div>
+        <span class="pk-t">{{ p.time }}</span>
+      </div>
+    </div>
+
+    <!-- Fatigue -->
+    <div class="dss-sec">
+      <div class="dss-st muted-t">| {{ 'dashboard.coach.dss.fatigueRisks' | translate }}</div>
+      <div class="dss-fat" *ngFor="let f of dssFatigueRisks">
+        <div class="fat-bar" [class]="'sv-'+f.severity"></div>
+        <div class="ava xs"><img *ngIf="f.avatar" [src]="f.avatar"/><span *ngIf="!f.avatar">{{ f.name?.[0] }}</span></div>
+        <div class="pk-info"><span class="pk-n">{{ f.name }}</span><span class="pk-d">{{ f.detailKey | translate }}</span></div>
+        <span class="pk-t">{{ f.time }}</span>
+      </div>
+    </div>
+
+    <div class="dss-sec dss-exp">
+      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> {{ 'dashboard.admin.dss.explanation' | translate }}</div>
+      <p class="dss-exp-txt">{{ 'dashboard.admin.dss.explanationText' | translate }}</p>
+    </div>
+  </aside>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════╗
+     ║                  SWIMMER DASHBOARD                         ║
+     ╚══════════════════════════════════════════════════════════════╝ -->
+<div class="dashboard-container" *ngIf="isNageur">
+  <div class="dashboard-main">
+    <header class="dash-header">
+      <h1 class="dash-title">{{ 'dashboard.swimmer.title' | translate }}</h1>
+      <div class="header-actions">
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.filters' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg></button>
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.search' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="h-icon-btn" [attr.title]="'dashboard.actions.copy' | translate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      </div>
+    </header>
+
+    <!-- Profile -->
+    <section class="sw-profile">
+      <div class="ava lg"><img *ngIf="currentUser?.imageprofile" [src]="'http://localhost:3300'+currentUser?.imageprofile"/><span *ngIf="!currentUser?.imageprofile">{{ (currentUser?.prenom?.[0]||'')+(currentUser?.nom?.[0]||'')|uppercase }}</span></div>
+      <div class="prof-info"><h2 class="prof-name">{{ currentUser?.prenom }} {{ currentUser?.nom }}</h2><span class="prof-age">{{ 'dashboard.swimmer.age' | translate }}</span><div class="prof-badges"><span class="pill dark">{{ 'dashboard.swimmer.badgeJunior' | translate }}</span><span class="pill outline">{{ 'dashboard.swimmer.badgeCategory' | translate }}</span></div></div>
+    </section>
+
+    <!-- Metrics -->
+    <section class="met-row">
+      <div class="met-card met-gold">
+        <div class="met-ico gold-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
+        <div class="met-data"><span class="met-val">{{ bestTime }}s <small>{{ 'dashboard.swimmer.bestTimeUnit' | translate }}</small></span><span class="met-lbl">{{ 'dashboard.swimmer.bestTime' | translate }}</span><span class="met-date">{{ 'dashboard.swimmer.bestTimeUpdated' | translate: { date: bestTimeDate } }}</span></div>
+      </div>
+      <div class="met-card met-dark">
+        <div class="met-ico dark-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><line x1="12" y1="9" x2="12" y2="15"/></svg></div>
+        <div class="met-data"><span class="met-val">{{ trainingLoad }} <small class="trend-d">↘ {{ 'dashboard.swimmer.trainingTrendDown' | translate }}</small></span><span class="met-lbl">{{ 'dashboard.swimmer.trainingLoad' | translate }}</span><span class="met-date">{{ 'dashboard.swimmer.trainingDate' | translate }}</span></div>
+      </div>
+      <div class="met-card met-light">
+        <div class="met-ico light-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="met-data"><span class="met-val">{{ attendancePercent }}%</span><span class="met-lbl">{{ 'dashboard.swimmer.attendance' | translate }}</span><span class="met-date">{{ 'dashboard.swimmer.attendanceDate' | translate }}</span></div>
+      </div>
+    </section>
+
+    <!-- Performance Chart -->
+    <section class="card chart-card">
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.swimmer.performanceAttendance' | translate }}</h3><select class="per-sel" [(ngModel)]="selectedPeriod"><option value="trimestre">{{ 'dashboard.swimmer.periodQuarter' | translate }}</option><option value="semestre">{{ 'dashboard.swimmer.periodSemester' | translate }}</option><option value="annee">{{ 'dashboard.swimmer.periodYear' | translate }}</option></select></div>
+      <div class="svg-wrap">
+        <svg class="svg-chart" viewBox="0 0 720 200" preserveAspectRatio="none">
+          <defs><linearGradient id="gP" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(59,130,246,0.3)"/><stop offset="100%" stop-color="rgba(59,130,246,0)"/></linearGradient><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(245,158,11,0.25)"/><stop offset="100%" stop-color="rgba(245,158,11,0)"/></linearGradient></defs>
+          <line x1="40" y1="40" x2="700" y2="40" stroke="#e5e7eb" stroke-width="0.5"/><line x1="40" y1="90" x2="700" y2="90" stroke="#e5e7eb" stroke-width="0.5"/><line x1="40" y1="140" x2="700" y2="140" stroke="#e5e7eb" stroke-width="0.5"/>
+          <polygon [attr.points]="'40,190 '+perfPts+' 700,190'" fill="url(#gP)"/><polyline [attr.points]="perfPts" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <polygon [attr.points]="'40,190 '+attPts+' 700,190'" fill="url(#gA)"/><polyline [attr.points]="attPts" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="10" y="44" class="y-lbl">90%</text><text x="10" y="94" class="y-lbl">60%</text><text x="10" y="144" class="y-lbl">30%</text>
+        </svg>
+        <div class="x-labels"><span>{{ 'months.jan' | translate }}</span><span>{{ 'months.feb' | translate }}</span><span>{{ 'months.mar' | translate }}</span><span>{{ 'months.apr' | translate }}</span><span>{{ 'months.may' | translate }}</span><span>{{ 'months.jun' | translate }}</span><span>{{ 'months.jul' | translate }}</span><span>{{ 'months.feb' | translate }}</span><span>{{ 'months.mar' | translate }}</span><span>{{ 'months.apr' | translate }}</span></div>
+      </div>
+      <div class="chart-leg"><span class="leg-i"><span class="leg-d blue-d"></span> {{ 'dashboard.swimmer.legendPerformance' | translate }}</span><span class="leg-i"><span class="leg-d amber-d"></span> {{ 'dashboard.swimmer.legendAttendance' | translate }}</span></div>
+      <div class="chart-dots"><span class="cdot on"></span><span class="cdot"></span><span class="cdot"></span></div>
+    </section>
+
+    <!-- Feedback du Coach -->
+    <section class="card fb-card">
+      <div class="card-top"><div class="fb-left"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div><h3 class="card-h">{{ 'dashboard.swimmer.coachFeedback' | translate }}</h3><span class="fb-meta">{{ 'dashboard.swimmer.coachMeta' | translate }}</span></div></div>
+        <div class="fb-acts"><button class="h-icon-btn s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="h-icon-btn s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg></button><span class="pill outline s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> {{ 'dashboard.swimmer.ageLabel' | translate }}</span></div>
+      </div>
+      <div class="star-row"><span *ngFor="let s of [1,2,3,4,5]" class="star" [class.active]="s<=feedbackRating" (click)="setRating(s)">★</span></div>
+      <div class="fb-input-row"><input type="text" class="fb-input" [placeholder]="'dashboard.swimmer.addNotePlaceholder' | translate" [(ngModel)]="feedbackComment"/><button class="send-btn" (click)="sendFeedback()">{{ 'dashboard.swimmer.send' | translate }}</button></div>
+    </section>
+
+    <!-- Competitions -->
+    <section class="comp-events">
+      <div class="comp-ev" *ngFor="let c of upcomingCompetitions.slice(0,2)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <div class="comp-ev-info"><span class="comp-ev-n">{{ c.nom || ('dashboard.swimmer.competitionTag' | translate) }}</span><span class="comp-ev-d">{{ fmtDate(c.date||'2024-04-30') }}</span></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="comp-tag-row"><span class="comp-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> {{ 'dashboard.swimmer.competitionTag' | translate }}</span></div>
+    </section>
+  </div>
+
+  <!-- ── SWIMMER DSS PANEL ── -->
+  <aside class="dss sw-dss">
+    <div class="dss-head"><span class="dss-t">| DSS Insights</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>
+
+    <!-- Performance Trend -->
+    <div class="dss-sec dss-trend-card">
+      <span class="dss-lbl">Performance Trend</span>
+      <div class="trend-main">
+        <div class="trend-left">
+          <span class="trend-big">{{ bestTime }}<small>s</small></span>
+          <span class="trend-u">au 100m</span>
+        </div>
+        <svg class="sparkline" viewBox="0 0 140 50">
+          <defs>
+            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(34,197,94,0.25)"/>
+              <stop offset="100%" stop-color="rgba(34,197,94,0)"/>
+            </linearGradient>
+          </defs>
+          <polygon points="5,45 20,40 35,38 50,32 65,30 80,25 95,20 110,15 125,10 135,6 135,50 5,50" fill="url(#sparkGrad)"/>
+          <polyline points="5,45 20,40 35,38 50,32 65,30 80,25 95,20 110,15 125,10 135,6" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="135" cy="6" r="3.5" fill="#22c55e"/>
+          <circle cx="135" cy="6" r="6" fill="none" stroke="rgba(34,197,94,0.3)" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <span class="dss-badge green">En Amélioration</span>
+    </div>
+
+    <!-- Fatigue Risk -->
+    <div class="dss-sec dss-fatigue-card">
+      <span class="dss-lbl">Fatigue Risk</span>
+      <div class="fatigue-main">
+        <div class="fatigue-left">
+          <span class="fat-lvl amber">Moyen</span>
+          <span class="fat-detail">Entraîné: 9 sessions</span>
+        </div>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 100 58" class="gauge">
+            <path d="M12,52 A38,38 0 0,1 88,52" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="9" stroke-linecap="round"/>
+            <path d="M12,52 A38,38 0 0,1 58,15" fill="none" stroke="url(#gaugeGrad)" stroke-width="9" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#22c55e"/>
+                <stop offset="60%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#ef4444"/>
+              </linearGradient>
+            </defs>
+            <!-- Needle -->
+            <line x1="50" y1="52" x2="54" y2="22" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="50" cy="52" r="4" fill="#f59e0b"/>
+            <circle cx="50" cy="52" r="2" fill="#1a1d2e"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="dss-sec dss-rec-card">
+      <div class="rec-header">
+        <span class="dss-lbl">Recommendation</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rec-chev"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="dss-rec">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f6c453" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <div class="rec-text">
+          <span class="rec-main">Sélectionner pour compétition prochaine</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rec-chev"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- Body Metrics -->
+    <div class="dss-sec dss-body">
+      <div class="dss-st">| Body Metrics</div>
+      <div class="body-layout">
+        <div class="body-data-col">
+          <div class="body-primary">
+            <span class="body-big">{{ weight }} <small>kg</small></span>
+            <span class="body-sub">{{ height }} cm</span>
+            <span class="dss-badge green sm">Healthy</span>
+          </div>
+          <svg class="body-sparkline" viewBox="0 0 120 30">
+            <polyline points="5,25 15,22 25,20 35,18 50,15 65,12 80,10 95,7 110,5" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="110" cy="5" r="2.5" fill="#22c55e"/>
+          </svg>
+          <div class="body-stats">
+            <div class="bs-row"><span class="bs-label">Weight</span><span class="bs-value">{{ weight }} kg</span></div>
+            <div class="bs-row"><span class="bs-label">Height</span><span class="bs-value">{{ height }} cm</span></div>
+            <div class="bs-row"><span class="bs-label">BMI</span><span class="bs-value bold">{{ bmi }}</span></div>
+          </div>
+          <div class="body-shape">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="12,2 22,22 2,22"/></svg>
+            <span class="body-shape-text">Inverted Triangle<br/>Body Shape</span>
+          </div>
+        </div>
+        <div class="body-img-col">
+          <div class="body-img-wrap">
+            <img src="assets/branding/body-silhouette.png" alt="Body" class="body-img"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Explanation -->
+    <div class="dss-sec dss-exp">
+      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Explication</div>
+      <p class="dss-exp-txt">Sélection basée sur amélioration et fatigue modérée</p>
+    </div>
+  </aside>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════╗
+     ║                       MODALS                               ║
+     ╚══════════════════════════════════════════════════════════════╝ -->
+
+<!-- Training Modal -->
+<div class="modal-overlay" *ngIf="showTrainingModal" (click)="closeModals()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>{{ 'dashboard.modals.trainingTitle' | translate }}</h3><button class="modal-close" (click)="closeModals()">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>{{ 'dashboard.modals.trainingTitleLabel' | translate }}</label><input type="text" [(ngModel)]="trainingForm.titre" [placeholder]="'dashboard.modals.trainingTitlePlaceholder' | translate"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>{{ 'dashboard.modals.trainingDate' | translate }}</label><input type="date" [(ngModel)]="trainingForm.date"/></div>
+        <div class="form-group"><label>{{ 'dashboard.modals.trainingTime' | translate }}</label><input type="time" [(ngModel)]="trainingForm.heure"/></div>
+        <div class="form-group"><label>{{ 'dashboard.modals.trainingDuration' | translate }}</label><input type="number" [(ngModel)]="trainingForm.duree" min="15" max="180"/></div>
+      </div>
+      <div class="form-group"><label>{{ 'dashboard.modals.trainingSwimmers' | translate }}</label>
+        <div class="nageur-select-grid">
+          <div class="nageur-chip" *ngFor="let n of nageurs" [class.selected]="isNageurSelected(n._id,'training')" (click)="toggleNageurSelection(n._id,'training')">
+            <div class="ava xs"><img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)"/><span *ngIf="!avatarUrl(n)">{{ getInitials(n) }}</span></div>
+            <span>{{ fullName(n) }}</span>
+            <svg *ngIf="isNageurSelected(n._id,'training')" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="form-group"><label>{{ 'dashboard.modals.trainingNotes' | translate }}</label><textarea [(ngModel)]="trainingForm.notes" rows="3" [placeholder]="'dashboard.modals.trainingNotesPlaceholder' | translate"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="modal-cancel" (click)="closeModals()">{{ 'dashboard.modals.cancel' | translate }}</button><button class="modal-submit blue-bg" (click)="submitTraining()" [disabled]="formSubmitting">{{ formSubmitting ? ('dashboard.modals.submitWorking' | translate) : ('dashboard.modals.submitPlan' | translate) }}</button></div>
+  </div>
+</div>
+
+<!-- Competition Modal -->
+<div class="modal-overlay" *ngIf="showCompetitionModal" (click)="closeModals()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>{{ 'dashboard.modals.competitionTitle' | translate }}</h3><button class="modal-close" (click)="closeModals()">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>{{ 'dashboard.modals.competitionName' | translate }}</label><input type="text" [(ngModel)]="competitionForm.nom" [placeholder]="'dashboard.modals.competitionNamePlaceholder' | translate"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>{{ 'dashboard.modals.competitionDate' | translate }}</label><input type="date" [(ngModel)]="competitionForm.date"/></div>
+        <div class="form-group"><label>{{ 'dashboard.modals.competitionPlace' | translate }}</label><input type="text" [(ngModel)]="competitionForm.lieu" [placeholder]="'dashboard.modals.competitionPlacePlaceholder' | translate"/></div>
+      </div>
+      <div class="form-group"><label>{{ 'dashboard.modals.competitionLevel' | translate }}</label><select [(ngModel)]="competitionForm.niveauRequis"><option value="Junior">{{ 'dashboard.modals.levelJunior' | translate }}</option><option value="Senior">{{ 'dashboard.modals.levelSenior' | translate }}</option><option value="Elite">{{ 'dashboard.modals.levelElite' | translate }}</option></select></div>
+      <div class="form-group"><label>{{ 'dashboard.modals.competitionSwimmers' | translate }}</label>
+        <div class="nageur-select-grid">
+          <div class="nageur-chip" *ngFor="let n of nageurs" [class.selected]="isNageurSelected(n._id,'competition')" (click)="toggleNageurSelection(n._id,'competition')">
+            <div class="ava xs"><img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)"/><span *ngIf="!avatarUrl(n)">{{ getInitials(n) }}</span></div>
+            <span>{{ fullName(n) }}</span>
+            <svg *ngIf="isNageurSelected(n._id,'competition')" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="modal-cancel" (click)="closeModals()">{{ 'dashboard.modals.cancel' | translate }}</button><button class="modal-submit amber-bg" (click)="submitCompetition()" [disabled]="formSubmitting">{{ formSubmitting ? ('dashboard.modals.submitWorking' | translate) : ('dashboard.modals.submitAdd' | translate) }}</button></div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal-overlay" *ngIf="showFeedbackModal" (click)="closeModals()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-head"><h3>{{ 'dashboard.modals.feedbackTitle' | translate }}</h3><button class="modal-close" (click)="closeModals()">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>{{ 'dashboard.modals.feedbackSwimmer' | translate }}</label>
+        <select [(ngModel)]="feedbackForm.nageurId"><option value="">{{ 'dashboard.modals.feedbackSelect' | translate }}</option><option *ngFor="let n of nageurs" [value]="n._id">{{ fullName(n) }}</option></select>
+      </div>
+      <div class="form-group"><label>{{ 'dashboard.modals.feedbackRating' | translate }}</label>
+        <div class="star-row lg"><span *ngFor="let s of [1,2,3,4,5]" class="star" [class.active]="s<=feedbackForm.rating" (click)="setFormRating(s)">★</span></div>
+      </div>
+      <div class="form-group"><label>{{ 'dashboard.modals.feedbackType' | translate }}</label><select [(ngModel)]="feedbackForm.type"><option value="general">{{ 'dashboard.modals.feedbackTypeGeneral' | translate }}</option><option value="technique">{{ 'dashboard.modals.feedbackTypeTechnique' | translate }}</option><option value="physique">{{ 'dashboard.modals.feedbackTypePhysical' | translate }}</option><option value="mental">{{ 'dashboard.modals.feedbackTypeMental' | translate }}</option></select></div>
+      <div class="form-group"><label>{{ 'dashboard.modals.feedbackComment' | translate }}</label><textarea [(ngModel)]="feedbackForm.comment" rows="3" [placeholder]="'dashboard.modals.feedbackCommentPlaceholder' | translate"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="modal-cancel" (click)="closeModals()">{{ 'dashboard.modals.cancel' | translate }}</button><button class="modal-submit blue-bg" (click)="submitFeedback()" [disabled]="formSubmitting">{{ formSubmitting ? ('dashboard.modals.submitWorking' | translate) : ('dashboard.modals.submit' | translate) }}</button></div>
+  </div>
 </div>

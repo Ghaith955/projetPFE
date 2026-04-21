@@ -1,135 +1,112 @@
-<div class="auth-container">
-  <!-- LEFT PANEL - Decorative -->
-  <div class="auth-left">
-    <!-- Swimmer Video Background -->
-    <video autoplay loop muted playsinline class="bg-video">
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-swimmer-underwater-in-a-pool-1956-large.mp4" type="video/mp4">
+<div class="auth-shell">
+  <section class="auth-visual" aria-hidden="true">
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+      class="auth-visual-video"
+      aria-label="Video d'arriere-plan"
+      [attr.muted]="''"
+      #heroVideo
+      (loadedmetadata)="onHeroVideoReady(heroVideo)"
+      (canplay)="startHeroVideo(heroVideo)"
+      (timeupdate)="enforceHeroClip(heroVideo)">
+      <source src="assets/videos/cam-mcevoy-paris2024.mp4" type="video/mp4" />
     </video>
-    <div class="video-overlay"></div>
+    <div class="auth-visual-overlay"></div>
+    <div class="auth-visual-vignette"></div>
+    <div class="auth-visual-pattern"></div>
+    <div class="auth-visual-glass"></div>
+    <div class="auth-top-brand" aria-label="IDSS NATATION">
+      <span class="brand-wordmark">idss</span>
+      <span class="brand-submark">NATATION</span>
+    </div>
 
-    <div class="auth-left-content">
-      <!-- Top Left Logo -->
-      <div class="brand">
-        <div class="brand-icon">
-          <!-- Modern semi-circle icon from the image -->
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect width="24" height="24" rx="6" fill="rgba(255,255,255,0.2)" />
-            <circle cx="12" cy="12" r="6" fill="white" clip-path="url(#half-clip)" />
-            <defs>
-              <clipPath id="half-clip">
-                <rect x="0" y="0" width="12" height="24" />
-              </clipPath>
-            </defs>
-          </svg>
-        </div>
-        <span class="brand-name">IDSS Natation</span>
+    <div class="auth-visual-content">
+      <p class="visual-kicker">Plateforme IDSS Natation</p>
+      <h2 class="visual-title">Concu pour aller plus loin.</h2>
+      <p class="visual-copy">
+        Une experience de connexion premium pour les clubs de natation: visualisez, coordonnez et accelerez la progression de vos equipes.
+      </p>
+      <div class="visual-points">
+        <span class="visual-pill">Planning intelligent</span>
+        <span class="visual-pill">Suivi en temps reel</span>
+        <span class="visual-pill">Espace securise</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-pane">
+    <div class="auth-card">
+      <div class="auth-heading">
+        <h1 class="auth-title">Connexion securisee</h1>
+        <p class="auth-subtitle">Entrez votre email et mot de passe pour acceder a votre espace IDSS.</p>
       </div>
 
-      <!-- Center Content -->
-      <div class="hero-center">
-        <div class="shield-container">
-          <div class="ring r1"></div>
-          <div class="ring r2"></div>
-          <div class="shield-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
+      <form class="form-stack" (ngSubmit)="onLogin()" novalidate>
+        <div class="form-group">
+          <label for="email" class="form-label">Adresse e-mail</label>
+          <div class="form-control-wrap">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              class="form-control"
+              [(ngModel)]="email"
+              autocomplete="email"
+              spellcheck="false"
+              placeholder="vous@idss-natation.com"
+              required />
           </div>
         </div>
 
-        <h1 class="hero-title">Espace sécurisé pour<br>vos performances</h1>
-        <p class="hero-subtitle">
-          Accédez à votre plateforme IDSS Natation et gérez vos entraînements,<br>vos statistiques et vos objectifs en toute simplicité.
+        <div class="form-group">
+          <label for="password" class="form-label">Mot de passe</label>
+          <div class="form-control-wrap">
+            <input
+              id="password"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              class="form-control form-control--with-toggle"
+              [(ngModel)]="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+              required />
+            <button type="button" class="field-toggle" (click)="togglePassword()" aria-label="Afficher ou masquer le mot de passe">
+              <span *ngIf="!showPassword">Afficher</span>
+              <span *ngIf="showPassword">Masquer</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-helper">
+          <label class="check-inline">
+            <input type="checkbox" [(ngModel)]="rememberSession" name="rememberSession" />
+            <span>Se souvenir de moi</span>
+          </label>
+          <a routerLink="/forgot-password" class="text-link">Mot de passe oublie ?</a>
+        </div>
+
+        <div class="status status--error" *ngIf="errorMessage" role="alert">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          type="submit"
+          class="primary-btn"
+          [class.is-loading]="isLoading || isScanning"
+          [disabled]="isLoading || isScanning">
+          <span *ngIf="!isLoading">Se connecter</span>
+          <span *ngIf="isLoading">Verification en cours...</span>
+        </button>
+
+        <p class="secondary-note">
+          Nouveau sur IDSS ?
+          <a routerLink="/register" class="link-strong">Creer un compte</a>
         </p>
-
-        <div class="hero-badges">
-          <span class="hero-badge">✔ Données protégées</span>
-          <span class="hero-badge">✔ Accès rapide</span>
-          <span class="hero-badge">✔ Suivi intelligent</span>
-        </div>
-      </div>
-
+      </form>
     </div>
-  </div>
-
-  <!-- RIGHT PANEL - Form -->
-  <div class="auth-right">
-    <div class="auth-form-wrapper">
-      <h2 class="form-title">Bienvenue !</h2>
-      <p class="form-subtitle">Connectez-vous à votre espace IDSS Natation.</p>
-
-      <!-- Email -->
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <div class="input-with-icon">
-          <span class="input-icon-left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
-            </svg>
-          </span>
-          <input type="text" class="form-input has-left-icon" [(ngModel)]="email" placeholder="exemple@idss-natation.com" autocomplete="email" />
-        </div>
-      </div>
-
-      <!-- Password -->
-      <div class="form-group">
-        <label class="form-label">Mot de passe</label>
-        <div class="input-with-icon">
-          <span class="input-icon-left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-          </span>
-          <input [type]="showPassword ? 'text' : 'password'" class="form-input has-left-icon" [(ngModel)]="password" placeholder="••••••••" autocomplete="current-password" (keyup.enter)="onLogin()" />
-          <button class="toggle-password" (click)="togglePassword()" type="button">
-            <!-- Eye open -->
-            <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            <!-- Eye closed -->
-            <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-              <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
-              <line x1="1" y1="1" x2="23" y2="23" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="form-options">
-        <a class="forgot-link" routerLink="/forgot-password">Mot de passe oublié ?</a>
-      </div>
-
-      <!-- Error -->
-      <div class="error-message" *ngIf="errorMessage">
-        <span class="error-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-            <line x1="12" y1="9" x2="12" y2="13" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-        </span>
-        {{ errorMessage }}
-      </div>
-
-      <!-- Submit -->
-      <button class="btn-primary" (click)="onLogin()" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Se connecter</span>
-        <span *ngIf="isLoading" class="spinner"></span>
-      </button>
-
-      <div class="form-divider">
-        <span>ou</span>
-      </div>
-
-      <p class="form-footer">
-        Pas encore de compte ?
-        <a routerLink="/register" class="link-accent">Créer un compte</a>
-      </p>
-    </div>
-  </div>
+  </section>
 </div>

@@ -1,0 +1,239 @@
+{
+  "sidebar": {
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمون",
+    "swimmers": "السباحون",
+    "coaches": "المدربون",
+    "competitions": "المنافسات",
+    "planning": "الجدول",
+    "trainingResults": "نتائج التدريب",
+    "trainingAnalytics": "تحليلات التدريب",
+    "myPerformance": "أدائي",
+    "cotisations": "الاشتراكات",
+    "settings": "الإعدادات",
+    "mySwimmers": "سباحي",
+    "themeDark": "الوضع الداكن",
+    "themeLight": "الوضع الفاتح",
+    "language": "اللغة"
+  },
+  "months": {
+    "jan": "ينا",
+    "feb": "فبر",
+    "mar": "مار",
+    "apr": "أبر",
+    "may": "ماي",
+    "jun": "يون",
+    "jul": "يول"
+  },
+  "dashboard": {
+    "actions": {
+      "filters": "الفلاتر",
+      "search": "بحث",
+      "copy": "نسخ"
+    },
+    "common": {
+      "fatigueHigh": "إجهاد مرتفع",
+      "fatigueMedium": "إجهاد متوسط"
+    },
+    "admin": {
+      "title": "لوحة الإدارة",
+      "welcomeTitle": "مرحبا أيها المدير",
+      "welcomeSubtitle": "نظرة عامة على قسم السباحة",
+      "stats": {
+        "swimmers": "السباحون",
+        "swimmersSub": "{{count}} سباح",
+        "trainings": "التدريبات",
+        "trainingsSub": "الفصل الحالي",
+        "competitions": "المنافسات",
+        "competitionsSub": "منافسات نشطة"
+      },
+      "globalPerformance": "الأداء العام",
+      "attendanceRate": "نسبة الحضور",
+      "progressLabel": "التقدم",
+      "accountRequests": "طلبات الحساب",
+      "seeAll": "عرض الكل",
+      "emptyRequests": "لا توجد طلبات معلقة",
+      "swimmerPerformance": "السباحون المتابعون",
+      "levelEstimate": "تقدير المستوى",
+      "dss": {
+        "title": "DSS Insights",
+        "alerts": "تنبيهات",
+        "alertsSub": "{{count}} سباح في تراجع",
+        "topPerformers": "أفضل الأداء",
+        "fatigueRisks": "مخاطر الإجهاد",
+        "explanation": "تفسير",
+        "explanationText": "اختيار بناء على التحسن ومتوسط الإجهاد",
+        "competitionBadgeTitle": "منافسة إقليمية",
+        "competitionBadgeDate": "أبريل 2024"
+      }
+    },
+    "coach": {
+      "title": "مرحبا المدرب {{name}}.",
+      "welcomeTitle": "مرحبا المدرب {{name}}",
+      "welcomeSubtitle": "هذه نظرة على السباحين وأدوات التدريب لديك.",
+      "swimmerCategory": "ناشئين",
+      "distanceLabel": "100 متر",
+      "attendance": "الحضور {{date}}",
+      "ctaTraining": "جدولة تدريب",
+      "ctaCompetition": "إضافة منافسة",
+      "toolsTitle": "أدوات المدرب",
+      "tableCoach": "المدرب {{name}}",
+      "tableEmail": "البريد الإلكتروني",
+      "tableExpiry": "انتهاء الحالة",
+      "dss": {
+        "decisions": "قرارات مقترحة",
+        "followup": "متابعة السباحين",
+        "topPerformers": "أفضل الأداء",
+        "fatigueRisks": "مخاطر الإجهاد",
+        "explanation": "تفسير"
+      },
+      "decisions": {
+        "trophy": "اختيار آدم سميث للمنافسة الإقليمية",
+        "alert": "تقليل حمل التدريب لنور لواتي",
+        "calendar": "جدولة حصة استشفاء هذا الأسبوع"
+      },
+      "feedback": {
+        "status": {
+          "progress": "يتحسن",
+          "stable": "ثابت",
+          "watch": "للمتابعة"
+        },
+        "note": {
+          "up": "تحسن الأداء +2.3ث",
+          "steady": "مستوى ثابت",
+          "down": "انخفاض في الانتظام"
+        }
+      }
+    },
+    "swimmer": {
+      "title": "لوحة السباح",
+      "age": "18 سنة",
+      "badgeJunior": "ناشئ",
+      "badgeCategory": "الفئة",
+      "bestTime": "أفضل زمن",
+      "bestTimeUnit": "100 متر",
+      "bestTimeUpdated": "تحديث {{date}}",
+      "trainingLoad": "حمل التدريب",
+      "trainingDate": "يناير 2024",
+      "trainingTrendDown": "انخفاض",
+      "attendance": "الحضور",
+      "attendanceDate": "7 أيام منذ 2024",
+      "performanceAttendance": "الأداء والحضور",
+      "periodQuarter": "الربع الأخير",
+      "periodSemester": "الفصل الأخير",
+      "periodYear": "هذا العام",
+      "legendPerformance": "أداء 100 متر",
+      "legendAttendance": "الحضور",
+      "coachFeedback": "ملاحظات المدرب",
+      "coachMeta": "المدرب بيرنو | منذ 3 ساعات",
+      "ageLabel": "العمر",
+      "addNotePlaceholder": "أضف ملاحظة...",
+      "send": "إرسال",
+      "competitionTag": "منافسة إقليمية",
+      "dss": {
+        "title": "DSS Insights",
+        "trend": "اتجاه الأداء",
+        "fatigue": "خطر الإجهاد",
+        "recommendation": "توصية",
+        "recommendationText": "اختيار للمنافسة القادمة",
+        "improving": "في تحسن",
+        "fatigueLevel": "متوسط",
+        "trainedSessions": "تدريب: 9 حصص",
+        "bodyMetrics": "مقاييس الجسم",
+        "healthy": "صحي",
+        "weight": "الوزن",
+        "height": "الطول",
+        "bmi": "مؤشر الكتلة",
+        "shape": "مثلث مقلوب\nشكل الجسم",
+        "explanation": "تفسير",
+        "explanationText": "اختيار بناء على التحسن وإجهاد متوسط"
+      }
+    },
+    "modals": {
+      "trainingTitle": "جدولة تدريب",
+      "trainingTitleLabel": "العنوان",
+      "trainingTitlePlaceholder": "مثال: حصة تحمل",
+      "trainingDate": "التاريخ",
+      "trainingTime": "الوقت",
+      "trainingDuration": "المدة (دقيقة)",
+      "trainingSwimmers": "السباحون",
+      "trainingNotes": "ملاحظات",
+      "trainingNotesPlaceholder": "ملاحظات إضافية...",
+      "competitionTitle": "إضافة منافسة",
+      "competitionName": "الاسم",
+      "competitionNamePlaceholder": "مثال: منافسة إقليمية",
+      "competitionDate": "التاريخ",
+      "competitionPlace": "المكان",
+      "competitionPlacePlaceholder": "المكان",
+      "competitionLevel": "المستوى المطلوب",
+      "competitionSwimmers": "السباحون المحددون",
+      "levelJunior": "ناشئ",
+      "levelSenior": "كبار",
+      "levelElite": "نخبة",
+      "feedbackTitle": "إرسال ملاحظات",
+      "feedbackSwimmer": "السباح",
+      "feedbackSelect": "اختر...",
+      "feedbackRating": "التقييم",
+      "feedbackType": "النوع",
+      "feedbackTypeGeneral": "عام",
+      "feedbackTypeTechnique": "تقني",
+      "feedbackTypePhysical": "بدني",
+      "feedbackTypeMental": "ذهني",
+      "feedbackComment": "تعليق",
+      "feedbackCommentPlaceholder": "ملاحظاتك...",
+      "cancel": "إلغاء",
+      "submit": "إرسال",
+      "submitAdd": "إضافة",
+      "submitPlan": "جدولة",
+      "submitWorking": "جارٍ..."
+    }
+  },
+  "roleDash": {
+    "nageur": {
+      "title": "لوحة السباح",
+      "subtitle": "نظرة على الأهداف والأداء والحصص القادمة.",
+      "pill": "سباح",
+      "kpiTime": "زمن 100 متر",
+      "kpiTimeNote": "تحسن بنسبة 1.8%",
+      "kpiSessions": "حصص هذا الأسبوع",
+      "kpiSessionsNote": "الهدف: 6 حصص",
+      "kpiProgress": "معدل التقدم",
+      "kpiProgressNote": "خلال آخر 30 يوما",
+      "panelCompetitions": "المنافسات القادمة",
+      "panelTraining": "تركيز التدريب",
+      "panelTrainingItems": {
+        "item1": "عمل منعطف عالي الشدة",
+        "item2": "تحمل هوائي منطقة 2",
+        "item3": "استشفاء نشط + مرونة"
+      },
+      "panelCompetitionsItems": {
+        "item1": "بطولة إقليمية - 100 متر حرة",
+        "item2": "لقاء وطني - 200 متر فراشة",
+        "item3": "كأس الأندية - تتابع"
+      }
+    },
+    "coach": {
+      "title": "لوحة المدرب",
+      "subtitle": "إدارة المجموعات وحمل التدريب والتقدم الجماعي.",
+      "pill": "مدرب",
+      "kpiSwimmers": "السباحون المتابعون",
+      "kpiSwimmersNote": "3 جدد هذا الأسبوع",
+      "kpiSessions": "الحصص المخططة",
+      "kpiSessionsNote": "للأيام السبعة القادمة",
+      "kpiAdherence": "الالتزام العام",
+      "kpiAdherenceNote": "متوسط حضور السباحين",
+      "panelAlerts": "تنبيهات الأداء",
+      "panelActions": "إجراءات موصى بها",
+      "panelAlertsItems": {
+        "item1": "U17 حرة - تراجع في آخر 50 متر",
+        "item2": "كبار مختلط - إرهاق مرتفع لدى 4 لاعبين",
+        "item3": "U15 فراشة - تحسن ملحوظ في الانطلاق"
+      },
+      "panelActionsItems": {
+        "item1": "تعديل الأحمال الخميس/الجمعة",
+        "item2": "إعادة ضبط أهداف السرعات القصيرة",
+        "item3": "جدولة ورشتي تقنية إضافيتين"
+      }
+    }
+  }
+}

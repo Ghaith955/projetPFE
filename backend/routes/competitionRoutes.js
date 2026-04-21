@@ -9,7 +9,7 @@ router.use(authenticateToken);
 
 router.get('/', competitionController.getAllCompetitions);
 router.get('/:id', competitionController.getCompetitionById);
-router.post('/', roleMiddleware('RESPONSABLE'), competitionController.createCompetition);
+router.post('/', roleMiddleware('RESPONSABLE', 'ENTRAINEUR'), competitionController.createCompetition);
 router.put('/:id', roleMiddleware('RESPONSABLE'), competitionController.updateCompetition);
 router.delete('/:id', roleMiddleware('RESPONSABLE'), competitionController.deleteCompetition);
 

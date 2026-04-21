@@ -1,0 +1,24 @@
+<svg width="780" height="220" viewBox="0 0 780 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="idssCineMain" x1="118" y1="42" x2="482" y2="178" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4FBFF"/>
+      <stop offset="0.58" stop-color="#9EE6FF"/>
+      <stop offset="1" stop-color="#7BC3FF"/>
+    </linearGradient>
+    <linearGradient id="idssCineWave" x1="30" y1="78" x2="220" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B3F6FF"/>
+      <stop offset="1" stop-color="#7AA4FF"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="780" height="220" fill="transparent"/>
+
+  <g transform="translate(26 34)">
+    <path d="M10 98C34 72 58 58 88 58C118 58 139 69 162 83C177 92 191 98 208 100V122C182 120 161 110 138 96C122 86 106 80 87 80C68 80 53 88 37 104C29 113 20 120 8 126L0 108C4 106 7 102 10 98Z" fill="url(#idssCineWave)" fill-opacity="0.94"/>
+    <path d="M28 56C47 36 69 27 93 27C120 27 143 39 163 61L145 77C131 61 115 51 94 51C77 51 62 57 50 69L28 56Z" fill="#E9F8FF" fill-opacity="0.88"/>
+    <circle cx="158" cy="50" r="10" fill="#E7FBFF" fill-opacity="0.92"/>
+  </g>
+
+  <text x="238" y="128" fill="url(#idssCineMain)" font-size="136" font-weight="800" font-family="Sora, Manrope, Segoe UI, sans-serif" letter-spacing="2.6">idss</text>
+  <text x="246" y="172" fill="#AFE2FF" font-size="30" font-weight="600" font-family="Manrope, Segoe UI, sans-serif" letter-spacing="7">NATATION</text>
+</svg>

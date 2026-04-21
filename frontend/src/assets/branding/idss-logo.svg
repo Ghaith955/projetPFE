@@ -1,0 +1,27 @@
+<svg width="480" height="120" viewBox="0 0 480 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="idssAqua" x1="18" y1="12" x2="104" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8EE9FF"/>
+      <stop offset="0.52" stop-color="#6FB8FF"/>
+      <stop offset="1" stop-color="#7C7DFF"/>
+    </linearGradient>
+    <linearGradient id="idssPurple" x1="14" y1="18" x2="100" y2="108" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8570FF"/>
+      <stop offset="1" stop-color="#4A36A9"/>
+    </linearGradient>
+    <linearGradient id="wordGrad" x1="134" y1="28" x2="280" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#BFD6FF"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(8 8)">
+    <rect x="0" y="0" width="96" height="96" rx="26" fill="url(#idssPurple)"/>
+    <path d="M14 56C24 44 34 40 46 40C58 40 66 45 76 52C82 56 87 58 92 58V68C84 68 78 66 70 61C61 56 54 52 45 52C36 52 29 55 22 62C18 66 14 69 9 71L4 62C8 60 11 58 14 56Z" fill="url(#idssAqua)"/>
+    <path d="M22 33C30 25 40 21 51 21C64 21 73 28 81 38L72 46C66 38 60 33 51 33C44 33 38 35 33 41L22 33Z" fill="#DDF5FF" fill-opacity="0.95"/>
+    <circle cx="70" cy="30" r="6" fill="#EAF9FF" fill-opacity="0.9"/>
+  </g>
+
+  <text x="132" y="63" fill="url(#wordGrad)" font-size="48" font-weight="800" font-family="Manrope, Arial, sans-serif" letter-spacing="1.2">IDSS</text>
+  <text x="136" y="88" fill="#8AB7FF" font-size="18" font-weight="600" font-family="Manrope, Arial, sans-serif" letter-spacing="3">NATATION PLATFORM</text>
+</svg>

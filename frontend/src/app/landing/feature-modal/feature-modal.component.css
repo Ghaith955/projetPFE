@@ -1,0 +1,96 @@
+.feature-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2.2rem);
+  background: rgba(3, 10, 22, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: backdrop-in 230ms ease-out both;
+}
+
+.feature-modal-panel {
+  width: min(45rem, 100%);
+  border-radius: 1.35rem;
+  border: 1px solid rgba(137, 224, 255, 0.62);
+  background: rgba(109, 192, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 12, 31, 0.58), 0 0 40px rgba(106, 215, 255, 0.36);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  color: #eff8ff;
+  position: relative;
+  padding: clamp(1.35rem, 3vw, 2.2rem);
+  animation: panel-in 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.feature-modal-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid rgba(152, 231, 255, 0.48);
+  border-radius: 999px;
+  background: rgba(7, 26, 54, 0.45);
+  color: #c9ebff;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.feature-modal-close:hover,
+.feature-modal-close:focus-visible {
+  transform: scale(1.06);
+  background: rgba(14, 42, 81, 0.72);
+  box-shadow: 0 0 22px rgba(112, 214, 255, 0.4);
+}
+
+.feature-modal-icon {
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(152, 230, 255, 0.6);
+  display: grid;
+  place-items: center;
+  font-size: 1.32rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 0 26px rgba(112, 216, 255, 0.34);
+}
+
+.feature-modal-panel h2 {
+  font-family: 'Orbitron', 'Segoe UI', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: clamp(1.2rem, 2.3vw, 1.75rem);
+  margin-bottom: 0.85rem;
+}
+
+.feature-modal-panel p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: rgba(220, 242, 255, 0.92);
+  max-width: 64ch;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

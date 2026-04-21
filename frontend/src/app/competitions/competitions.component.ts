@@ -36,6 +36,7 @@ export class CompetitionsComponent implements OnInit {
   ) {}
 
   get isAdmin() { return this.auth.role === 'RESPONSABLE'; }
+  get canManageCompetitions() { return this.auth.role === 'RESPONSABLE' || this.auth.role === 'ENTRAINEUR'; }
 
   ngOnInit() { 
     this.loadCompetitions(); 

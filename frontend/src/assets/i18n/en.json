@@ -1,0 +1,239 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "swimmers": "Swimmers",
+    "coaches": "Coaches",
+    "competitions": "Competitions",
+    "planning": "Planning",
+    "trainingResults": "Training Results",
+    "trainingAnalytics": "Training Analytics",
+    "myPerformance": "My Performance",
+    "cotisations": "Fees",
+    "settings": "Settings",
+    "mySwimmers": "My Swimmers",
+    "themeDark": "Dark mode",
+    "themeLight": "Light mode",
+    "language": "Language"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul"
+  },
+  "dashboard": {
+    "actions": {
+      "filters": "Filters",
+      "search": "Search",
+      "copy": "Copy"
+    },
+    "common": {
+      "fatigueHigh": "High fatigue",
+      "fatigueMedium": "Moderate fatigue"
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "welcomeTitle": "Hello Admin",
+      "welcomeSubtitle": "Overview of the swimming section",
+      "stats": {
+        "swimmers": "Swimmers",
+        "swimmersSub": "{{count}} swimmers",
+        "trainings": "Trainings",
+        "trainingsSub": "Current semester",
+        "competitions": "Competitions",
+        "competitionsSub": "Active competitions"
+      },
+      "globalPerformance": "Overall Performance",
+      "attendanceRate": "Attendance Rate",
+      "progressLabel": "Progress",
+      "accountRequests": "Account Requests",
+      "seeAll": "See All",
+      "emptyRequests": "No pending requests",
+      "swimmerPerformance": "Tracked swimmers",
+      "levelEstimate": "Estimated level",
+      "dss": {
+        "title": "DSS Insights",
+        "alerts": "Alerts",
+        "alertsSub": "{{count}} swimmers trending down",
+        "topPerformers": "Top Performers",
+        "fatigueRisks": "Fatigue Risks",
+        "explanation": "Explanation",
+        "explanationText": "Selection based on improvement and average fatigue",
+        "competitionBadgeTitle": "Regional competition",
+        "competitionBadgeDate": "April 2024"
+      }
+    },
+    "coach": {
+      "title": "Hello Coach {{name}}.",
+      "welcomeTitle": "Hello Coach {{name}}",
+      "welcomeSubtitle": "Here is an overview of your swimmers and training tools.",
+      "swimmerCategory": "Junior",
+      "distanceLabel": "at 100m",
+      "attendance": "Attendance {{date}}",
+      "ctaTraining": "Schedule Training",
+      "ctaCompetition": "Add Competition",
+      "toolsTitle": "Coach Tools",
+      "tableCoach": "Coach {{name}}",
+      "tableEmail": "Email",
+      "tableExpiry": "Status expiry",
+      "dss": {
+        "decisions": "Suggested Decisions",
+        "followup": "Swimmer Follow-up",
+        "topPerformers": "Top Performers",
+        "fatigueRisks": "Fatigue Risks",
+        "explanation": "Explanation"
+      },
+      "decisions": {
+        "trophy": "Select Adam Smith for regional competition",
+        "alert": "Reduce training load for Nour Louati",
+        "calendar": "Schedule recovery session this week"
+      },
+      "feedback": {
+        "status": {
+          "progress": "Improving",
+          "stable": "Stable",
+          "watch": "Watch"
+        },
+        "note": {
+          "up": "Performance up +2.3s",
+          "steady": "Maintaining level",
+          "down": "Consistency drop"
+        }
+      }
+    },
+    "swimmer": {
+      "title": "Swimmer Dashboard",
+      "age": "18 years",
+      "badgeJunior": "Junior",
+      "badgeCategory": "Category",
+      "bestTime": "Best Time",
+      "bestTimeUnit": "at 100m",
+      "bestTimeUpdated": "Updated {{date}}",
+      "trainingLoad": "Training Load",
+      "trainingDate": "January 2024",
+      "trainingTrendDown": "Down",
+      "attendance": "Attendance",
+      "attendanceDate": "7 days since 2024",
+      "performanceAttendance": "Performance & Attendance",
+      "periodQuarter": "Last quarter",
+      "periodSemester": "Last semester",
+      "periodYear": "This year",
+      "legendPerformance": "100m performance",
+      "legendAttendance": "Attendance",
+      "coachFeedback": "Coach Feedback",
+      "coachMeta": "Coach Biernot | 3 hours ago",
+      "ageLabel": "Age",
+      "addNotePlaceholder": "Add a note...",
+      "send": "Send",
+      "competitionTag": "Regional competition",
+      "dss": {
+        "title": "DSS Insights",
+        "trend": "Performance Trend",
+        "fatigue": "Fatigue Risk",
+        "recommendation": "Recommendation",
+        "recommendationText": "Select for upcoming competition",
+        "improving": "Improving",
+        "fatigueLevel": "Medium",
+        "trainedSessions": "Trained: 9 sessions",
+        "bodyMetrics": "Body Metrics",
+        "healthy": "Healthy",
+        "weight": "Weight",
+        "height": "Height",
+        "bmi": "BMI",
+        "shape": "Inverted Triangle\nBody Shape",
+        "explanation": "Explanation",
+        "explanationText": "Selection based on improvement and moderate fatigue"
+      }
+    },
+    "modals": {
+      "trainingTitle": "Schedule Training",
+      "trainingTitleLabel": "Title",
+      "trainingTitlePlaceholder": "Ex: Endurance session",
+      "trainingDate": "Date",
+      "trainingTime": "Time",
+      "trainingDuration": "Duration (min)",
+      "trainingSwimmers": "Swimmers",
+      "trainingNotes": "Notes",
+      "trainingNotesPlaceholder": "Additional notes...",
+      "competitionTitle": "Add Competition",
+      "competitionName": "Name",
+      "competitionNamePlaceholder": "Ex: Regional competition",
+      "competitionDate": "Date",
+      "competitionPlace": "Location",
+      "competitionPlacePlaceholder": "Location",
+      "competitionLevel": "Required level",
+      "competitionSwimmers": "Selected swimmers",
+      "levelJunior": "Junior",
+      "levelSenior": "Senior",
+      "levelElite": "Elite",
+      "feedbackTitle": "Send Feedback",
+      "feedbackSwimmer": "Swimmer",
+      "feedbackSelect": "Select...",
+      "feedbackRating": "Rating",
+      "feedbackType": "Type",
+      "feedbackTypeGeneral": "General",
+      "feedbackTypeTechnique": "Technique",
+      "feedbackTypePhysical": "Physical",
+      "feedbackTypeMental": "Mental",
+      "feedbackComment": "Comment",
+      "feedbackCommentPlaceholder": "Your feedback...",
+      "cancel": "Cancel",
+      "submit": "Send",
+      "submitAdd": "Add",
+      "submitPlan": "Schedule",
+      "submitWorking": "Working..."
+    }
+  },
+  "roleDash": {
+    "nageur": {
+      "title": "Swimmer Dashboard",
+      "subtitle": "Overview of your goals, performance, and upcoming sessions.",
+      "pill": "SWIMMER",
+      "kpiTime": "100m Time",
+      "kpiTimeNote": "improvement of 1.8%",
+      "kpiSessions": "Sessions this week",
+      "kpiSessionsNote": "goal: 6 sessions",
+      "kpiProgress": "Progress rate",
+      "kpiProgressNote": "over the last 30 days",
+      "panelCompetitions": "Upcoming competitions",
+      "panelTraining": "Training focus",
+      "panelTrainingItems": {
+        "item1": "High intensity turn work",
+        "item2": "Zone 2 aerobic endurance block",
+        "item3": "Active recovery + mobility"
+      },
+      "panelCompetitionsItems": {
+        "item1": "Regional Championship - 100m Freestyle",
+        "item2": "National Meet - 200m Butterfly",
+        "item3": "Interclub Cup - Relay"
+      }
+    },
+    "coach": {
+      "title": "Coach Dashboard",
+      "subtitle": "Group management, training load, and collective progress.",
+      "pill": "COACH",
+      "kpiSwimmers": "Swimmers tracked",
+      "kpiSwimmersNote": "3 new this week",
+      "kpiSessions": "Planned sessions",
+      "kpiSessionsNote": "for the next 7 days",
+      "kpiAdherence": "Overall adherence",
+      "kpiAdherenceNote": "average swimmer attendance",
+      "panelAlerts": "Performance alerts",
+      "panelActions": "Recommended actions",
+      "panelAlertsItems": {
+        "item1": "U17 Freestyle - pace drop on final 50m",
+        "item2": "Mixed Senior - high fatigue detected for 4 athletes",
+        "item3": "U15 Butterfly - notable start improvement"
+      },
+      "panelActionsItems": {
+        "item1": "Adjust volumes Thu/Fri",
+        "item2": "Recalibrate short sprint goals",
+        "item3": "Schedule 2 additional technique workshops"
+      }
+    }
+  }
+}

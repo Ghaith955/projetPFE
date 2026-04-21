@@ -15,9 +15,13 @@ import { PlanningComponent } from './planning/planning.component';
 import { UtilisateursComponent } from './admin/utilisateurs/utilisateurs.component';
 import { CotisationsComponent } from './cotisations/cotisations.component';
 import { ProfileComponent } from './profile/profile.component';
+import { LandingComponent } from './landing/landing.component';
+import { TrainingResultsComponent } from './training-results/training-results.component';
+import { MyPerformanceComponent } from './my-performance/my-performance.component';
+import { TrainingAnalyticsComponent } from './training-analytics/training-analytics.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', component: LandingComponent, pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
@@ -34,13 +38,16 @@ const routes: Routes = [
       { path: 'entraineurs', component: EntraineursComponent, data: { roles: ['RESPONSABLE'] } },
       { path: 'competitions', component: CompetitionsComponent },
       { path: 'planning', component: PlanningComponent },
+      { path: 'training-results', component: TrainingResultsComponent, data: { roles: ['ENTRAINEUR', 'RESPONSABLE'] } },
+      { path: 'training-analytics', component: TrainingAnalyticsComponent, data: { roles: ['ENTRAINEUR', 'RESPONSABLE'] } },
+      { path: 'my-performance', component: MyPerformanceComponent, data: { roles: ['NAGEUR'] } },
       { path: 'utilisateurs', component: UtilisateursComponent, data: { roles: ['RESPONSABLE'] } },
-      { path: 'cotisations', component: CotisationsComponent, data: { roles: ['RESPONSABLE'] } },
+      { path: 'cotisations', component: CotisationsComponent, data: { roles: ['RESPONSABLE', 'NAGEUR'] } },
       { path: 'settings', component: ProfileComponent },
     ]
   },
 
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

@@ -37,6 +37,9 @@ export class CotisationsComponent implements OnInit {
     private router: Router
   ) {}
 
+  get isAdmin() { return this.auth.currentUser?.role === 'RESPONSABLE'; }
+  get isNageur() { return this.auth.currentUser?.role === 'NAGEUR'; }
+
   ngOnInit() { this.loadData(); }
 
   loadData() {
@@ -50,10 +53,12 @@ export class CotisationsComponent implements OnInit {
       error: () => { this.errorMessage = 'Erreur de chargement des cotisations.'; }
     });
 
-    this.api.getAllNageurs().subscribe({
-      next: (data) => { this.nageurs = Array.isArray(data) ? data : []; },
-      error: () => {}
-    });
+    if (this.isAdmin) {
+      this.api.getAllNageurs().subscribe({
+        next: (data) => { this.nageurs = Array.isArray(data) ? data : []; },
+        error: () => {}
+      });
+    }
 
     this.api.getCotisationStats().subscribe({
       next: (data) => { this.stats = data; this.isLoading = false; },
@@ -76,12 +81,14 @@ export class CotisationsComponent implements OnInit {
   }
 
   openAddModal() {
+    if (!this.isAdmin) return;
     this.isEditMode = false;
     this.resetForm();
     this.showModal = true;
   }
 
   openEditModal(c: any) {
+    if (!this.isAdmin) return;
     this.isEditMode = true;
     this.selectedId = c._id;
     this.form = {
@@ -132,6 +139,7 @@ export class CotisationsComponent implements OnInit {
   }
 
   deleteCotisation(id: string) {
+    if (!this.isAdmin) return;
     if (!confirm('Supprimer cette cotisation ?')) return;
     this.api.deleteCotisation(id).subscribe({
       next: () => {
@@ -144,6 +152,7 @@ export class CotisationsComponent implements OnInit {
   }
 
   markAsPaid(c: any) {
+    if (!this.isAdmin) return;
     this.api.updateCotisation(c._id, { ...c, nageur: c.nageur?._id, statut: 'Payé' }).subscribe({
       next: () => {
         this.successMessage = 'Cotisation marquée comme payée !';

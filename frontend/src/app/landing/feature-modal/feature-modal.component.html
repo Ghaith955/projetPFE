@@ -1,0 +1,23 @@
+<div class="feature-modal-backdrop" *ngIf="feature" (click)="onBackdropClick($event)">
+  <section
+    class="feature-modal-panel"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'feature-modal-title-' + feature.key"
+  >
+    <button
+      type="button"
+      class="feature-modal-close"
+      aria-label="Fermer les details"
+      (click)="closeModal()"
+    >
+      ×
+    </button>
+
+    <span class="feature-modal-icon" aria-hidden="true">{{ feature.icon }}</span>
+
+    <h2 [id]="'feature-modal-title-' + feature.key">{{ feature.title }}</h2>
+
+    <p>{{ feature.detail }}</p>
+  </section>
+</div>

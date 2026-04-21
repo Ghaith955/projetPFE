@@ -1,0 +1,205 @@
+<div class="training-results-page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">IDSS</span>
+      <h1>Training Results</h1>
+      <p>Capture les resultats de chaque nageur juste apres la seance.</p>
+    </div>
+    <div class="head-actions">
+      <button class="mode-btn" [class.active]="viewMode === 'single'" (click)="setView('single')">Saisie rapide</button>
+      <button class="mode-btn" [class.active]="viewMode === 'multi'" (click)="setView('multi')">Saisie multi-nageurs</button>
+    </div>
+  </header>
+
+  <section class="glass-card session-card">
+    <div class="session-grid">
+      <div class="field">
+        <label>Seance d entrainement</label>
+        <select [(ngModel)]="selectedSessionId" (change)="onSessionChange()" name="session">
+          <option value="">Selectionner une seance</option>
+          <option *ngFor="let s of sessions" [value]="s._id || s.id">
+            {{ s.titre || s.title || 'Seance' }} · {{ s.date | date:'dd MMM yyyy' }}
+          </option>
+        </select>
+      </div>
+
+      <div class="session-meta" *ngIf="selectedSession">
+        <div class="meta-chip">{{ sessionDate | date:'dd MMM yyyy' }}</div>
+        <div class="meta-chip">{{ selectedSession?.type || 'Programme' }}</div>
+        <div class="meta-chip">{{ selectedSession?.duree || selectedSession?.dureeMinutes || 0 }} min</div>
+      </div>
+
+      <button class="ghost-btn" type="button" (click)="applySessionToRows()">Appliquer a toutes les lignes</button>
+    </div>
+  </section>
+
+  <section class="glass-card form-card" *ngIf="viewMode === 'single'">
+    <form #singleFormRef="ngForm" (ngSubmit)="submitSingle(singleFormRef)">
+      <div class="form-grid">
+        <div class="field">
+          <label>Nageur</label>
+          <select [(ngModel)]="singleForm.swimmerId" name="singleSwimmer" required>
+            <option value="">Selectionner</option>
+            <option *ngFor="let s of swimmers" [value]="resolveNageurId(s)">
+              {{ s.utilisateur?.prenom }} {{ s.utilisateur?.nom }}
+            </option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="singleForm.date" name="singleDate" required />
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select [(ngModel)]="singleForm.type" name="singleType" required>
+            <option *ngFor="let t of trainingTypes" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Duree (min)</label>
+          <input type="number" min="1" [(ngModel)]="singleForm.duration" name="singleDuration" required />
+        </div>
+        <div class="field">
+          <label>Distance (m)</label>
+          <input type="number" min="1" [(ngModel)]="singleForm.distance" name="singleDistance" required />
+        </div>
+        <div class="field">
+          <label>Intensite (1-10)</label>
+          <input type="number" min="1" max="10" [(ngModel)]="singleForm.intensity" name="singleIntensity" required />
+        </div>
+        <div class="field">
+          <label>Temps de performance</label>
+          <input type="text" [(ngModel)]="singleForm.performanceTime" name="singlePerf" placeholder="Ex: 58.4s" />
+        </div>
+        <div class="field">
+          <label>Feedback coach</label>
+          <select [(ngModel)]="singleForm.feedback" name="singleFeedback" required>
+            <option *ngFor="let f of feedbackOptions" [value]="f.value">{{ f.label }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Presence</label>
+          <select [(ngModel)]="singleForm.attendance" name="singleAttendance" required>
+            <option *ngFor="let a of attendanceOptions" [value]="a.value">{{ a.label }}</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label>Note coach</label>
+          <textarea rows="3" [(ngModel)]="singleForm.note" name="singleNote" placeholder="Observation rapide"></textarea>
+        </div>
+      </div>
+
+      <div class="form-foot">
+        <button class="btn-primary" type="submit" [disabled]="isSubmitting">Enregistrer</button>
+        <span class="form-message success" *ngIf="successMessage">{{ successMessage }}</span>
+        <span class="form-message error" *ngIf="errorMessage">{{ errorMessage }}</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="glass-card table-card" *ngIf="viewMode === 'multi'">
+    <div class="table-head">
+      <div>
+        <h2>Saisie multi-nageurs</h2>
+        <p>Un tableau par nageur pour saisir rapidement les resultats.</p>
+      </div>
+      <div class="table-actions">
+        <span class="chip">{{ swimmers.length }} nageurs</span>
+      </div>
+    </div>
+
+    <form (ngSubmit)="submitBatch()" #batchForm="ngForm">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nageur</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Duree</th>
+              <th>Distance</th>
+              <th>Intensite</th>
+              <th>Perf</th>
+              <th>Feedback</th>
+              <th>Presence</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of tableRows; let i = index; trackBy: trackRow">
+              <td class="name-cell">
+                <div class="name-stack">
+                  <span class="name">{{ row.swimmerName }}</span>
+                </div>
+              </td>
+              <td>
+                <input type="date" [(ngModel)]="row.date" name="date-{{ i }}" required />
+              </td>
+              <td>
+                <select [(ngModel)]="row.type" name="type-{{ i }}" required>
+                  <option *ngFor="let t of trainingTypes" [value]="t.value">{{ t.label }}</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" min="1" [(ngModel)]="row.duration" name="duration-{{ i }}" required />
+              </td>
+              <td>
+                <input type="number" min="1" [(ngModel)]="row.distance" name="distance-{{ i }}" required />
+              </td>
+              <td>
+                <input type="number" min="1" max="10" [(ngModel)]="row.intensity" name="intensity-{{ i }}" required />
+              </td>
+              <td>
+                <input type="text" [(ngModel)]="row.performanceTime" name="perf-{{ i }}" placeholder="58.4s" />
+              </td>
+              <td>
+                <select [(ngModel)]="row.feedback" name="feedback-{{ i }}" required>
+                  <option *ngFor="let f of feedbackOptions" [value]="f.value">{{ f.label }}</option>
+                </select>
+              </td>
+              <td>
+                <select [(ngModel)]="row.attendance" name="attendance-{{ i }}" required>
+                  <option *ngFor="let a of attendanceOptions" [value]="a.value">{{ a.label }}</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" [(ngModel)]="row.note" name="note-{{ i }}" placeholder="Note" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="form-foot">
+        <button class="btn-primary" type="submit" [disabled]="isSubmitting">Enregistrer tous</button>
+        <span class="form-message success" *ngIf="successMessage">{{ successMessage }}</span>
+        <span class="form-message error" *ngIf="errorMessage">{{ errorMessage }}</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="glass-card ai-card">
+    <div class="ai-head">
+      <h2>Zone IDSS</h2>
+      <p>Reservee aux insights IA (a venir).</p>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-tile">
+        <span>Fatigue</span>
+        <strong>Placeholder</strong>
+      </div>
+      <div class="ai-tile">
+        <span>Prediction</span>
+        <strong>Placeholder</strong>
+      </div>
+      <div class="ai-tile">
+        <span>Recommandations</span>
+        <strong>Placeholder</strong>
+      </div>
+      <div class="ai-tile">
+        <span>Explications</span>
+        <strong>Placeholder</strong>
+      </div>
+    </div>
+  </section>
+</div>

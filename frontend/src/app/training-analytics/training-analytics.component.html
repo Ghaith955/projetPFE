@@ -1,0 +1,107 @@
+<div class="training-analytics-page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">IDSS</span>
+      <h1>Training Analytics</h1>
+      <p>Analyse globale des entrainements, tendances et presence.</p>
+    </div>
+  </header>
+
+  <section class="glass-card filter-card">
+    <div class="filter-grid">
+      <div class="field">
+        <label>Du</label>
+        <input type="date" [(ngModel)]="filterStart" (change)="applyFilters()" />
+      </div>
+      <div class="field">
+        <label>Au</label>
+        <input type="date" [(ngModel)]="filterEnd" (change)="applyFilters()" />
+      </div>
+      <div class="field">
+        <label>Nageur</label>
+        <select [(ngModel)]="selectedSwimmerId" (change)="applyFilters()">
+          <option value="">Tous</option>
+          <option *ngFor="let s of swimmers" [value]="resolveNageurId(s)">
+            {{ s.utilisateur?.prenom }} {{ s.utilisateur?.nom }}
+          </option>
+        </select>
+      </div>
+      <button class="ghost-btn" type="button" (click)="clearFilters()">Reinitialiser</button>
+    </div>
+  </section>
+
+  <section class="stats-grid">
+    <div class="glass-card stat">
+      <span>Distance totale</span>
+      <strong>{{ totalDistance }} m</strong>
+    </div>
+    <div class="glass-card stat">
+      <span>Intensite moyenne</span>
+      <strong>{{ avgIntensity }}</strong>
+    </div>
+    <div class="glass-card stat">
+      <span>Taux de presence</span>
+      <strong>{{ attendanceRate }}%</strong>
+    </div>
+  </section>
+
+  <section class="glass-card table-card">
+    <div class="table-head">
+      <h2>Detail des seances</h2>
+      <span>{{ filtered.length }} resultats</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nageur</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Duree</th>
+            <th>Distance</th>
+            <th>Intensite</th>
+            <th>Presence</th>
+            <th>Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filtered">
+            <td>{{ r.swimmerName || getSwimmerName(r.swimmerId) }}</td>
+            <td>{{ r.date | date:'dd MMM yyyy' }}</td>
+            <td>{{ r.type | titlecase }}</td>
+            <td>{{ r.duration }} min</td>
+            <td>{{ r.distance }} m</td>
+            <td>{{ r.intensity }}</td>
+            <td>{{ r.attendance | titlecase }}</td>
+            <td>{{ r.feedback | titlecase }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="glass-card ai-card">
+    <div class="ai-head">
+      <h2>Zone IDSS</h2>
+      <p>Placeholders pour insights IA a venir.</p>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-tile">
+        <span>Fatigue</span>
+        <strong>Placeholder</strong>
+      </div>
+      <div class="ai-tile">
+        <span>Prediction</span>
+        <strong>Placeholder</strong>
+      </div>
+      <div class="ai-tile">
+        <span>Recommandations</span>
+        <strong>Placeholder</strong>
+      </div>
+      <div class="ai-tile">
+        <span>Explications</span>
+        <strong>Placeholder</strong>
+      </div>
+    </div>
+  </section>
+</div>

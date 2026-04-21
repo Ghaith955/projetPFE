@@ -1,1 +1,47 @@
-<p>interface-entaineur works!</p>
+<section class="role-dashboard role-dashboard--coach">
+	<header class="role-header">
+		<div>
+			<h1>{{ 'roleDash.coach.title' | translate }}</h1>
+			<p>{{ 'roleDash.coach.subtitle' | translate }}</p>
+		</div>
+		<span class="role-pill">{{ 'roleDash.coach.pill' | translate }}</span>
+	</header>
+
+	<div class="role-kpis">
+		<article class="role-card">
+			<h3>{{ 'roleDash.coach.kpiSwimmers' | translate }}</h3>
+			<strong>24</strong>
+			<small>{{ 'roleDash.coach.kpiSwimmersNote' | translate }}</small>
+		</article>
+		<article class="role-card">
+			<h3>{{ 'roleDash.coach.kpiSessions' | translate }}</h3>
+			<strong>18</strong>
+			<small>{{ 'roleDash.coach.kpiSessionsNote' | translate }}</small>
+		</article>
+		<article class="role-card">
+			<h3>{{ 'roleDash.coach.kpiAdherence' | translate }}</h3>
+			<strong>91%</strong>
+			<small>{{ 'roleDash.coach.kpiAdherenceNote' | translate }}</small>
+		</article>
+	</div>
+
+	<div class="role-grid">
+		<article class="panel">
+			<h3>{{ 'roleDash.coach.panelAlerts' | translate }}</h3>
+			<ul>
+				<li><span>U17 Libre</span> {{ 'roleDash.coach.panelAlertsItems.item1' | translate }}</li>
+				<li><span>Senior Mixte</span> {{ 'roleDash.coach.panelAlertsItems.item2' | translate }}</li>
+				<li><span>U15 Papillon</span> {{ 'roleDash.coach.panelAlertsItems.item3' | translate }}</li>
+			</ul>
+		</article>
+
+		<article class="panel">
+			<h3>{{ 'roleDash.coach.panelActions' | translate }}</h3>
+			<ul>
+				<li>{{ 'roleDash.coach.panelActionsItems.item1' | translate }}</li>
+				<li>{{ 'roleDash.coach.panelActionsItems.item2' | translate }}</li>
+				<li>{{ 'roleDash.coach.panelActionsItems.item3' | translate }}</li>
+			</ul>
+		</article>
+	</div>
+</section>

@@ -5,7 +5,7 @@
     <span class="page-subtitle">Adhésions</span>
   </div>
   <div class="topbar-right">
-    <button class="btn-primary-sm" (click)="openAddModal()">+ Nouvelle cotisation</button>
+    <button class="btn-primary-sm" (click)="openAddModal()" *ngIf="isAdmin">+ Nouvelle cotisation</button>
   </div>
 </header>
 
@@ -56,7 +56,7 @@
   <div class="empty-state" *ngIf="!isLoading && filteredCotisations.length === 0">
     <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
     <p>Aucune cotisation trouvée</p>
-    <button class="btn-primary-sm" (click)="openAddModal()">+ Nouvelle cotisation</button>
+    <button class="btn-primary-sm" (click)="openAddModal()" *ngIf="isAdmin">+ Nouvelle cotisation</button>
   </div>
 
   <!-- TABLE -->
@@ -69,7 +69,7 @@
           <th>Période</th>
           <th>Mode paiement</th>
           <th>Statut</th>
-          <th>Actions</th>
+          <th *ngIf="isAdmin">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -94,7 +94,7 @@
           </td>
           <td><span class="mode-badge">{{ c.modePaiement }}</span></td>
           <td><span class="statut-badge" [class]="getStatutClass(c.statut)">{{ c.statut }}</span></td>
-          <td>
+          <td *ngIf="isAdmin">
             <div class="action-btns">
               <button class="svg-icon-btn pay" *ngIf="c.statut !== 'Payé'" (click)="markAsPaid(c)" title="Marquer comme payé">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -114,7 +114,7 @@
 </div>
 
 <!-- MODAL -->
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+<div class="modal-overlay" *ngIf="showModal && isAdmin" (click)="closeModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3>{{ isEditMode ? 'Modifier la cotisation' : 'Nouvelle cotisation' }}</h3>

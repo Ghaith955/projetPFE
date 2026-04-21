@@ -1,4 +1,5 @@
 const Competition = require('../models/competition.model');
+const { notifyNageurs } = require('../utils/notificationHelper');
 
 const competitionController = {};
 
@@ -29,6 +30,17 @@ competitionController.createCompetition = async (req, res) => {
     const { nom, date, lieu, description, niveauRequis, statut, nageurs } = req.body;
     const competition = new Competition({ nom, date, lieu, description, niveauRequis, statut, nageurs });
     await competition.save();
+
+    await notifyNageurs({
+      nageurIds: Array.isArray(nageurs) ? nageurs : [],
+      title: 'Nouvelle competition',
+      message: `Vous etes inscrit a la competition "${nom}" prevue le ${new Date(date).toLocaleDateString('fr-FR')}.`,
+      type: 'competition',
+      resourceType: 'Competition',
+      resourceId: competition._id,
+      createdBy: req.user.userId
+    });
+
     res.status(201).json({ message: 'Compétition créée avec succès!', competition });
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la création.', error: error.message });

@@ -24,6 +24,24 @@
   <div class="alert alert-success" *ngIf="successMessage"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span> {{ successMessage }}</div>
   <div class="alert alert-error" *ngIf="errorMessage && !showModal"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> {{ errorMessage }}</div>
 
+  <div class="smart-strip" *ngIf="!isLoading">
+    <div class="smart-card">
+      <span class="smart-kicker">Total</span>
+      <span class="smart-val">{{ entrainements.length }}</span>
+      <span class="smart-sub">Entraînements planifiés</span>
+    </div>
+    <div class="smart-card">
+      <span class="smart-kicker">Mois</span>
+      <span class="smart-val">{{ monthNames[currentMonth] }}</span>
+      <span class="smart-sub">{{ currentYear }}</span>
+    </div>
+    <div class="smart-card">
+      <span class="smart-kicker">Sélection</span>
+      <span class="smart-val">{{ selectedDay?.events?.length || 0 }}</span>
+      <span class="smart-sub">Séances sur la journée</span>
+    </div>
+  </div>
+
   <div class="loading-state" *ngIf="isLoading">
     <div class="spinner"></div>
     <p>Chargement...</p>
@@ -61,12 +79,6 @@
         </div>
       </div>
 
-      <div class="cal-legend">
-        <div class="legend-item" *ngFor="let t of types">
-          <span class="legend-dot" [style.background]="getTypeColor(t)"></span>
-          <span>{{ t }}</span>
-        </div>
-      </div>
     </div>
 
     <!-- Day Detail -->
@@ -76,7 +88,8 @@
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </div>
         <p>Sélectionnez un jour pour voir les entraînements</p>
-        <button class="btn-primary-sm" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter un entraînement</button>
+        <span class="empty-hint">Astuce: vous pouvez basculer entre calendrier et liste selon votre besoin.</span>
+        <button class="btn-primary-sm empty-cta" *ngIf="canEdit" (click)="openAddModal()">+ Ajouter un entraînement</button>
       </div>
 
       <div *ngIf="selectedDay">

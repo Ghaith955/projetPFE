@@ -1,212 +1,186 @@
-<div class="auth-container">
-  <!-- LEFT PANEL - Decorative -->
-  <div class="auth-left">
-    <!-- Swimmer Video Background -->
-    <video autoplay loop muted playsinline class="bg-video">
-      <source src="https://assets.mixkit.co/videos/preview/mixkit-swimmer-underwater-in-a-pool-1956-large.mp4" type="video/mp4">
+<div class="auth-shell">
+  <section class="auth-visual" aria-hidden="true">
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+      class="auth-visual-video"
+      [attr.muted]="''"
+      #heroVideo
+      (loadedmetadata)="onHeroVideoReady(heroVideo)"
+      (canplay)="startHeroVideo(heroVideo)"
+      (timeupdate)="enforceHeroClip(heroVideo)">
+      <source src="assets/videos/cam-mcevoy-paris2024.mp4" type="video/mp4" />
     </video>
-    <div class="video-overlay"></div>
+    <div class="auth-visual-overlay"></div>
+    <div class="auth-visual-vignette"></div>
+    <div class="auth-visual-pattern"></div>
+    <div class="auth-visual-glass"></div>
+    <div class="auth-top-brand" aria-label="IDSS NATATION">
+      <span class="brand-wordmark">idss</span>
+      <span class="brand-submark">NATATION</span>
+    </div>
 
-    <div class="auth-left-content">
-      <!-- Top Left Brand -->
-      <div class="brand">
-        <div class="brand-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect width="24" height="24" rx="6" fill="rgba(255,255,255,0.2)" />
-            <circle cx="12" cy="12" r="6" fill="white" clip-path="url(#half-clip)" />
-            <defs>
-              <clipPath id="half-clip">
-                <rect x="0" y="0" width="12" height="24" />
-              </clipPath>
-            </defs>
-          </svg>
-        </div>
-        <span class="brand-name">IDSS Natation</span>
-      </div>
-
-      <div class="hero-center">
-        <div class="shield-container">
-          <div class="ring r1"></div>
-          <div class="ring r2"></div>
-          <div class="shield-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-          </div>
-        </div>
-
-        <h1 class="hero-title">Rejoignez la<br>Section Natation</h1>
-        <p class="hero-subtitle">
-          Créez votre compte et accédez à votre<br>
-          espace personnel IDSS en toute sécurité.
-        </p>
-
-        <div class="hero-badges">
-          <span class="hero-badge">Sécurisé</span>
-          <span class="hero-badge">Rapide</span>
-          <span class="hero-badge">Fiable</span>
-        </div>
+    <div class="auth-visual-content">
+      <p class="visual-kicker">Inscription IDSS</p>
+      <h2 class="visual-title">Creez votre environnement de performance.</h2>
+      <p class="visual-copy">
+        Lancez votre espace en quelques minutes et donnez a chaque role un parcours clair pour structurer l'entrainement et la progression.
+      </p>
+      <div class="visual-points">
+        <span class="visual-pill">Profils adaptes aux roles</span>
+        <span class="visual-pill">Parcours rapide</span>
+        <span class="visual-pill">Demarrage immediat</span>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- RIGHT PANEL -->
-  <div class="auth-right">
-    <div class="auth-form-wrapper">
-      <!-- Back button -->
-      <a routerLink="/login" class="back-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Retour à la connexion
-      </a>
+  <section class="auth-pane">
+    <div class="auth-card auth-card--scroll">
+      <a routerLink="/login" class="back-link">&#8592; Retour a la connexion</a>
 
-      <h2 class="form-title">Créer un compte</h2>
-      <p class="form-subtitle">Votre inscription sera soumise à l'approbation de l'administrateur</p>
+      <div class="auth-heading">
+        <h1 class="auth-title">Creer votre compte</h1>
+        <p class="auth-subtitle">Renseignez vos informations pour rejoindre la plateforme avec le role qui vous correspond.</p>
+      </div>
 
-      <!-- Role Selector -->
       <div class="role-tabs">
-        <button *ngFor="let r of roles" class="role-tab" [class.active]="selectedRole === r.value"
-          (click)="selectRole(r.value)">
+        <button type="button" *ngFor="let r of roles" class="role-tab" [class.active]="selectedRole === r.value" (click)="selectRole(r.value)">
           <span class="role-icon" [innerHTML]="r.icon"></span>
-          {{ r.label }}
+          <span>{{ r.label }}</span>
         </button>
       </div>
 
-      <!-- Photo Upload -->
       <div class="photo-upload-wrapper">
         <label for="file-upload" class="photo-upload-btn" [class.has-image]="imagePreview">
-          <img *ngIf="imagePreview" [src]="imagePreview" alt="Aperçu" class="preview-img">
-          <div class="upload-placeholder" *ngIf="!imagePreview">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-              <circle cx="12" cy="13" r="4"></circle>
-            </svg>
-          </div>
+          <img *ngIf="imagePreview" [src]="imagePreview" alt="Apercu" class="preview-img" />
+          <div class="upload-placeholder" *ngIf="!imagePreview">+</div>
         </label>
-        <span class="photo-label">Photo</span>
-        <input id="file-upload" type="file" accept="image/*" (change)="onFileChange($event)" hidden>
+        <span class="photo-label">Photo de profil</span>
+        <input id="file-upload" type="file" accept="image/*" (change)="onFileChange($event)" hidden />
       </div>
 
-      <!-- Nam and Prenom -->
-      <div class="form-row">
-        <div class="form-group half-width">
-          <label class="form-label">Nom</label>
-          <input type="text" class="form-input" [(ngModel)]="nom" />
-        </div>
-        <div class="form-group half-width">
-          <label class="form-label">Prénom</label>
-          <input type="text" class="form-input" [(ngModel)]="prenom" />
-        </div>
-      </div>
-
-      <!-- Email -->
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-input" [(ngModel)]="email" />
-      </div>
-
-      <!-- Password -->
-      <div class="form-group">
-        <label class="form-label">Mot de passe</label>
-        <input type="password" class="form-input" [(ngModel)]="password" />
-      </div>
-
-      <!-- Nageur Fields -->
-      <ng-container *ngIf="selectedRole === 'NAGEUR'">
-        <div class="form-row">
-          <div class="form-group third-width">
-            <label class="form-label">Âge</label>
-            <input type="number" class="form-input" [(ngModel)]="age" />
+      <div class="form-stack">
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Nom de famille</label>
+            <input type="text" class="form-control" [(ngModel)]="nom" />
           </div>
-          <div class="form-group third-width">
-            <label class="form-label">Sexe</label>
-            <select class="form-input" [(ngModel)]="sexe">
-              <option value="Masculin">Masculin</option>
-              <option value="Féminin">Féminin</option>
-            </select>
-          </div>
-          <div class="form-group third-width">
-            <label class="form-label">Poids (kg)</label>
-            <input type="number" class="form-input" [(ngModel)]="poids" />
+          <div class="form-group">
+            <label class="form-label">Prenom</label>
+            <input type="text" class="form-control" [(ngModel)]="prenom" />
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Spécialités</label>
-          <div class="chips-container">
-            <button *ngFor="let spec of availableSpecialites" class="chip" [class.active]="specialites.includes(spec)"
-              (click)="toggleSpecialite(spec)">
-              {{ spec }}
+          <label class="form-label">Adresse e-mail</label>
+          <input type="email" class="form-control" [(ngModel)]="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <div class="form-control-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" class="form-control form-control--with-toggle" [(ngModel)]="password" />
+            <button type="button" class="field-toggle" (click)="showPassword = !showPassword">
+              {{ showPassword ? 'Masquer' : 'Afficher' }}
             </button>
           </div>
         </div>
-      </ng-container>
 
-      <!-- Entraîneur Fields -->
-      <ng-container *ngIf="selectedRole === 'ENTRAINEUR'">
-        <div class="form-row">
-          <div class="form-group half-width">
-            <label class="form-label">N° Certification *</label>
-            <input type="text" class="form-input" [(ngModel)]="numeroCertification" placeholder="CERT-XXXX-XXX" />
+        <ng-container *ngIf="selectedRole === 'NAGEUR'">
+          <div class="form-grid form-grid--3">
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <input type="number" class="form-control" [(ngModel)]="age" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sexe</label>
+              <select class="form-control" [(ngModel)]="sexe">
+                <option value="Masculin">Masculin</option>
+                <option value="Feminin">Feminin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Poids (kg)</label>
+              <input type="number" class="form-control" [(ngModel)]="poids" />
+            </div>
           </div>
-          <div class="form-group half-width">
-            <label class="form-label">Diplôme</label>
-            <select class="form-input" [(ngModel)]="diplome">
-              <option value="">Sélectionner</option>
-              <option value="Licence">Licence</option>
-              <option value="Master">Master</option>
-              <option value="Autre">Autre</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group half-width">
-            <label class="form-label">Années d'expérience</label>
-            <input type="number" class="form-input" [(ngModel)]="experience" placeholder="0" />
-          </div>
-          <div class="form-group half-width">
-            <label class="form-label">Téléphone</label>
-            <input type="tel" class="form-input" [(ngModel)]="phone" placeholder="06 XX XX XX XX" />
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label class="form-label">Spécialités</label>
-          <div class="chips-container">
-            <button *ngFor="let spec of availableSpecialites" class="chip" [class.active]="specialites.includes(spec)"
-              (click)="toggleSpecialite(spec)">
-              {{ spec }}
-            </button>
+          <div class="form-group">
+            <label class="form-label">Club</label>
+            <input type="text" class="form-control" [(ngModel)]="club" />
           </div>
-        </div>
-      </ng-container>
 
-      <!-- Responsable Fields -->
-      <ng-container *ngIf="selectedRole === 'RESPONSABLE'">
-        <div class="form-group">
-          <label class="form-label">Téléphone</label>
-          <input type="tel" class="form-input" [(ngModel)]="phone" />
-        </div>
-      </ng-container>
+          <div class="form-group">
+            <label class="form-label">Specialites</label>
+            <div class="chips-container">
+              <button type="button" *ngFor="let spec of availableSpecialites" class="chip" [class.active]="specialites.includes(spec)" (click)="toggleSpecialite(spec)">
+                {{ spec }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
 
-      <!-- Messages -->
-      <div class="error-message" *ngIf="errorMessage">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        {{ errorMessage }}
+        <ng-container *ngIf="selectedRole === 'ENTRAINEUR'">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Numero de certification</label>
+              <input type="text" class="form-control" [(ngModel)]="numeroCertification" placeholder="CERT-XXXX-XXX" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Diplome</label>
+              <select class="form-control" [(ngModel)]="diplome">
+                <option value="">Selectionner</option>
+                <option value="Licence">Licence</option>
+                <option value="Master">Master</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Experience (annees)</label>
+              <input type="number" class="form-control" [(ngModel)]="experience" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telephone</label>
+              <input type="tel" class="form-control" [(ngModel)]="phone" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Specialites</label>
+            <div class="chips-container">
+              <button type="button" *ngFor="let spec of availableSpecialites" class="chip" [class.active]="specialites.includes(spec)" (click)="toggleSpecialite(spec)">
+                {{ spec }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedRole === 'RESPONSABLE'">
+          <div class="form-group">
+            <label class="form-label">Telephone</label>
+            <input type="tel" class="form-control" [(ngModel)]="phone" />
+          </div>
+        </ng-container>
+
+        <div class="status status--error" *ngIf="errorMessage">{{ errorMessage }}</div>
+        <div class="status status--success" *ngIf="successMessage">{{ successMessage }}</div>
+
+        <button class="primary-btn" (click)="onRegister()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Soumettre la demande</span>
+          <span *ngIf="isLoading">Creation du compte...</span>
+        </button>
+
+        <p class="secondary-note">
+          Vous avez deja un compte ?
+          <a routerLink="/login" class="link-strong">Se connecter</a>
+        </p>
       </div>
-      <div class="success-message" *ngIf="successMessage">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        {{ successMessage }}
-      </div>
-
-      <!-- Submit -->
-      <button class="btn-primary" (click)="onRegister()" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Soumettre la demande</span>
-        <span *ngIf="isLoading" class="spinner"></span>
-      </button>
-
-      <p class="form-footer">
-        Déjà un compte? <a routerLink="/login" class="link-accent">Se connecter</a>
-      </p>
     </div>
-  </div>
+  </section>
 </div>

@@ -71,6 +71,31 @@ export class ApiService {
     }
     return this.http.get(`${this.baseUrl}/performances`, { params: httpParams });
   }
+  getPerformanceTrends(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get(`${this.baseUrl}/performances/trends`, { params: httpParams });
+  }
+  getPerformanceInsights(params?: any): Observable<any> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get(`${this.baseUrl}/performances/insights`, { params: httpParams });
+  }
+  createTrainingResult(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/performances/training-result`, data);
+  }
   createPerformance(data: any): Observable<any> { return this.http.post(`${this.baseUrl}/performances`, data); }
   updatePerformance(id: string, data: any): Observable<any> { return this.http.put(`${this.baseUrl}/performances/${id}`, data); }
   deletePerformance(id: string): Observable<any> { return this.http.delete(`${this.baseUrl}/performances/${id}`); }
@@ -81,4 +106,17 @@ export class ApiService {
 
   // Chatbot
   sendChatMessage(messages: any[]): Observable<any> { return this.http.post(`${this.baseUrl}/chat`, { messages }); }
+
+  // Notifications
+  getMyNotifications(limit = 30): Observable<any> {
+    return this.http.get(`${this.baseUrl}/notifications`, { params: { limit } });
+  }
+
+  markNotificationAsRead(id: string): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/notifications/${id}/read`, {});
+  }
+
+  markAllNotificationsAsRead(): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/notifications/read-all`, {});
+  }
 }
