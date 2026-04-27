@@ -1,5 +1,5 @@
 <!-- ╔══════════════════════════════════════════════════════════════╗
-     ║                    ADMIN DASHBOARD                          ║
+     ║                    ADMIN DASHBOARD                           ║
      ╚══════════════════════════════════════════════════════════════╝ -->
 <div class="dashboard-container" *ngIf="isAdmin">
   <div class="dashboard-main">
@@ -53,12 +53,14 @@
     <section class="card">
       <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.accountRequests' | translate }}</h3><a class="see-all" (click)="navigate('/utilisateurs')">{{ 'dashboard.admin.seeAll' | translate }} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a></div>
       <div class="dem-list">
-        <div class="dem-row" *ngFor="let u of pendingRegistrations.slice(0,3)">
+        <div class="dem-row selectable" *ngFor="let u of pendingRegistrations.slice(0,3)"
+             [class.selected]="selectedProfile?.source?._id === u._id"
+             (click)="selectProfile(u)">
           <div class="dem-user"><div class="ava sm"><img *ngIf="avatarUrl(u)" [src]="avatarUrl(u)"/><span *ngIf="!avatarUrl(u)">{{ getInitials(u) }}</span></div><div class="dem-info"><span class="dem-name">{{ u.prenom }} {{ u.nom }}</span><span class="dem-email">{{ u.email }}</span></div></div>
           <div class="dem-acts">
-            <button class="act-btn acc" (click)="approveRegistration(u._id)" [disabled]="actionLoading[u._id]"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-            <button class="act-btn edt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <button class="act-btn rej" (click)="rejectRegistration(u._id)" [disabled]="actionLoading[u._id]"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <button class="act-btn acc" (click)="$event.stopPropagation(); approveRegistration(u._id)" [disabled]="actionLoading[u._id]"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button class="act-btn edt" (click)="$event.stopPropagation()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="act-btn rej" (click)="$event.stopPropagation(); rejectRegistration(u._id)" [disabled]="actionLoading[u._id]"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
         <div class="empty-msg" *ngIf="pendingRegistrations.length===0">{{ 'dashboard.admin.emptyRequests' | translate }}</div>
@@ -69,12 +71,29 @@
     <section class="card">
       <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.swimmerPerformance' | translate }}</h3><a class="see-all" (click)="navigate('/nageurs')">{{ 'dashboard.admin.seeAll' | translate }} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a></div>
       <div class="dem-list">
-        <div class="dem-row" *ngFor="let n of nageurs.slice(0,3)">
+        <div class="dem-row selectable" *ngFor="let n of nageurs.slice(0,3)"
+             [class.selected]="selectedProfile?.source?._id === n._id"
+             (click)="selectProfile(n, 'NAGEUR')">
           <div class="dem-user"><div class="ava sm"><img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)"/><span *ngIf="!avatarUrl(n)">{{ getInitials(n) }}</span></div><div class="dem-info"><span class="dem-name">{{ fullName(n) }}</span><span class="dem-email">{{ 'dashboard.admin.levelEstimate' | translate }}</span></div></div>
           <div class="perf-vals"><span class="pv-time">{{ n.poid || '57.5' }}s</span><span class="pv-badge red">0%</span></div>
         </div>
       </div>
     </section>
+
+    <!-- Entraineurs -->
+    <section class="card">
+      <div class="card-top"><h3 class="card-h">Entraîneurs</h3></div>
+      <div class="dem-list">
+        <div class="dem-row selectable" *ngFor="let e of entraineurs.slice(0,3)"
+             [class.selected]="selectedProfile?.source?._id === e._id"
+             (click)="selectProfile(e, 'ENTRAINEUR')">
+          <div class="dem-user"><div class="ava sm"><img *ngIf="avatarUrl(e)" [src]="avatarUrl(e)"/><span *ngIf="!avatarUrl(e)">{{ getInitials(e) }}</span></div><div class="dem-info"><span class="dem-name">{{ fullName(e) }}</span><span class="dem-email">{{ e.utilisateur?.email || '—' }}</span></div></div>
+          <div class="perf-vals"><span class="pv-time">{{ e.specialite || 'Coach' }}</span></div>
+        </div>
+        <div class="empty-msg" *ngIf="entraineurs.length===0">Aucun entraîneur trouvé</div>
+      </div>
+    </section>
+
   </div>
 
   <!-- ── ADMIN DSS PANEL ── -->
@@ -123,7 +142,7 @@
 
 
 <!-- ╔══════════════════════════════════════════════════════════════╗
-     ║                   COACH DASHBOARD                          ║
+     ║                   COACH DASHBOARD                            ║
      ╚══════════════════════════════════════════════════════════════╝ -->
 <div class="dashboard-container" *ngIf="isEntraineur">
   <div class="dashboard-main">
@@ -227,7 +246,7 @@
 
 
 <!-- ╔══════════════════════════════════════════════════════════════╗
-     ║                  SWIMMER DASHBOARD                         ║
+     ║                  SWIMMER DASHBOARD                           ║
      ╚══════════════════════════════════════════════════════════════╝ -->
 <div class="dashboard-container" *ngIf="isNageur">
   <div class="dashboard-main">
@@ -301,118 +320,47 @@
 
   <!-- ── SWIMMER DSS PANEL ── -->
   <aside class="dss sw-dss">
-    <div class="dss-head"><span class="dss-t">| DSS Insights</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button></div>
+    <div class="dss-head"><span class="dss-t">{{ 'dashboard.swimmer.dss.title' | translate }}</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
 
-    <!-- Performance Trend -->
-    <div class="dss-sec dss-trend-card">
-      <span class="dss-lbl">Performance Trend</span>
-      <div class="trend-main">
-        <div class="trend-left">
-          <span class="trend-big">{{ bestTime }}<small>s</small></span>
-          <span class="trend-u">au 100m</span>
-        </div>
-        <svg class="sparkline" viewBox="0 0 140 50">
-          <defs>
-            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="rgba(34,197,94,0.25)"/>
-              <stop offset="100%" stop-color="rgba(34,197,94,0)"/>
-            </linearGradient>
-          </defs>
-          <polygon points="5,45 20,40 35,38 50,32 65,30 80,25 95,20 110,15 125,10 135,6 135,50 5,50" fill="url(#sparkGrad)"/>
-          <polyline points="5,45 20,40 35,38 50,32 65,30 80,25 95,20 110,15 125,10 135,6" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="135" cy="6" r="3.5" fill="#22c55e"/>
-          <circle cx="135" cy="6" r="6" fill="none" stroke="rgba(34,197,94,0.3)" stroke-width="1.5"/>
-        </svg>
-      </div>
-      <span class="dss-badge green">En Amélioration</span>
+    <div class="dss-sec"><span class="dss-lbl">{{ 'dashboard.swimmer.dss.trend' | translate }}</span><div class="trend-val"><span class="trend-big">{{ bestTime }}s</span><span class="trend-u">{{ 'dashboard.swimmer.bestTimeUnit' | translate }}</span></div>
+      <svg class="sparkline" viewBox="0 0 120 40"><polyline points="5,35 20,30 35,28 50,22 65,20 80,15 95,12 110,8" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="dss-badge green">{{ 'dashboard.swimmer.dss.improving' | translate }}</span>
     </div>
 
-    <!-- Fatigue Risk -->
-    <div class="dss-sec dss-fatigue-card">
-      <span class="dss-lbl">Fatigue Risk</span>
-      <div class="fatigue-main">
-        <div class="fatigue-left">
-          <span class="fat-lvl amber">Moyen</span>
-          <span class="fat-detail">Entraîné: 9 sessions</span>
-        </div>
-        <div class="gauge-wrap">
-          <svg viewBox="0 0 100 58" class="gauge">
-            <path d="M12,52 A38,38 0 0,1 88,52" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="9" stroke-linecap="round"/>
-            <path d="M12,52 A38,38 0 0,1 58,15" fill="none" stroke="url(#gaugeGrad)" stroke-width="9" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#22c55e"/>
-                <stop offset="60%" stop-color="#f59e0b"/>
-                <stop offset="100%" stop-color="#ef4444"/>
-              </linearGradient>
-            </defs>
-            <!-- Needle -->
-            <line x1="50" y1="52" x2="54" y2="22" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="50" cy="52" r="4" fill="#f59e0b"/>
-            <circle cx="50" cy="52" r="2" fill="#1a1d2e"/>
-          </svg>
-        </div>
-      </div>
+    <div class="dss-sec"><span class="dss-lbl">{{ 'dashboard.swimmer.dss.fatigue' | translate }}</span><span class="fat-lvl amber">{{ 'dashboard.swimmer.dss.fatigueLevel' | translate }}</span>
+      <div class="gauge-wrap"><svg viewBox="0 0 100 55" class="gauge"><path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="#2a2d3a" stroke-width="8" stroke-linecap="round"/><path d="M10,50 A40,40 0 0,1 55,12" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/></svg></div>
+      <span class="dss-det">{{ 'dashboard.swimmer.dss.trainedSessions' | translate }}</span>
     </div>
 
-    <!-- Recommendation -->
-    <div class="dss-sec dss-rec-card">
-      <div class="rec-header">
-        <span class="dss-lbl">Recommendation</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rec-chev"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="dss-rec">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f6c453" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        <div class="rec-text">
-          <span class="rec-main">Sélectionner pour compétition prochaine</span>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="rec-chev"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
+    <div class="dss-sec"><span class="dss-lbl">{{ 'dashboard.swimmer.dss.recommendation' | translate }}</span>
+      <div class="dss-rec"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span>{{ 'dashboard.swimmer.dss.recommendationText' | translate }}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
     </div>
 
-    <!-- Body Metrics -->
+    <!-- Body Metrics with real image -->
     <div class="dss-sec dss-body">
-      <div class="dss-st">| Body Metrics</div>
-      <div class="body-layout">
-        <div class="body-data-col">
-          <div class="body-primary">
-            <span class="body-big">{{ weight }} <small>kg</small></span>
-            <span class="body-sub">{{ height }} cm</span>
-            <span class="dss-badge green sm">Healthy</span>
-          </div>
-          <svg class="body-sparkline" viewBox="0 0 120 30">
-            <polyline points="5,25 15,22 25,20 35,18 50,15 65,12 80,10 95,7 110,5" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="110" cy="5" r="2.5" fill="#22c55e"/>
-          </svg>
-          <div class="body-stats">
-            <div class="bs-row"><span class="bs-label">Weight</span><span class="bs-value">{{ weight }} kg</span></div>
-            <div class="bs-row"><span class="bs-label">Height</span><span class="bs-value">{{ height }} cm</span></div>
-            <div class="bs-row"><span class="bs-label">BMI</span><span class="bs-value bold">{{ bmi }}</span></div>
-          </div>
-          <div class="body-shape">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="12,2 22,22 2,22"/></svg>
-            <span class="body-shape-text">Inverted Triangle<br/>Body Shape</span>
-          </div>
-        </div>
-        <div class="body-img-col">
-          <div class="body-img-wrap">
-            <img src="assets/branding/body-silhouette.png" alt="Body" class="body-img"/>
-          </div>
-        </div>
+      <div class="dss-st">| {{ 'dashboard.swimmer.dss.bodyMetrics' | translate }}</div>
+      <div class="body-header">
+        <div><span class="body-big">{{ weight }} kg</span><span class="body-sub">{{ height }} cm</span><span class="dss-badge green sm">{{ 'dashboard.swimmer.dss.healthy' | translate }}</span></div>
+        <div class="body-img-wrap"><img src="assets/branding/body-silhouette.png" alt="Body" class="body-img"/></div>
       </div>
+      <div class="body-stats">
+        <div class="bs-row"><span>{{ 'dashboard.swimmer.dss.weight' | translate }}</span><span>{{ weight }} kg</span></div>
+        <div class="bs-row"><span>{{ 'dashboard.swimmer.dss.height' | translate }}</span><span>{{ height }} cm</span></div>
+        <div class="bs-row"><span>{{ 'dashboard.swimmer.dss.bmi' | translate }}</span><span class="bold">{{ bmi }}</span></div>
+      </div>
+      <div class="body-shape"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="12,2 22,22 2,22"/></svg><span class="body-shape-text">{{ 'dashboard.swimmer.dss.shape' | translate }}</span></div>
     </div>
 
-    <!-- Explanation -->
     <div class="dss-sec dss-exp">
-      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Explication</div>
-      <p class="dss-exp-txt">Sélection basée sur amélioration et fatigue modérée</p>
+      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> {{ 'dashboard.swimmer.dss.explanation' | translate }}</div>
+      <p class="dss-exp-txt">{{ 'dashboard.swimmer.dss.explanationText' | translate }}</p>
     </div>
   </aside>
 </div>
 
 
 <!-- ╔══════════════════════════════════════════════════════════════╗
-     ║                       MODALS                               ║
+     ║                       MODALS                                 ║
      ╚══════════════════════════════════════════════════════════════╝ -->
 
 <!-- Training Modal -->
@@ -481,5 +429,50 @@
       <div class="form-group"><label>{{ 'dashboard.modals.feedbackComment' | translate }}</label><textarea [(ngModel)]="feedbackForm.comment" rows="3" [placeholder]="'dashboard.modals.feedbackCommentPlaceholder' | translate"></textarea></div>
     </div>
     <div class="modal-foot"><button class="modal-cancel" (click)="closeModals()">{{ 'dashboard.modals.cancel' | translate }}</button><button class="modal-submit blue-bg" (click)="submitFeedback()" [disabled]="formSubmitting">{{ formSubmitting ? ('dashboard.modals.submitWorking' | translate) : ('dashboard.modals.submit' | translate) }}</button></div>
+  </div>
+</div>
+
+<!-- Profile Modal (Admin) -->
+<div class="modal-overlay" *ngIf="showProfileModal && selectedProfile" (click)="closeProfile()">
+  <div class="modal profile-modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3>Profil</h3>
+      <button class="modal-close" (click)="closeProfile()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="profile-head">
+        <div class="ava lg profile-ava">
+          <img *ngIf="avatarUrl(selectedProfile.source)" [src]="avatarUrl(selectedProfile.source)" />
+          <span *ngIf="!avatarUrl(selectedProfile.source)">{{ getInitials(selectedProfile.source) }}</span>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">{{ fullName(selectedProfile.source) }}</div>
+          <div class="profile-role">{{ getRoleLabel(selectedProfile.role || selectedProfile.user?.role || '') }}</div>
+          <div class="profile-email" *ngIf="selectedProfile.user?.email">{{ selectedProfile.user?.email }}</div>
+        </div>
+      </div>
+      <div class="profile-meta">
+        <div class="meta-item" *ngIf="selectedProfile.user?.telephone">
+          <span class="meta-key">Téléphone</span>
+          <span class="meta-val">{{ selectedProfile.user?.telephone }}</span>
+        </div>
+        <div class="meta-item" *ngIf="selectedProfile.user?.dateNaissance">
+          <span class="meta-key">Naissance</span>
+          <span class="meta-val">{{ fmtDate(selectedProfile.user?.dateNaissance) }}</span>
+        </div>
+        <div class="meta-item" *ngIf="selectedProfile.source?.categorie">
+          <span class="meta-key">Catégorie</span>
+          <span class="meta-val">{{ selectedProfile.source?.categorie }}</span>
+        </div>
+        <div class="meta-item" *ngIf="selectedProfile.source?.niveau">
+          <span class="meta-key">Niveau</span>
+          <span class="meta-val">{{ selectedProfile.source?.niveau }}</span>
+        </div>
+        <div class="meta-item" *ngIf="selectedProfile.source?.club">
+          <span class="meta-key">Club</span>
+          <span class="meta-val">{{ selectedProfile.source?.club }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
