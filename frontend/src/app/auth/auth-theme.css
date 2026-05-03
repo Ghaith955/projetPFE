@@ -4,6 +4,31 @@
   --auth-font-display: 'Sora', 'Segoe UI', sans-serif;
   --auth-font-body: 'Manrope', 'Segoe UI', sans-serif;
 
+  --auth-bg: #061521;
+  --auth-surface: rgba(10, 26, 40, 0.78);
+  --auth-surface-soft: rgba(9, 26, 40, 0.72);
+  --auth-border: rgba(70, 158, 204, 0.22);
+  --auth-ink: #e8f4ff;
+  --auth-muted: #b0c6de;
+  --auth-muted-soft: #86a6c4;
+
+  --auth-primary: #32a6ff;
+  --auth-primary-strong: #1d7fd9;
+  --auth-primary-soft: rgba(50, 166, 255, 0.12);
+  --auth-gradient: linear-gradient(140deg, #1d7fd9 0%, #32a6ff 50%, #26d2c4 100%);
+
+  --auth-radius-card: 18px;
+  --auth-radius-control: 12px;
+
+  --auth-shadow-card: 0 18px 48px rgba(4, 18, 30, 0.48);
+  --auth-shadow-soft: 0 14px 32px rgba(4, 18, 30, 0.36);
+
+  display: block;
+  min-height: 100vh;
+  font-family: var(--auth-font-body);
+}
+
+:host-context([data-theme='light']) {
   --auth-bg: #eff4fa;
   --auth-surface: #ffffff;
   --auth-surface-soft: #f6f9fd;
@@ -11,21 +36,12 @@
   --auth-ink: #10263d;
   --auth-muted: #6a7f97;
   --auth-muted-soft: #7f92a9;
-
   --auth-primary: #107be5;
   --auth-primary-strong: #0561cf;
   --auth-primary-soft: rgba(16, 123, 229, 0.18);
   --auth-gradient: linear-gradient(140deg, #0452b4 0%, #0f84db 54%, #17a0ca 100%);
-
-  --auth-radius-card: 16px;
-  --auth-radius-control: 12px;
-
   --auth-shadow-card: 0 24px 48px rgba(20, 54, 90, 0.16);
   --auth-shadow-soft: 0 12px 28px rgba(12, 43, 76, 0.1);
-
-  display: block;
-  min-height: 100vh;
-  font-family: var(--auth-font-body);
 }
 
 .auth-shell {
@@ -39,7 +55,7 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  border-right: 1px solid rgba(255, 255, 255, 0.6);
+  border-right: 1px solid var(--auth-border);
 }
 
 .auth-visual-video {
@@ -194,7 +210,7 @@
 
 .auth-card--scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: #c9d8e9;
+  background: rgba(50, 166, 255, 0.35);
 }
 
 .brand-block {
@@ -274,7 +290,7 @@
   margin: 0 0 7px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #3f5673;
+  color: var(--auth-muted);
 }
 
 .form-control-wrap {
@@ -286,7 +302,7 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #8ba0ba;
+  color: var(--auth-muted-soft);
   line-height: 0;
 }
 
@@ -305,7 +321,7 @@
 }
 
 .form-control::placeholder {
-  color: #98abc0;
+  color: var(--auth-muted-soft);
   font-weight: 500;
 }
 
@@ -319,7 +335,7 @@
 
 .form-control:focus {
   border-color: var(--auth-primary);
-  background: #ffffff;
+  background: var(--auth-surface);
   box-shadow: 0 0 0 4px var(--auth-primary-soft);
 }
 
@@ -330,7 +346,7 @@
   transform: translateY(-50%);
   border: none;
   background: transparent;
-  color: #3d6fa8;
+  color: var(--auth-primary);
   font-size: 0.77rem;
   font-weight: 700;
   cursor: pointer;
@@ -349,7 +365,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.82rem;
-  color: #556f8c;
+  color: var(--auth-muted);
 }
 
 .check-inline input {
@@ -376,15 +392,15 @@
 }
 
 .status--error {
-  color: #c53152;
-  border: 1px solid #f8ccd7;
-  background: #fff2f5;
+  color: #ffd1d1;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.16);
 }
 
 .status--success {
-  color: #17693d;
-  border: 1px solid #cfeede;
-  background: #f1fbf5;
+  color: #bff0d3;
+  border: 1px solid rgba(47, 211, 122, 0.32);
+  background: rgba(47, 211, 122, 0.16);
 }
 
 .primary-btn {
@@ -392,19 +408,19 @@
   height: 48px;
   border: none;
   border-radius: 13px;
-  background: linear-gradient(105deg, #0860ca 0%, #0f7fe2 50%, #13a5ce 100%);
+  background: var(--auth-gradient);
   color: #ffffff;
   font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: 0.01em;
   cursor: pointer;
-  box-shadow: 0 14px 28px rgba(16, 104, 191, 0.3);
+  box-shadow: 0 14px 28px rgba(50, 166, 255, 0.28);
   transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
 }
 
 .primary-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 18px 32px rgba(16, 104, 191, 0.34);
+  box-shadow: 0 18px 32px rgba(50, 166, 255, 0.36);
 }
 
 .primary-btn:active:not(:disabled) {
@@ -442,7 +458,7 @@
   .auth-visual {
     min-height: 350px;
     border-right: none;
-    border-bottom: 1px solid #d6e2ef;
+    border-bottom: 1px solid var(--auth-border);
   }
 
   .auth-visual-video {

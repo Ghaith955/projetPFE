@@ -163,6 +163,12 @@ export class CotisationsComponent implements OnInit {
     });
   }
 
+  downloadFacture(c: any) {
+    const token = localStorage.getItem('token');
+    const url = `http://localhost:3300/cotisations/${c._id}/facture?token=${token}`;
+    window.open(url, '_blank');
+  }
+
   getStatutClass(statut: string): string {
     const map: any = { 'Payé': 'paye', 'En attente': 'attente', 'En retard': 'retard', 'Annulé': 'annule' };
     return map[statut] || '';

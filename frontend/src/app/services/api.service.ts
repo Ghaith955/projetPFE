@@ -54,6 +54,12 @@ export class ApiService {
   createCotisation(data: any): Observable<any> { return this.http.post(`${this.baseUrl}/cotisations`, data); }
   updateCotisation(id: string, data: any): Observable<any> { return this.http.put(`${this.baseUrl}/cotisations/${id}`, data); }
   deleteCotisation(id: string): Observable<any> { return this.http.delete(`${this.baseUrl}/cotisations/${id}`); }
+  downloadCotisationFacture(id: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cotisations/${id}/facture`, {
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
 
   // Demandes
   getAllDemandes(): Observable<any> { return this.http.get(`${this.baseUrl}/demandes`); }
@@ -118,5 +124,68 @@ export class ApiService {
 
   markAllNotificationsAsRead(): Observable<any> {
     return this.http.patch(`${this.baseUrl}/notifications/read-all`, {});
+  }
+
+  // ── IDSS ────────────────────────────────────────────────────────────────
+  getIdssSummary(): Observable<any>                       { return this.http.get(`${this.baseUrl}/idss/summary`); }
+  getIdssDecisions(params?: any): Observable<any> {
+    let p = new HttpParams();
+    if (params) Object.keys(params).forEach(k => { if (params[k] != null) p = p.set(k, params[k]); });
+    return this.http.get(`${this.baseUrl}/idss/decisions`, { params: p });
+  }
+  getIdssLatestDecision(nageurId: string): Observable<any> { return this.http.get(`${this.baseUrl}/idss/decisions/latest/${nageurId}`); }
+  getIdssMyStatus(): Observable<any>                       { return this.http.get(`${this.baseUrl}/idss/my-status`); }
+  getIdssHistory(nageurId: string, limit = 30): Observable<any> { return this.http.get(`${this.baseUrl}/idss/history/${nageurId}`, { params: { limit } }); }
+  getIdssBaseline(nageurId: string): Observable<any>       { return this.http.get(`${this.baseUrl}/idss/baseline/${nageurId}`); }
+  updateIdssBaseline(nageurId: string, data: any): Observable<any> { return this.http.patch(`${this.baseUrl}/idss/baseline/${nageurId}`, data); }
+  acknowledgeIdssDecision(id: string, note = ''): Observable<any> { return this.http.patch(`${this.baseUrl}/idss/decisions/${id}/acknowledge`, { note }); }
+  triggerIdssAnalysis(performanceId: string): Observable<any> { return this.http.post(`${this.baseUrl}/idss/analyze/${performanceId}`, {}); }
+
+  // ── AI Engine (Python FastAPI) ──────────────────────────────────────
+  aiHealthCheck(): Observable<any> { return this.http.get(`${this.baseUrl}/ai/health`); }
+
+  aiAnalyzePerformance(swimmerId: string, periodDays = 90, stroke?: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/analyze`, { swimmer_id: swimmerId, period_days: periodDays, stroke });
+  }
+
+  aiPredictTime(swimmerId: string, competitionDate?: string, trainingPlan?: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/predict`, { swimmer_id: swimmerId, competition_date: competitionDate, training_plan: trainingPlan });
+  }
+
+  aiFatigueDetection(swimmerIds?: string[], useMl = false): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/fatigue`, { swimmer_ids: swimmerIds, use_ml: useMl });
+  }
+
+  aiRecommendSwimmers(competitionId?: string, stroke?: string, distance?: number, category?: string, topN = 5): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/recommend`, { competition_id: competitionId, stroke, distance, category, top_n: topN });
+  }
+
+  aiSimulateScenario(swimmerId: string, weeks = 4, changes?: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/simulate`, { swimmer_id: swimmerId, simulation_weeks: weeks, changes });
+  }
+
+  /** Returns fatigue status for ALL swimmers — used by Admin/Coach dashboard */
+  aiDashboard(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/ai/dashboard`);
+  }
+
+  /** Run batch analysis on all swimmers and return full IDSS state */
+  aiBatchAnalyze(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/batch-analyze`, {});
+  }
+
+  /** Explainability layer — transparent reasoning for any IDSS decision */
+  aiExplain(decisionType: string, swimmerId?: string, params?: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/explain`, { decision_type: decisionType, swimmer_id: swimmerId, params });
+  }
+
+  /** Generate personalized training plan for a swimmer */
+  aiPlan(swimmerId: string, targetWeeks = 4): Observable<any> {
+    return this.http.post(`${this.baseUrl}/ai/plan`, { swimmer_id: swimmerId, target_weeks: targetWeeks });
+  }
+
+  /** Team-wide training planning */
+  aiTeamPlan(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/ai/team-plan`);
   }
 }

@@ -11,6 +11,7 @@
     "myPerformance": "My Performance",
     "cotisations": "Fees",
     "settings": "Settings",
+    "simulation": "AI Simulation",
     "mySwimmers": "My Swimmers",
     "themeDark": "Dark mode",
     "themeLight": "Light mode",
@@ -56,7 +57,7 @@
       "swimmerPerformance": "Tracked swimmers",
       "levelEstimate": "Estimated level",
       "dss": {
-        "title": "DSS Insights",
+        "title": "IDSS Insights",
         "alerts": "Alerts",
         "alertsSub": "{{count}} swimmers trending down",
         "topPerformers": "Top Performers",
@@ -131,7 +132,7 @@
       "send": "Send",
       "competitionTag": "Regional competition",
       "dss": {
-        "title": "DSS Insights",
+        "title": "IDSS Insights",
         "trend": "Performance Trend",
         "fatigue": "Fatigue Risk",
         "recommendation": "Recommendation",

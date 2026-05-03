@@ -35,14 +35,36 @@ export class DashboardComponent implements OnInit {
   chartAtt = [65, 78, 72, 85, 80];
   chartPerf = [55, 70, 68, 78, 72];
 
-  /* DSS - Admin */
+  /* DSS - Admin/Coach — real IDSS data */
+  idssSummary: any = null;
   dssAlerts: any[] = [];
   dssTopPerformers: any[] = [];
   dssFatigueRisks: any[] = [];
+  idssAtRisk: any[] = [];
+  idssLevelCounts: any = { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 };
+  idssPendingAlerts = 0;
 
   /* DSS - Coach */
   coachDecisions: any[] = [];
   coachFeedbacks: any[] = [];
+
+  /* DSS - Swimmer */
+  idssMyDecision: any = null;
+  idssMyBaseline: any = null;
+
+  /* ── AI Brain (Python) ── */
+  aiBrainLoading = false;
+  aiBrainOnline = false;
+  aiBrainDashboard: any = null;
+  aiBrainSwimmers: any[] = [];
+  aiBrainAtRisk: any[] = [];
+  aiBrainHealthy: any[] = [];
+  aiBrainStats = { total: 0, atRisk: 0, avgAcwr: 0, highFatigue: 0 };
+
+  /* AI Brain - Swimmer individual */
+  aiMyAnalysis: any = null;
+  aiMyPrediction: any = null;
+  aiMyLoading = false;
 
   /* ── Swimmer ── */
   bestTime = '58.4';
@@ -54,7 +76,9 @@ export class DashboardComponent implements OnInit {
   selectedPeriod = 'trimestre';
   weight = 72;
   height = 170;
+  swimmerSexe = 'Masculin';
   get bmi() { return +(this.weight / ((this.height / 100) ** 2)).toFixed(1); }
+  get bodyImagePath(): string { return this.swimmerSexe === 'Féminin' ? 'assets/branding/bodyf.png' : 'assets/branding/bodym.png'; }
 
   /* SVG chart points */
   perfPts = '40,155 110,140 180,142 250,128 320,130 390,118 460,112 530,98 600,88 670,78';
@@ -92,20 +116,30 @@ export class DashboardComponent implements OnInit {
   loadAdminData() {
     this.api.getStats().subscribe({ next: d => { this.stats = d; this.recentUsers = d.recentUsers || []; }, error: () => {} });
     this.api.getPendingRegistrations().subscribe({ next: d => { this.pendingRegistrations = Array.isArray(d) ? d : []; }, error: () => {} });
-    this.api.getAllNageurs().subscribe({ next: d => { this.nageurs = Array.isArray(d) ? d : []; this.computeAdminDSS(); }, error: () => {} });
+    this.api.getAllNageurs().subscribe({ next: d => { this.nageurs = Array.isArray(d) ? d : []; }, error: () => {} });
     this.api.getAllEntraineurs().subscribe({ next: d => { this.entraineurs = Array.isArray(d) ? d : []; }, error: () => {} });
     this.api.getAllCompetitions().subscribe({ next: d => { this.upcomingCompetitions = Array.isArray(d) ? d.slice(0, 5) : []; }, error: () => {} });
     this.api.getPendingDemandesCount().subscribe({ next: d => { this.pendingDemandes = d.count; }, error: () => {} });
+    this.loadIdssSummary();
+    this.loadAiBrainDashboard();
   }
 
   loadCoachData() {
-    this.api.getAllNageurs().subscribe({ next: d => { this.nageurs = Array.isArray(d) ? d : []; this.computeCoachDSS(); }, error: () => {} });
+    this.api.getAllNageurs().subscribe({ next: d => { this.nageurs = Array.isArray(d) ? d : []; this.computeCoachStaticCards(); }, error: () => {} });
     this.api.getAllEntraineurs().subscribe({ next: d => { this.entraineurs = Array.isArray(d) ? d : []; }, error: () => {} });
     this.api.getAllCompetitions().subscribe({ next: d => { this.upcomingCompetitions = Array.isArray(d) ? d : []; }, error: () => {} });
     this.api.getPendingDemandesCount().subscribe({ next: d => { this.pendingDemandes = d.count; }, error: () => {} });
+    this.loadIdssSummary();
+    this.loadAiBrainDashboard();
   }
 
   loadSwimmerData() {
+    this.auth.getMe().subscribe({
+      next: (d: any) => {
+        if (d?.roleData?.sexe) this.swimmerSexe = d.roleData.sexe;
+        if (d?.roleData?.poid) this.weight = +d.roleData.poid || 72;
+      }, error: () => {}
+    });
     this.api.getPerformanceInsights({ nageurId: this.currentUser?.id }).subscribe({
       next: (d: any) => {
         if (d) { this.bestTime = d.bestTime || '58.4'; this.trainingLoad = d.trainingLoad || 16; this.attendancePercent = d.attendance || 92; }
@@ -113,48 +147,73 @@ export class DashboardComponent implements OnInit {
     });
     this.api.getAllCompetitions().subscribe({ next: d => { this.upcomingCompetitions = Array.isArray(d) ? d.slice(0, 3) : []; }, error: () => {} });
     this.api.getPendingDemandesCount().subscribe({ next: d => { this.pendingDemandes = d.count; }, error: () => {} });
+    // Load IDSS swimmer status
+    this.api.getIdssMyStatus().subscribe({
+      next: (d: any) => {
+        this.idssMyDecision = d?.decision || null;
+        this.idssMyBaseline = d?.baseline || null;
+      }, error: () => {}
+    });
+    // Load AI Brain analysis for this swimmer
+    this.loadAiMyAnalysis();
   }
 
-  /* ── DSS Computations ── */
-  computeAdminDSS() {
-    const n = this.nageurs;
-    if (!n.length) return;
-    this.dssTopPerformers = n.slice(0, 3).map((s, i) => ({
-      rank: i + 1, name: this.fullName(s), time: ['58.4s', '57.5s', '57.8s'][i],
-      detail: ['Br: 119.5', 'Br: 180.8', 'Br: 57.6s'][i], avatar: this.avatarUrl(s)
-    }));
-    this.dssAlerts = n.slice(0, 3).map((s, i) => ({
-      rank: i + 1, name: this.fullName(s),
-      prev: ['-1 82.5s', '-1 68.5s', '-1 62.5s'][i], change: ['-0.3s', '-0.8s', '-0.7s'][i],
-      avatar: this.avatarUrl(s)
-    }));
-    this.dssFatigueRisks = n.slice(0, 2).map((s, i) => ({
-      name: this.fullName(s), detailKey: ['dashboard.common.fatigueHigh', 'dashboard.common.fatigueMedium'][i],
-      time: ['57.5s', '59.6s'][i], severity: ['high', 'medium'][i], avatar: this.avatarUrl(s)
-    }));
+  /* ── IDSS Data Loaders ── */
+  loadIdssSummary() {
+    this.api.getIdssSummary().subscribe({
+      next: (d: any) => {
+        this.idssSummary      = d;
+        this.idssLevelCounts  = d.levelCounts || { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 };
+        this.idssPendingAlerts = d.pendingAlerts || 0;
+        this.idssAtRisk = d.atRiskSwimmers || [];
+
+        // Map to existing template structure
+        this.dssFatigueRisks = this.idssAtRisk.slice(0, 5).map((r: any) => ({
+          name:      this.fullName(r.nageur),
+          avatar:    this.avatarUrl(r.nageur),
+          severity:  r.fatigueLevel === 'CRITICAL' ? 'high' : 'medium',
+          fatigueScore: r.fatigueScore,
+          fatigueLevel: r.fatigueLevel,
+          recommendation: r.recommendation,
+          triggeredRules: r.triggeredRules || [],
+          decisionId: r.decisionId
+        }));
+
+        // Alert list = unacknowledged high-risk decisions
+        this.dssAlerts = this.idssAtRisk.slice(0, 4).map((r: any) => ({
+          name:    this.fullName(r.nageur),
+          avatar:  this.avatarUrl(r.nageur),
+          level:   r.fatigueLevel,
+          score:   r.fatigueScore,
+          message: r.triggeredRules?.[0]?.message || 'Risque de fatigue détecté'
+        }));
+      },
+      error: () => {}
+    });
   }
 
-  computeCoachDSS() {
+  acknowledgeAlert(decisionId: string) {
+    this.api.acknowledgeIdssDecision(decisionId).subscribe({
+      next: () => this.loadIdssSummary(),
+      error: () => {}
+    });
+  }
+
+  /* ── DSS Computations (static cards for coach) ── */
+  computeCoachStaticCards() {
     const n = this.nageurs;
     if (!n.length) return;
     this.coachDecisions = [
       { icon: 'trophy', textKey: 'dashboard.coach.decisions.trophy', priority: 'high' },
-      { icon: 'alert', textKey: 'dashboard.coach.decisions.alert', priority: 'medium' },
+      { icon: 'alert',  textKey: 'dashboard.coach.decisions.alert',  priority: 'medium' },
       { icon: 'calendar', textKey: 'dashboard.coach.decisions.calendar', priority: 'low' }
     ];
     this.coachFeedbacks = n.slice(0, 3).map((s, i) => ({
-      name: this.fullName(s), statusKey: ['dashboard.coach.feedback.status.progress', 'dashboard.coach.feedback.status.stable', 'dashboard.coach.feedback.status.watch'][i],
-      statusClass: ['green', 'blue', 'amber'][i],
-      noteKey: ['dashboard.coach.feedback.note.up', 'dashboard.coach.feedback.note.steady', 'dashboard.coach.feedback.note.down'][i],
+      name: this.fullName(s),
+      statusKey: ['dashboard.coach.feedback.status.progress','dashboard.coach.feedback.status.stable','dashboard.coach.feedback.status.watch'][i],
+      statusClass: ['green','blue','amber'][i],
+      noteKey: ['dashboard.coach.feedback.note.up','dashboard.coach.feedback.note.steady','dashboard.coach.feedback.note.down'][i],
       avatar: this.avatarUrl(s)
-    }));
-    this.dssTopPerformers = n.slice(0, 3).map((s, i) => ({
-      rank: i + 1, name: this.fullName(s), time: ['58.4s', '57.5s', '57.8s'][i],
-      detail: ['Br: 119.5', 'Br: 180.8', 'Br: 57.6s'][i], avatar: this.avatarUrl(s)
-    }));
-    this.dssFatigueRisks = n.slice(0, 2).map((s, i) => ({
-      name: this.fullName(s), detailKey: ['dashboard.common.fatigueHigh', 'dashboard.common.fatigueMedium'][i],
-      time: ['57.5s', '59.6s'][i], severity: ['high', 'medium'][i], avatar: this.avatarUrl(s)
     }));
   }
 
@@ -180,6 +239,75 @@ export class DashboardComponent implements OnInit {
     this.feedbackComment = '';
   }
 
+  /* ── AI Brain Data Loaders ── */
+  loadAiBrainDashboard() {
+    this.aiBrainLoading = true;
+    this.api.aiDashboard().subscribe({
+      next: (d: any) => {
+        this.aiBrainOnline = true;
+        this.aiBrainDashboard = d;
+        const swimmers = d?.swimmers || d?.results || [];
+        this.aiBrainSwimmers = swimmers;
+        this.aiBrainAtRisk = swimmers.filter((s: any) => s.fatigue_level === 'HIGH' || s.fatigue_level === 'CRITICAL');
+        this.aiBrainHealthy = swimmers.filter((s: any) => s.fatigue_level === 'LOW');
+
+        const total = swimmers.length;
+        const atRisk = this.aiBrainAtRisk.length;
+        const acwrVals = swimmers.map((s: any) => s.acwr).filter((v: number) => v != null && v > 0);
+        const avgAcwr = acwrVals.length ? +(acwrVals.reduce((a: number, b: number) => a + b, 0) / acwrVals.length).toFixed(2) : 0;
+        const highFatigue = swimmers.filter((s: any) => (s.fatigue_score || 0) >= 60).length;
+        this.aiBrainStats = { total, atRisk, avgAcwr, highFatigue };
+        this.aiBrainLoading = false;
+      },
+      error: () => { this.aiBrainOnline = false; this.aiBrainLoading = false; }
+    });
+  }
+
+  loadAiMyAnalysis() {
+    if (!this.currentUser?.id) return;
+    this.aiMyLoading = true;
+    // Get the nageur ID from auth
+    this.auth.getMe().subscribe({
+      next: (d: any) => {
+        const nageurId = d?.roleData?._id;
+        if (!nageurId) { this.aiMyLoading = false; return; }
+        // Fetch performance analysis
+        this.api.aiAnalyzePerformance(nageurId).subscribe({
+          next: (analysis: any) => { this.aiMyAnalysis = analysis; },
+          error: () => {}
+        });
+        // Fetch time prediction
+        this.api.aiPredictTime(nageurId).subscribe({
+          next: (pred: any) => { this.aiMyPrediction = pred; this.aiMyLoading = false; },
+          error: () => { this.aiMyLoading = false; }
+        });
+      },
+      error: () => { this.aiMyLoading = false; }
+    });
+  }
+
+  getAcwrStatus(acwr: number): { label: string; color: string; icon: string } {
+    if (acwr <= 0) return { label: 'Pas de données', color: '#86a6c4', icon: '—' };
+    if (acwr < 0.8) return { label: 'Sous-entraîné', color: '#3b82f6', icon: '↓' };
+    if (acwr <= 1.3) return { label: 'Zone Optimale', color: '#22c55e', icon: '✓' };
+    if (acwr <= 1.5) return { label: 'Attention', color: '#f59e0b', icon: '⚠' };
+    return { label: 'Danger', color: '#ef4444', icon: '🔴' };
+  }
+
+  getTrendLabel(slope: number): string {
+    if (slope < -0.5) return 'En forte progression ↗';
+    if (slope < -0.1) return 'En progression ↗';
+    if (slope < 0.1) return 'Stable →';
+    if (slope < 0.5) return 'En régression ↘';
+    return 'En forte régression ↘';
+  }
+
+  getTrendColor(slope: number): string {
+    if (slope < -0.1) return '#22c55e';
+    if (slope < 0.1) return '#f59e0b';
+    return '#ef4444';
+  }
+
   /* ── Form actions ── */
   openTrainingModal() { this.trainingForm = { titre: '', date: '', heure: '', duree: 60, nageurs: [], notes: '' }; this.showTrainingModal = true; }
   openCompetitionModal() { this.competitionForm = { nom: '', date: '', lieu: '', niveauRequis: 'Junior', nageurs: [] }; this.showCompetitionModal = true; }
@@ -188,11 +316,51 @@ export class DashboardComponent implements OnInit {
   closeModals() { this.showTrainingModal = false; this.showCompetitionModal = false; this.showFeedbackModal = false; }
 
   submitTraining() {
+    if (!this.trainingForm.titre || !this.trainingForm.date || !this.trainingForm.heure) {
+      return;
+    }
+
     this.formSubmitting = true;
-    this.api.createEntrainement(this.trainingForm).subscribe({
-      next: () => { this.formSubmitting = false; this.showTrainingModal = false; this.loadData(); },
+    const payload = this.buildTrainingPayload();
+    this.api.createEntrainement(payload).subscribe({
+      next: () => {
+        this.formSubmitting = false;
+        this.showTrainingModal = false;
+        this.loadData();
+      },
       error: () => { this.formSubmitting = false; }
     });
+  }
+
+  private buildTrainingPayload() {
+    const heureDebut = this.trainingForm.heure || '08:00';
+    const duree = Number(this.trainingForm.duree || 60);
+    const heureFin = this.addMinutes(heureDebut, duree);
+
+    return {
+      titre: this.trainingForm.titre,
+      date: this.trainingForm.date,
+      heureDebut,
+      heureFin,
+      duree,
+      type: 'Endurance',
+      intensite: 'Modérée',
+      lieu: 'Piscine principale',
+      description: this.trainingForm.notes || '',
+      statut: 'Planifié',
+      nageurs: Array.isArray(this.trainingForm.nageurs) ? this.trainingForm.nageurs : []
+    };
+  }
+
+  private addMinutes(time: string, minutes: number): string {
+    const [h, m] = time.split(':').map((v) => Number(v));
+    if (Number.isNaN(h) || Number.isNaN(m)) {
+      return time;
+    }
+    const total = (h * 60 + m + minutes) % (24 * 60);
+    const hh = String(Math.floor(total / 60)).padStart(2, '0');
+    const mm = String(total % 60).padStart(2, '0');
+    return `${hh}:${mm}`;
   }
 
   submitCompetition() {

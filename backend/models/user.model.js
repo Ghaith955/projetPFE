@@ -12,6 +12,11 @@ const userSchema = new mongoose.Schema({
     enum: ['RESPONSABLE', 'ENTRAINEUR', 'NAGEUR'],
     required: true
   },
+  status: {
+    type: String,
+    enum: ['PENDING', 'APPROVED'],
+    default: 'PENDING'
+  },
   isActive: { type: Boolean, default: false },
   dateCreation: { type: Date, default: Date.now },
   preferences: {

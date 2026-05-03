@@ -41,48 +41,40 @@
   </div>
 
   <!-- CARDS GRID -->
-  <div class="cards-grid" *ngIf="!isLoading && filteredEntraineurs.length > 0">
-    <div class="ent-card" *ngFor="let e of filteredEntraineurs">
-      <div class="ent-card-header">
-        <div class="avatar" *ngIf="!e.utilisateur?.imageprofile">{{ getInitials(e) }}</div>
-        <img *ngIf="e.utilisateur?.imageprofile" [src]="e.utilisateur.imageprofile" class="avatar-img" />
-        <div class="ent-card-info">
-          <div class="ent-card-name">{{ e.utilisateur?.nom }} {{ e.utilisateur?.prenom }}</div>
-          <div class="ent-card-email">{{ e.utilisateur?.email }}</div>
+  <div class="profile-grid" *ngIf="!isLoading && filteredEntraineurs.length > 0">
+    <article class="profile-card" *ngFor="let e of filteredEntraineurs">
+      <div class="profile-media">
+        <img *ngIf="e.utilisateur?.imageprofile" [src]="e.utilisateur.imageprofile" class="profile-photo" [alt]="e.utilisateur?.nom + ' ' + e.utilisateur?.prenom" />
+        <div *ngIf="!e.utilisateur?.imageprofile" class="profile-photo profile-fallback">{{ getInitials(e) }}</div>
+        <div class="profile-pill-row">
+          <span class="pill">Entraîneur</span>
+          <span class="pill role">{{ getExperienceLabel(e.experience) }}</span>
         </div>
-        <div class="ent-card-actions">
-          <button class="svg-icon-btn edit" (click)="openEditModal(e)" title="Modifier">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="svg-icon-btn delete" (click)="deleteEntraineur(e._id, e.utilisateur?.nom)" title="Supprimer">
+      </div>
+
+      <div class="profile-body">
+        <div class="profile-name">{{ e.utilisateur?.prenom }} {{ e.utilisateur?.nom }}</div>
+        <div class="profile-desc">{{ e.utilisateur?.email }}</div>
+        <div class="profile-meta">
+          <span class="meta-item"><span class="meta-label">Club</span>{{ e.club || '—' }}</span>
+          <span class="meta-item"><span class="meta-label">Expérience</span>{{ e.experience }} ans</span>
+          <span class="meta-item"><span class="meta-label">Téléphone</span>{{ e.utilisateur?.phone || '—' }}</span>
+        </div>
+      </div>
+
+      <div class="profile-footer">
+        <div class="spec-wrap">
+          <span class="spec-tag">{{ e.specialite || 'Coach' }}</span>
+        </div>
+        <div class="profile-actions">
+          <button class="profile-cta" (click)="openEditModal(e)">Modifier</button>
+          <button class="icon-btn delete" (click)="deleteEntraineur(e._id, e.utilisateur?.nom)" title="Supprimer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
         </div>
       </div>
 
-      <div class="ent-card-body">
-        <div class="info-row">
-          <span class="info-label">Club</span>
-          <span class="info-val">{{ e.club || '—' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Expérience</span>
-          <span class="info-val">{{ e.experience }} ans
-            <span class="exp-badge" [class]="'exp-' + getExperienceLabel(e.experience).toLowerCase()">
-              {{ getExperienceLabel(e.experience) }}
-            </span>
-          </span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Téléphone</span>
-          <span class="info-val">{{ e.utilisateur?.phone || '—' }}</span>
-        </div>
-      </div>
-
-      <div class="ent-card-footer">
-        <span class="spec-tag" *ngFor="let s of e.specialites">{{ s }}</span>
-      </div>
-    </div>
+    </article>
   </div>
 </div>
 

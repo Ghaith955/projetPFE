@@ -220,5 +220,31 @@ export class PlanningComponent implements OnInit {
     return new Date(date).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long' });
   }
 
+  toggleNageurSelection(id: string) {
+    const list = this.form.nageurs;
+    const idx = list.indexOf(id);
+    if (idx > -1) list.splice(idx, 1);
+    else list.push(id);
+  }
+
+  isNageurSelected(id: string): boolean {
+    return this.form.nageurs.includes(id);
+  }
+
+  fullName(n: any): string {
+    const u = n?.utilisateur || n;
+    return `${u?.prenom || ''} ${u?.nom || ''}`.trim() || 'Nageur';
+  }
+
+  avatarUrl(n: any): string {
+    const img = n?.utilisateur?.imageprofile || n?.imageprofile;
+    return img ? 'http://localhost:3300' + img : '';
+  }
+
+  getInitials(n: any): string {
+    const u = n?.utilisateur || n;
+    return ((u?.prenom?.[0] || '') + (u?.nom?.[0] || '')).toUpperCase();
+  }
+
   navigate(route: string) { this.router.navigate([route]); }
 }

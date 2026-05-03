@@ -48,60 +48,39 @@
     <button class="btn-primary-sm" (click)="openAddModal()">+ Ajouter le premier nageur</button>
   </div>
 
-  <!-- TABLE -->
-  <div class="table-card" *ngIf="!isLoading && filteredNageurs.length > 0">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nageur</th>
-          <th>Email</th>
-          <th>Âge</th>
-          <th>Sexe</th>
-          <th>Poids</th>
-          <th>Spécialité</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let n of filteredNageurs">
-          <td>
-            <div class="user-cell">
-              <div class="avatar" *ngIf="!n.utilisateur?.imageprofile">
-                {{ getInitials(n) }}
-              </div>
-              <img *ngIf="n.utilisateur?.imageprofile"
-                   [src]="n.utilisateur.imageprofile"
-                   class="avatar-img" />
-              <div>
-                <div class="user-name">{{ n.utilisateur?.nom }} {{ n.utilisateur?.prenom }}</div>
-                <div class="user-sub">{{ n.utilisateur?.phone || '—' }}</div>
-              </div>
-            </div>
-          </td>
-          <td class="cell-muted">{{ n.utilisateur?.email }}</td>
-          <td>{{ n.age }} ans</td>
-          <td>
-            <span class="badge" [class.badge-male]="n.sexe === 'Homme'" [class.badge-female]="n.sexe === 'Femme'">
-              {{ n.sexe }}
-            </span>
-          </td>
-          <td>{{ n.poid }} kg</td>
-          <td>
-            <span class="spec-tag" *ngFor="let s of n.specialite">{{ s }}</span>
-          </td>
-          <td>
-            <div class="action-btns">
-              <button class="svg-icon-btn edit" (click)="openEditModal(n)" title="Modifier">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </button>
-              <button class="svg-icon-btn delete" (click)="deleteNageur(n._id, n.utilisateur?.nom)" title="Supprimer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- CARDS -->
+  <div class="profile-grid" *ngIf="!isLoading && filteredNageurs.length > 0">
+    <article class="profile-card" *ngFor="let n of filteredNageurs">
+      <div class="profile-media">
+        <img *ngIf="n.utilisateur?.imageprofile" [src]="n.utilisateur.imageprofile" class="profile-photo" [alt]="n.utilisateur?.nom + ' ' + n.utilisateur?.prenom" />
+        <div *ngIf="!n.utilisateur?.imageprofile" class="profile-photo profile-fallback">{{ getInitials(n) }}</div>
+        <div class="profile-pill-row">
+          <span class="pill">Nageur</span>
+          <span class="pill" [class.badge-male]="n.sexe === 'Homme'" [class.badge-female]="n.sexe === 'Femme'">{{ n.sexe || '—' }}</span>
+        </div>
+      </div>
+      <div class="profile-body">
+        <div class="profile-name">{{ n.utilisateur?.prenom }} {{ n.utilisateur?.nom }}</div>
+        <div class="profile-desc">{{ n.utilisateur?.email }}</div>
+        <div class="profile-meta">
+          <span class="meta-item"><span class="meta-label">Âge</span>{{ n.age || '—' }} ans</span>
+          <span class="meta-item"><span class="meta-label">Poids</span>{{ n.poid || '—' }} kg</span>
+          <span class="meta-item"><span class="meta-label">Téléphone</span>{{ n.utilisateur?.phone || '—' }}</span>
+        </div>
+      </div>
+      <div class="profile-footer">
+        <div class="spec-wrap">
+          <span class="spec-tag" *ngFor="let s of n.specialite">{{ s }}</span>
+          <span class="spec-tag" *ngIf="!n.specialite || n.specialite.length === 0">—</span>
+        </div>
+        <div class="profile-actions">
+          <button class="profile-cta" (click)="openEditModal(n)">Modifier</button>
+          <button class="icon-btn delete" (click)="deleteNageur(n._id, n.utilisateur?.nom)" title="Supprimer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </article>
   </div>
 </div>
 

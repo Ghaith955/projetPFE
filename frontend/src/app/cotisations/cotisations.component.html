@@ -69,6 +69,7 @@
           <th>Période</th>
           <th>Mode paiement</th>
           <th>Statut</th>
+          <th>Facture</th>
           <th *ngIf="isAdmin">Actions</th>
         </tr>
       </thead>
@@ -94,6 +95,12 @@
           </td>
           <td><span class="mode-badge">{{ c.modePaiement }}</span></td>
           <td><span class="statut-badge" [class]="getStatutClass(c.statut)">{{ c.statut }}</span></td>
+          <td>
+            <button class="facture-btn" *ngIf="c.statut === 'Payé'" (click)="downloadFacture(c)">
+              Télécharger
+            </button>
+            <span class="facture-muted" *ngIf="c.statut !== 'Payé'">—</span>
+          </td>
           <td *ngIf="isAdmin">
             <div class="action-btns">
               <button class="svg-icon-btn pay" *ngIf="c.statut !== 'Payé'" (click)="markAsPaid(c)" title="Marquer comme payé">

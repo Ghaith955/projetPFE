@@ -19,6 +19,7 @@ import { LandingComponent } from './landing/landing.component';
 import { TrainingResultsComponent } from './training-results/training-results.component';
 import { MyPerformanceComponent } from './my-performance/my-performance.component';
 import { TrainingAnalyticsComponent } from './training-analytics/training-analytics.component';
+import { SimulationComponent } from './simulation/simulation.component';
 
 const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
@@ -40,6 +41,7 @@ const routes: Routes = [
       { path: 'planning', component: PlanningComponent },
       { path: 'training-results', component: TrainingResultsComponent, data: { roles: ['ENTRAINEUR', 'RESPONSABLE'] } },
       { path: 'training-analytics', component: TrainingAnalyticsComponent, data: { roles: ['ENTRAINEUR', 'RESPONSABLE'] } },
+      { path: 'simulation', component: SimulationComponent, data: { roles: ['ENTRAINEUR', 'RESPONSABLE'] } },
       { path: 'my-performance', component: MyPerformanceComponent, data: { roles: ['NAGEUR'] } },
       { path: 'utilisateurs', component: UtilisateursComponent, data: { roles: ['RESPONSABLE'] } },
       { path: 'cotisations', component: CotisationsComponent, data: { roles: ['RESPONSABLE', 'NAGEUR'] } },

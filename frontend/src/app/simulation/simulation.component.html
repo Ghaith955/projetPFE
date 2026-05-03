@@ -1,0 +1,347 @@
+<div class="sim-page">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="sim-header">
+    <div class="sim-header-left">
+      <div class="sim-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div>
+        <h1 class="sim-title">Simulateur d'Entraînement</h1>
+        <p class="sim-subtitle">Explorez l'impact de vos décisions avant de les appliquer</p>
+      </div>
+    </div>
+    <div class="sim-header-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      AI Brain v2.0
+    </div>
+  </header>
+
+  <!-- ═══ MAIN GRID ═══ -->
+  <div class="sim-grid">
+
+    <!-- ─── LEFT: CONFIG PANEL ─── -->
+    <div class="sim-config-panel">
+
+      <!-- Swimmer Selection -->
+      <section class="sim-section">
+        <div class="section-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><line x1="12" y1="9" x2="12" y2="15"/></svg>
+          <span>Sélection du Nageur</span>
+        </div>
+        <select class="sim-select" [(ngModel)]="selectedSwimmerId" (change)="onSwimmerSelect()" id="swimmer-select">
+          <option value="">-- Choisir un nageur --</option>
+          <option *ngFor="let n of nageurs" [value]="n._id">{{ getSwimmerName(n) }}</option>
+        </select>
+
+        <!-- Selected swimmer card -->
+        <div class="swimmer-card" *ngIf="selectedSwimmer">
+          <div class="swimmer-ava">
+            <img *ngIf="avatarUrl(selectedSwimmer)" [src]="avatarUrl(selectedSwimmer)" />
+            <span *ngIf="!avatarUrl(selectedSwimmer)">{{ getInitials(selectedSwimmer) }}</span>
+          </div>
+          <div class="swimmer-info">
+            <span class="swimmer-name">{{ getSwimmerName(selectedSwimmer) }}</span>
+            <div class="swimmer-tags">
+              <span class="tag" *ngIf="selectedSwimmer.specialite">{{ selectedSwimmer.specialite }}</span>
+              <span class="tag age-tag" *ngIf="selectedSwimmer.age">{{ selectedSwimmer.age }} ans</span>
+            </div>
+          </div>
+          <div class="swimmer-status" *ngIf="swimmerFatigue">
+            <span class="status-dot" [style.background]="getFatigueColor(swimmerFatigue.fatigue_level)"></span>
+            <span class="status-label" [style.color]="getFatigueColor(swimmerFatigue.fatigue_level)">{{ swimmerFatigue.fatigue_level }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current State (when swimmer selected) -->
+      <section class="sim-section" *ngIf="selectedSwimmer && !analysisLoading">
+        <div class="section-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+          <span>État Actuel</span>
+        </div>
+        <div class="state-grid">
+          <div class="state-card">
+            <span class="state-val" [style.color]="getAcwrColor(swimmerFatigue?.acwr || 0)">{{ swimmerFatigue?.acwr || '—' }}</span>
+            <span class="state-lbl">ACWR</span>
+            <span class="state-badge" [style.color]="getAcwrColor(swimmerFatigue?.acwr || 0)">{{ getAcwrLabel(swimmerFatigue?.acwr || 0) }}</span>
+          </div>
+          <div class="state-card">
+            <span class="state-val" [style.color]="getFatigueColor(swimmerFatigue?.fatigue_level || 'LOW')">{{ swimmerFatigue?.fatigue_score || 0 }}%</span>
+            <span class="state-lbl">Fatigue</span>
+            <span class="state-badge">Score actuel</span>
+          </div>
+          <div class="state-card">
+            <span class="state-val">{{ swimmerAnalysis?.sessions_analyzed || 0 }}</span>
+            <span class="state-lbl">Séances</span>
+            <span class="state-badge">Dernier mois</span>
+          </div>
+          <div class="state-card">
+            <span class="state-val" [style.color]="swimmerAnalysis?.trend === 'improving' ? '#22c55e' : (swimmerAnalysis?.trend === 'declining' ? '#ef4444' : '#f59e0b')">
+              {{ swimmerAnalysis?.trend === 'improving' ? '↗' : (swimmerAnalysis?.trend === 'declining' ? '↘' : '→') }}
+            </span>
+            <span class="state-lbl">Tendance</span>
+            <span class="state-badge">{{ swimmerAnalysis?.trend || 'stable' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loading state -->
+      <div class="loading-state" *ngIf="analysisLoading">
+        <div class="loading-spinner"></div>
+        <span>Analyse en cours...</span>
+      </div>
+
+      <!-- Simulation Parameters -->
+      <section class="sim-section" *ngIf="selectedSwimmer">
+        <div class="section-head">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Paramètres de Simulation</span>
+        </div>
+
+        <div class="param-group">
+          <div class="param-header">
+            <label>Durée de la simulation</label>
+            <span class="param-value">{{ simWeeks }} semaine{{ simWeeks > 1 ? 's' : '' }}</span>
+          </div>
+          <input type="range" class="sim-slider" [(ngModel)]="simWeeks" min="1" max="12" step="1" id="sim-weeks" />
+          <div class="slider-ticks"><span>1</span><span>4</span><span>8</span><span>12</span></div>
+        </div>
+
+        <div class="param-group">
+          <div class="param-header">
+            <label>Séances par semaine</label>
+            <span class="param-value">{{ simSessions }}</span>
+          </div>
+          <input type="range" class="sim-slider sessions" [(ngModel)]="simSessions" min="1" max="7" step="1" id="sim-sessions" />
+          <div class="slider-ticks"><span>1</span><span>3</span><span>5</span><span>7</span></div>
+        </div>
+
+        <div class="param-group">
+          <div class="param-header">
+            <label>Intensité moyenne</label>
+            <span class="param-value" [style.color]="getIntensityColor(simIntensity)">{{ simIntensity }}/10 · {{ getIntensityLabel(simIntensity) }}</span>
+          </div>
+          <input type="range" class="sim-slider intensity" [(ngModel)]="simIntensity" min="1" max="10" step="1" id="sim-intensity" />
+          <div class="slider-ticks"><span>Faible</span><span>Modérée</span><span>Élevée</span><span>Max</span></div>
+        </div>
+
+        <div class="param-group">
+          <div class="param-header">
+            <label>Charge par séance (km)</label>
+            <span class="param-value">{{ simLoadPerSession }} km</span>
+          </div>
+          <input type="range" class="sim-slider load" [(ngModel)]="simLoadPerSession" min="1" max="10" step="0.5" id="sim-load" />
+          <div class="slider-ticks"><span>1</span><span>3</span><span>6</span><span>10</span></div>
+        </div>
+
+        <button class="sim-run-btn" (click)="runSimulation()" [disabled]="simLoading" id="run-simulation-btn">
+          <svg *ngIf="!simLoading" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <div *ngIf="simLoading" class="btn-spinner"></div>
+          {{ simLoading ? 'Simulation en cours...' : 'Lancer la Simulation' }}
+        </button>
+      </section>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="!selectedSwimmer">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+        <h3>Sélectionnez un nageur</h3>
+        <p>Choisissez un nageur pour simuler des modifications d'entraînement et visualiser leur impact prédit par l'IA.</p>
+      </div>
+    </div>
+
+    <!-- ─── RIGHT: RESULTS PANEL ─── -->
+    <div class="sim-results-panel">
+
+      <!-- Error -->
+      <div class="sim-error" *ngIf="simError">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        {{ simError }}
+      </div>
+
+      <!-- Results -->
+      <ng-container *ngIf="simResult && !simResult.error">
+
+        <!-- Impact Card -->
+        <section class="result-card impact-card" [class.positive]="simResult.projected?.delta_sec < 0" [class.negative]="simResult.projected?.delta_sec > 0">
+          <div class="impact-header">
+            <h3>Impact Prédit</h3>
+            <span class="impact-badge" [class]="getDeltaClass(simResult.projected?.delta_sec || 0)">
+              {{ simResult.projected?.delta_sec < 0 ? 'Amélioration' : (simResult.projected?.delta_sec > 0 ? 'Dégradation' : 'Stable') }}
+            </span>
+          </div>
+
+          <div class="impact-main">
+            <div class="impact-delta">
+              <span class="delta-value" [class]="getDeltaClass(simResult.projected?.delta_sec || 0)">
+                {{ simResult.projected?.delta_sec >= 0 ? '+' : '' }}{{ simResult.projected?.delta_sec | number:'1.2-2' }}s
+              </span>
+              <span class="delta-label">Delta Performance</span>
+            </div>
+            <div class="impact-time">
+              <span class="time-value">{{ simResult.projected?.predicted_time_sec | number:'1.2-2' }}s</span>
+              <span class="time-label">Temps Projeté</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Comparison Grid -->
+        <section class="result-card comparison-card">
+          <h3 class="result-card-title">Comparaison: Actuel → Projeté</h3>
+          <div class="comparison-grid">
+            <div class="comp-row">
+              <span class="comp-label">ACWR</span>
+              <div class="comp-values">
+                <span class="comp-current" [style.color]="getAcwrColor(simResult.current?.acwr || 0)">{{ simResult.current?.acwr }}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="comp-projected" [style.color]="getAcwrColor(simResult.projected?.acwr || 0)">{{ simResult.projected?.acwr }}</span>
+              </div>
+              <span class="comp-status" [style.color]="getAcwrColor(simResult.projected?.acwr || 0)">{{ getAcwrLabel(simResult.projected?.acwr || 0) }}</span>
+            </div>
+            <div class="comp-row">
+              <span class="comp-label">Fatigue</span>
+              <div class="comp-values">
+                <span class="comp-current" [style.color]="getFatigueColor(simResult.current?.fatigue_level || 'LOW')">{{ simResult.current?.fatigue_level }}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="comp-projected" [style.color]="getFatigueColor(simResult.projected?.fatigue_level || 'LOW')">{{ simResult.projected?.fatigue_level }}</span>
+              </div>
+              <span class="comp-status" [style.color]="getFatigueColor(simResult.projected?.fatigue_level || 'LOW')">{{ simResult.projected?.fatigue_change }}</span>
+            </div>
+            <div class="comp-row">
+              <span class="comp-label">Charge/sem</span>
+              <div class="comp-values">
+                <span class="comp-current">{{ simResult.current?.load_7d_km }} km</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="comp-projected">{{ simResult.changes_applied?.total_load_weekly_km }} km</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Warnings -->
+        <section class="result-card warnings-card" *ngIf="simResult.warnings?.length">
+          <h3 class="result-card-title warning-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Alertes ({{ simResult.warnings.length }})
+          </h3>
+          <div class="warning-item" *ngFor="let w of simResult.warnings">
+            <span class="warning-dot"></span>
+            <span>{{ w }}</span>
+          </div>
+        </section>
+
+        <!-- Explanation CTA -->
+        <section class="result-card explain-card">
+          <div class="explain-header">
+            <h3 class="result-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Comprendre cette décision
+            </h3>
+            <button class="explain-btn" (click)="loadExplanation()" *ngIf="!showExplanation" [disabled]="explainLoading" id="explain-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              {{ explainLoading ? 'Chargement...' : 'Pourquoi cette prédiction ?' }}
+            </button>
+          </div>
+
+          <!-- Explanation content -->
+          <div class="explain-content" *ngIf="showExplanation && simExplanation">
+            <p class="explain-summary">{{ simExplanation.summary }}</p>
+
+            <div class="explain-chain" *ngIf="simExplanation.reasoning_chain">
+              <span class="chain-title">Raisonnement de l'IA</span>
+              <div class="chain-step" *ngFor="let step of simExplanation.reasoning_chain">
+                {{ step }}
+              </div>
+            </div>
+
+            <div class="explain-meta">
+              <span class="meta-pill">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83"/><circle cx="12" cy="12" r="3"/></svg>
+                {{ simExplanation.method }}
+              </span>
+              <span class="meta-pill quality" [class.good]="simExplanation.data_quality === 'BONNE'" [class.fair]="simExplanation.data_quality === 'MOYENNE'" [class.poor]="simExplanation.data_quality === 'FAIBLE'">
+                Qualité: {{ simExplanation.data_quality }}
+              </span>
+            </div>
+          </div>
+
+          <div class="explain-loading" *ngIf="explainLoading">
+            <div class="loading-spinner sm"></div>
+            <span>L'IA analyse le raisonnement...</span>
+          </div>
+        </section>
+
+        <!-- ACWR Gauge Visual -->
+        <section class="result-card gauge-card">
+          <h3 class="result-card-title">ACWR Projeté</h3>
+          <div class="gauge-container">
+            <svg viewBox="0 0 100 60" class="acwr-gauge">
+              <!-- Background arc -->
+              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8" stroke-linecap="round"/>
+              <!-- Safe zones -->
+              <path d="M 10 50 A 40 40 0 0 1 26 18" fill="none" stroke="rgba(59,130,246,0.3)" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 26 18 A 40 40 0 0 1 74 18" fill="none" stroke="rgba(34,197,94,0.3)" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 74 18 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(239,68,68,0.3)" stroke-width="8" stroke-linecap="round"/>
+              <!-- Value arc -->
+              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none"
+                [attr.stroke]="getAcwrColor(simResult.projected?.acwr || 0)"
+                stroke-width="8" stroke-linecap="round"
+                [attr.stroke-dasharray]="((simResult.projected?.acwr || 0) / 2 * 125) + ' 125'"/>
+              <text x="50" y="44" text-anchor="middle" [attr.fill]="getAcwrColor(simResult.projected?.acwr || 0)" class="gauge-val">{{ simResult.projected?.acwr }}</text>
+              <text x="50" y="55" text-anchor="middle" fill="rgba(255,255,255,0.5)" class="gauge-lbl">ACWR</text>
+            </svg>
+            <div class="gauge-labels">
+              <span style="color:#3b82f6">0.8</span>
+              <span style="color:#22c55e">1.0-1.3</span>
+              <span style="color:#ef4444">1.5+</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Reset button -->
+        <button class="sim-reset-btn" (click)="resetSimulation()" id="reset-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Nouvelle Simulation
+        </button>
+      </ng-container>
+
+      <!-- No simulation error -->
+      <div class="sim-no-data" *ngIf="simResult?.error">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>{{ simResult.error }}</p>
+        <span>{{ simResult.explanation }}</span>
+      </div>
+
+      <!-- Empty results state -->
+      <div class="results-empty" *ngIf="!simResult && !simError && selectedSwimmer">
+        <div class="results-empty-visual">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6" stroke-width="1.5"/></svg>
+        </div>
+        <h3>Prêt à simuler</h3>
+        <p>Ajustez les paramètres et lancez une simulation pour voir l'impact projeté sur la performance et la fatigue de {{ getSwimmerName(selectedSwimmer) }}.</p>
+      </div>
+
+      <!-- Sim History -->
+      <section class="sim-history" *ngIf="simHistory.length > 0">
+        <h3 class="history-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Historique de Simulation
+        </h3>
+        <div class="history-item" *ngFor="let h of simHistory; let i = index" [class.latest]="i === 0">
+          <div class="history-meta">
+            <span class="history-swimmer">{{ h.swimmer }}</span>
+            <span class="history-time">{{ h.weeks }}sem · {{ h.changes.sessions_per_week }}séances/sem</span>
+          </div>
+          <div class="history-result">
+            <span class="history-delta" [class]="getDeltaClass(h.result.projected?.delta_sec || 0)">
+              {{ h.result.projected?.delta_sec >= 0 ? '+' : '' }}{{ h.result.projected?.delta_sec | number:'1.2-2' }}s
+            </span>
+            <span class="history-acwr" [style.color]="getAcwrColor(h.result.projected?.acwr || 0)">
+              ACWR {{ h.result.projected?.acwr }}
+            </span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

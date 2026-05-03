@@ -1,0 +1,73 @@
+# IDSS AI Brain — Advancement Report
+**Author:** JAMAI RAED | **Project:** PFE Natation | **Club:** Stade Tunisien | **Version:** 2.0
+
+## Vision
+The IDSS (Intelligent Decision Support System) is the intelligent core of the swimming club management platform for the Stade Tunisien. It leverages historical and real-time sports data to assist coaches and decision-makers in making objective, data-driven, and explainable decisions regarding swimmer performance, training planning, and competition management. The entire system operates on locally managed data — no external AI services.
+
+## Architecture (Two-Layer Design)
+- **Layer 1 (Node.js):** Always-on rule engine (11 rules), auto-evaluates on every performance save
+- **Layer 2 (Python/FastAPI):** Advanced analytics, ML, explainability, and planning
+- **Communication:** Angular → Node.js (JWT) → Python AI Service (proxy)
+- **Database:** Shared MongoDB (PFE_NATATION)
+
+## Advancement Status (What Was Done)
+
+### [DONE] Feature Engineering Pipeline (utils/features.py)
+- Extracts 17+ features from raw MongoDB data (ACWR, trend slope, load windows, etc.)
+- Time parsing for swimming formats (M:SS.ms, SS.ms)
+- Why: Every module depends on this — it's the data backbone of the IDSS
+
+### [DONE] Fatigue Detection (modules/fatigue.py)
+- 6 weighted rules scoring 0-100 (ACWR, consecutive days, RPE, overload, etc.)
+- Batch analysis for all swimmers simultaneously
+- Why: Core safety feature — protects swimmers from overtraining and injury
+
+### [DONE] Performance Analysis & Prediction (modules/performance.py)
+- Trend analysis: numpy.polyfit for improving/stable/declining classification
+- Race time prediction: scikit-learn LinearRegression with 5 features
+- R² confidence scoring (HIGH/MEDIUM/LOW)
+- Why: Helps coaches predict future performance and identify trends early
+
+### [DONE] Competition Recommendation (modules/recommendation.py)
+- Multi-factor weighted scoring (35% perf, 25% progression, 15% fatigue, etc.)
+- Min-Max normalization across all swimmers
+- Why: Objective, data-driven swimmer selection instead of subjective choice
+
+### [DONE] Training Simulation (modules/simulation.py)
+- What-if scenario projection: change load/intensity → see projected impact
+- ACWR projection with chronic load adaptation over N weeks
+- Warning system for dangerous load increases (>30%)
+- Why: Lets coaches explore decisions safely before implementing them
+
+### [DONE] Explainability Layer (modules/explainability.py) — NEW
+- Structured reasoning for ALL decision types (fatigue, prediction, recommendation, simulation)
+- Factor-by-factor contribution breakdown
+- Step-by-step reasoning chains (numbered logic)
+- Data quality assessment (BONNE/MOYENNE/FAIBLE)
+- Natural-language summaries in French
+- Why: Builds trust — coaches see exactly WHY the AI made each recommendation
+
+### [DONE] Training Planning (modules/planning.py) — NEW
+- Periodization phase detection: BASE / BUILD / PEAK / RECOVERY
+- Personalized load adjustments with safety limits (max 10%/week increase)
+- Weekly plans with intensity distribution and focus areas
+- Team-wide planning with risk grouping
+- Why: Provides "personalized training adjustments and efficient planning strategies"
+
+### [DONE] Full API Integration
+- 11 Python endpoints exposed via FastAPI
+- Node.js proxy routes (all /ai/* endpoints)
+- JWT-authenticated end-to-end chain
+- Swagger docs at http://localhost:8000/docs
+
+## Summary
+All core IDSS capabilities from the vision are now implemented:
+  ✅ Performance trend analysis
+  ✅ Fatigue risk detection
+  ✅ Future performance prediction
+  ✅ Optimal swimmer selection for competitions
+  ✅ Personalized training adjustments
+  ✅ Efficient planning strategies
+  ✅ Decision scenario simulation
+  ✅ Explainability layer (transparent & understandable)
+  ✅ Locally managed data (no external AI)

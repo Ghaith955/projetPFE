@@ -9,6 +9,7 @@ router.use(authenticateToken);
 
 router.get('/', cotisationController.getAllCotisations);
 router.get('/stats', cotisationController.getStats);
+router.get('/:id/facture', cotisationController.getFacturePdf);
 router.get('/:id', cotisationController.getCotisationById);
 router.post('/', roleMiddleware('RESPONSABLE'), cotisationController.createCotisation);
 router.put('/:id', roleMiddleware('RESPONSABLE'), cotisationController.updateCotisation);

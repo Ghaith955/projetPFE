@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user.model");
 const { sendMail } = require("../utils/sendEmail");
+const { buildPasswordResetEmail, getLogoAttachment } = require("../utils/emailTemplates");
 
 const passwordController = {};
 
@@ -30,16 +31,18 @@ passwordController.requestPasswordReset = async (req, res) => {
     console.log(" Expiration en base :", new Date(updatedUser.resetPasswordExpires).toLocaleString());
 
     // URL de réinitialisation qui pointe vers le frontend
-    const resetURL = `http://localhost:4200/reset-password/${token}`; // Port frontend Angular
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const resetURL = `${frontendUrl}/reset-password/${token}`;
 
-    const emailContent = `
-      <p>Vous avez demandé une réinitialisation de votre mot de passe.</p>
-      <p>Cliquez sur le lien suivant pour le réinitialiser :</p>
-      <a href="${resetURL}">${resetURL}</a>
-      <p>Ce lien expirera dans 1 heure.</p>
-    `;
+    const logoAttachment = getLogoAttachment();
+    const attachments = logoAttachment ? [logoAttachment] : [];
+    const emailContent = buildPasswordResetEmail({
+      user,
+      resetUrl: resetURL,
+      logoCid: logoAttachment ? logoAttachment.cid : null
+    });
 
-    await sendMail(user.email, "Réinitialisation du mot de passe", emailContent, true);
+    await sendMail(user.email, "Reinitialisation du mot de passe", emailContent, true, undefined, attachments);
     console.log(" Email envoyé avec succès !");
 
     res.status(200).json({ message: "Email de réinitialisation envoyé" });

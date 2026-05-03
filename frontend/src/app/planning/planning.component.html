@@ -243,12 +243,27 @@
         <textarea [(ngModel)]="form.description" placeholder="Détails de la séance..." rows="3"></textarea>
       </div>
       <div class="field-group full">
-        <label>Nageurs concernés (maintenez Ctrl/Cmd pour sélection multiple)</label>
-        <select multiple [(ngModel)]="form.nageurs" class="multi-select" style="height: 120px;">
-          <option *ngFor="let n of allNageurs" [value]="n._id">
-            {{ n.utilisateur?.nom }} {{ n.utilisateur?.prenom }}
-          </option>
-        </select>
+        <label>Nageurs concernés</label>
+        <div class="swimmer-card-grid">
+          <button
+            type="button"
+            class="swimmer-card"
+            *ngFor="let n of allNageurs"
+            [class.selected]="isNageurSelected(n._id)"
+            (click)="toggleNageurSelection(n._id)">
+            <span class="swimmer-media">
+              <img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)" class="swimmer-photo" />
+              <span *ngIf="!avatarUrl(n)" class="swimmer-photo fallback">{{ getInitials(n) }}</span>
+            </span>
+            <span class="swimmer-info">
+              <span class="swimmer-name">{{ fullName(n) }}</span>
+              <span class="swimmer-meta">{{ n.utilisateur?.email || '' }}</span>
+            </span>
+            <span class="swimmer-check" *ngIf="isNageurSelected(n._id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </button>
+        </div>
       </div>
     </div>
     <div class="modal-footer">

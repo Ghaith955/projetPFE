@@ -5,15 +5,15 @@ dotenv.config();
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // true pour port 465, false pour 587
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: Number(process.env.EMAIL_PORT || 465),
+    secure: String(process.env.EMAIL_SECURE || "true") === "true",
     auth: {
-        user: process.env.EMAIL_USER, // Email administrateur (ex : admin@gmail.com)
-        pass: process.env.EMAIL_PASS, // Mot de passe ou mot de passe d'application si 2FA activé
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
     tls: {
-        // Ignore l'erreur de certificat auto-signé (à utiliser uniquement en développement)
+        // Ignore l'erreur de certificat auto-signe (a utiliser uniquement en developpement)
         rejectUnauthorized: false,
     }
 });
@@ -26,25 +26,36 @@ const transporter = nodemailer.createTransport({
  * @param {boolean} isHtml - Indique si le contenu est en HTML
  * @param {string} from - L'adresse email de l'expéditeur (par défaut l'admin)
  */
-const sendMail = (to, subject, content, isHtml = false, from = process.env.EMAIL_USER) => {
-    if (!to) {
-        console.error("Aucun destinataire spécifié.");
-        return;
-    }
-
-    const mailOptions = {
-        from: from,
-        to: to,
-        subject: subject,
-        [isHtml ? "html" : "text"]: content
-    };
-
-    transporter.sendMail(mailOptions, (err, info) => {
-        if (err) {
-            console.error("Erreur lors de l'envoi de l'e-mail :", err);
-        } else {
-            console.log('E-mail envoyé : ' + info.response);
+const sendMail = (
+    to,
+    subject,
+    content,
+    isHtml = false,
+    from = process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    attachments = []
+) => {
+    return new Promise((resolve, reject) => {
+        if (!to) {
+            console.error('Aucun destinataire specifie.');
+            return resolve(false);
         }
+
+        const mailOptions = {
+            from: from,
+            to: to,
+            subject: subject,
+            [isHtml ? 'html' : 'text']: content,
+            attachments: Array.isArray(attachments) ? attachments : []
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error("Erreur lors de l'envoi de l'e-mail :", err);
+                return reject(err);
+            }
+            console.log('E-mail envoye : ' + info.response);
+            return resolve(info);
+        });
     });
 };
 

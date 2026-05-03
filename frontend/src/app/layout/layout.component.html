@@ -49,6 +49,56 @@
   </aside>
 
   <main class="main-content">
+    <div class="top-bar">
+      <div class="top-actions">
+        <button
+          type="button"
+          class="notif-btn"
+          (click)="toggleNotifications()"
+          [attr.aria-expanded]="showNotifications"
+          aria-label="Notifications"
+        >
+          <span class="notif-icon" aria-hidden="true" [innerHTML]="icons['bell']"></span>
+          <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+
+        <div class="notif-panel" *ngIf="showNotifications">
+          <div class="notif-header">
+            <span>Notifications</span>
+            <button
+              type="button"
+              class="notif-clear"
+              (click)="markAllNotificationsAsRead()"
+              [disabled]="unreadCount === 0"
+            >
+              Tout marquer comme lu
+            </button>
+          </div>
+
+          <div class="notif-loading" *ngIf="notificationsLoading">Chargement...</div>
+          <div class="notif-empty" *ngIf="!notificationsLoading && notifications.length === 0">
+            Aucune notification.
+          </div>
+
+          <div class="notif-list" *ngIf="!notificationsLoading && notifications.length > 0">
+            <button
+              type="button"
+              class="notif-item"
+              *ngFor="let n of notifications"
+              [class.unread]="!n.isRead"
+              (click)="openNotification(n)"
+            >
+              <span class="notif-dot" aria-hidden="true"></span>
+              <div class="notif-content">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-message">{{ n.message }}</div>
+                <div class="notif-time">{{ formatNotificationDate(n.createdAt) }}</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="page-shell">
       <router-outlet></router-outlet>
     </div>

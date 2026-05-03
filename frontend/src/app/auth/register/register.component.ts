@@ -156,7 +156,7 @@ export class RegisterComponent {
 
     this.auth.register(formData).subscribe({
       next: () => {
-        this.successMessage = 'Compte créé avec succès ! Redirection...';
+        this.successMessage = "Inscription enregistree. En attente d'approbation. Un email vous a ete envoye.";
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err) => {

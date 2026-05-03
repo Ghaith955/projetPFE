@@ -1,0 +1,284 @@
+{
+  "timestamp": "2026-05-03T23:13:09.640996",
+  "passed": 14,
+  "failed": 1,
+  "total_time_ms": 4228.9,
+  "tests": [
+    {
+      "test": "MongoDB Connection",
+      "status": "PASS",
+      "time_ms": 36.3,
+      "detail": {
+        "db": "PFE_NATATION",
+        "collections": [
+          "idssdecisions",
+          "competitions",
+          "users",
+          "demandes",
+          "entraineurs",
+          "nageurs",
+          "entrainements",
+          "roles",
+          "swimmerbaselines",
+          "notifications",
+          "cotisations",
+          "performances"
+        ]
+      }
+    },
+    {
+      "test": "Data Counts",
+      "status": "PASS",
+      "time_ms": 13.8,
+      "detail": {
+        "nageurs": 4,
+        "performances": 14,
+        "entrainements": 4,
+        "users": 15,
+        "competitions": 4
+      }
+    },
+    {
+      "test": "Swimmer IDs Retrieval",
+      "status": "PASS",
+      "time_ms": 1.6,
+      "detail": {
+        "count": 4,
+        "sample": [
+          "69dc40ed04f2b85fcbd3f8b8",
+          "69dcb549a1e1caf442412146",
+          "69e7b7b08b09217d12c7d430"
+        ]
+      }
+    },
+    {
+      "test": "Single Swimmer Feature Extraction",
+      "status": "PASS",
+      "time_ms": 46.3,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "age": 25,
+        "personal_best_sec": 51.0,
+        "avg_time_last5": 59.666666666666664,
+        "sessions_count": 3,
+        "trend_slope": -1.4999999999999922,
+        "consistency_std": 12.503332889007368,
+        "avg_fatigue_reported": 7.333333333333333,
+        "avg_intensity": 7.333333333333333,
+        "sessions_last7d": 0,
+        "sessions_last14d": 0,
+        "total_load_7d": 0.0,
+        "total_load_14d": 0.0,
+        "total_load_28d": 0.0,
+        "acwr": 0.0,
+        "consecutive_days": 0,
+        "avg_training_intensity": 5.0,
+        "attendance_rate": 1.0
+      }
+    },
+    {
+      "test": "Full Pipeline — All Swimmers",
+      "status": "PASS",
+      "time_ms": 61.0,
+      "detail": {
+        "success": 4,
+        "fail": 0,
+        "missing_data": 0,
+        "features_sample": [
+          {
+            "name": "Jamai Raed",
+            "sessions": 3,
+            "acwr": 0.0,
+            "trend_slope": -1.4999999999999922
+          },
+          {
+            "name": "Issaoui Ridha",
+            "sessions": 2,
+            "acwr": 2.7,
+            "trend_slope": 0.0
+          },
+          {
+            "name": "Zied mr",
+            "sessions": 1,
+            "acwr": 0.0,
+            "trend_slope": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "test": "Fatigue Detection — Single",
+      "status": "PASS",
+      "time_ms": 14.7,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "fatigue_level": "LOW",
+        "fatigue_score": 10,
+        "acwr": 0.0,
+        "consecutive_days": 0,
+        "avg_fatigue_reported": 7.3,
+        "sessions_last7d": 0,
+        "total_load_7d_km": 0.0,
+        "recommendation": "Continuer le plan actuel. Possibilité d'augmenter progressivement (+10%/sem max).",
+        "confidence": "RULE_BASED",
+        "explanation": "Fatigue LOW (score 10/100). Facteurs: Fatigue déclarée modérée: 7.3/10."
+      }
+    },
+    {
+      "test": "Fatigue Detection — Batch",
+      "status": "PASS",
+      "time_ms": 73.0,
+      "detail": {
+        "total": 4,
+        "distribution": {
+          "LOW": 2,
+          "MEDIUM": 0,
+          "HIGH": 2,
+          "CRITICAL": 0
+        },
+        "at_risk": 2
+      }
+    },
+    {
+      "test": "Performance Analysis",
+      "status": "PASS",
+      "time_ms": 3431.5,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "period_days": 90,
+        "sessions_analyzed": 3,
+        "trend": "improving",
+        "slope_per_session_sec": -1.5,
+        "personal_best_sec": 51.0,
+        "avg_time_last5_sec": 59.67,
+        "improvement_pct": 0.0,
+        "consistency_score": 0,
+        "explanation": "Performance en amélioration de 1.50s par séance sur 90 jours."
+      }
+    },
+    {
+      "test": "Performance Prediction (ML)",
+      "status": "PASS",
+      "time_ms": 58.3,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "predicted_time_sec": 48.45,
+        "current_best_sec": 51.0,
+        "delta_sec": -2.55,
+        "confidence": "LOW",
+        "r_squared": 1.0,
+        "model_used": "LinearRegression",
+        "feature_importance": {
+          "progression": -1.5,
+          "intensity": 0.0015,
+          "session_load": 0.0895,
+          "fatigue_level": 0.0015,
+          "duration": 0.0
+        },
+        "explanation": "Temps prédit: 48.45s (basé sur 3 séances). Facteurs principaux: progression (-1.500s), session_load (+0.089s), intensity (+0.002s). Confiance: LOW (R²=1.00)."
+      }
+    },
+    {
+      "test": "Competition Recommendation",
+      "status": "PASS",
+      "time_ms": 100.7,
+      "detail": {
+        "total_evaluated": 4,
+        "top3": [
+          {
+            "name": "Jamai Raed",
+            "score": 0.808
+          },
+          {
+            "name": "Zied mr",
+            "score": 0.506
+          },
+          {
+            "name": "Issaoui Ridha",
+            "score": 0.301
+          }
+        ]
+      }
+    },
+    {
+      "test": "Scenario Simulation",
+      "status": "FAIL",
+      "time_ms": 50.7,
+      "error": "'charmap' codec can't encode character '\\u2192' in position 62: character maps to <undefined>"
+    },
+    {
+      "test": "Explainability Layer",
+      "status": "PASS",
+      "time_ms": 39.9,
+      "detail": {
+        "data_quality": "FAIBLE",
+        "method": "Système expert à base de règles avec scoring pondéré (ACWR, RPE, charge, tendance)",
+        "chain_steps": 6
+      }
+    },
+    {
+      "test": "Training Plan Generation",
+      "status": "PASS",
+      "time_ms": 49.4,
+      "detail": {
+        "phase": null,
+        "weeks_generated": 4
+      }
+    },
+    {
+      "test": "ML Model Quality Assessment",
+      "status": "PASS",
+      "time_ms": 104.4,
+      "detail": {
+        "total": 4,
+        "with_prediction": 1,
+        "confidence_dist": {
+          "LOW": 1
+        },
+        "r2_values": [
+          1.0
+        ],
+        "avg_r2": 1.0
+      }
+    },
+    {
+      "test": "Multi-Scenario Decision Sweep",
+      "status": "PASS",
+      "time_ms": 147.3,
+      "detail": [
+        {
+          "scenario": "Light",
+          "delta_sec": -17.85,
+          "acwr": 1.0,
+          "fatigue": "LOW",
+          "warnings": 1
+        },
+        {
+          "scenario": "Moderate",
+          "delta_sec": -42.15,
+          "acwr": 1.0,
+          "fatigue": "LOW",
+          "warnings": 1
+        },
+        {
+          "scenario": "Intense",
+          "delta_sec": -90.45,
+          "acwr": 1.0,
+          "fatigue": "MEDIUM",
+          "warnings": 1
+        },
+        {
+          "scenario": "Extreme",
+          "delta_sec": -168.75,
+          "acwr": 1.0,
+          "fatigue": "MEDIUM",
+          "warnings": 2
+        }
+      ]
+    }
+  ]
+}

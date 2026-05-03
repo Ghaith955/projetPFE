@@ -1,5 +1,8 @@
 const Performance = require('../models/performance.model');
 const Nageur = require('../models/nageur.model');
+const { evaluateRules }  = require('../utils/idssRuleEngine');
+const { updateBaseline } = require('../utils/idssBaselineUpdater');
+const IDSSDecision       = require('../models/idssDecision.model');
 
 const performanceController = {};
 
@@ -278,6 +281,23 @@ performanceController.create = async (req, res) => {
     });
 
     await perf.save();
+
+    // ── IDSS: run rule engine asynchronously after save ──────────────────
+    setImmediate(async () => {
+      try {
+        const baseline = await updateBaseline(perf.nageur);
+        const result   = evaluateRules(perf, baseline);
+        await IDSSDecision.create({
+          nageur: perf.nageur, performance: perf._id,
+          fatigueScore: result.fatigueScore, fatigueLevel: result.fatigueLevel,
+          triggeredRules: result.triggeredRules, recommendation: result.recommendation,
+          recommendationMessage: result.recommendationMessage,
+          confidence: result.confidence, source: result.source,
+          inputSnapshot: result.inputSnapshot
+        });
+      } catch (e) { console.error('IDSS auto-analysis error:', e.message); }
+    });
+
     res.status(201).json({ message: 'Performance ajoutée !', performance: perf });
   } catch (error) {
     res.status(500).json({ message: 'Erreur.', error: error.message });
@@ -344,6 +364,23 @@ performanceController.createTrainingResult = async (req, res) => {
     });
 
     await perf.save();
+
+    // ── IDSS: run rule engine asynchronously after save ──────────────────
+    setImmediate(async () => {
+      try {
+        const baseline = await updateBaseline(perf.nageur);
+        const result   = evaluateRules(perf, baseline);
+        await IDSSDecision.create({
+          nageur: perf.nageur, performance: perf._id,
+          fatigueScore: result.fatigueScore, fatigueLevel: result.fatigueLevel,
+          triggeredRules: result.triggeredRules, recommendation: result.recommendation,
+          recommendationMessage: result.recommendationMessage,
+          confidence: result.confidence, source: result.source,
+          inputSnapshot: result.inputSnapshot
+        });
+      } catch (e) { console.error('IDSS auto-analysis error:', e.message); }
+    });
+
     res.status(201).json({ message: 'Resultat d entrainement ajoute avec succes.', performance: perf });
   } catch (error) {
     res.status(500).json({ message: 'Erreur.', error: error.message });

@@ -15,7 +15,10 @@ const CotisationSchema = new mongoose.Schema({
     enum: ['Espèces', 'Virement', 'Chèque', 'Carte'],
     default: 'Espèces'
   },
-  notes: { type: String, default: '' }
+  notes: { type: String, default: '' },
+  facturePath: { type: String, default: '' },
+  factureNumber: { type: String, default: '' },
+  paidAt: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Cotisation', CotisationSchema);

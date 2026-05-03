@@ -1,6 +1,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const { sendMail } = require('../utils/sendEmail');
+const {
+  buildPendingUserEmail,
+  buildAdminPendingEmail,
+  getLogoAttachment
+} = require('../utils/emailTemplates');
 
 const authController = {};
 
@@ -20,7 +26,9 @@ authController.login = async (req, res) => {
 
     // enabling bypass wa9teyan yaani
 
-    if (!user.isActive) {
+    const isInactive = user.isActive === false;
+    const isPending = user.status === 'PENDING';
+    if (isInactive || (isPending && user.isActive !== true)) {
       return res.status(403).json({ message: 'Votre compte n\'est pas encore activé.' });
     }
 
@@ -200,6 +208,7 @@ authController.register = async (req, res) => {
       phone: phone || null,
       imageprofile,
       role,
+      status: 'PENDING',
       // Require admin activation
       isActive: false
     });
@@ -231,15 +240,40 @@ authController.register = async (req, res) => {
       await newEntraineur.save();
     }
 
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+    const logoAttachment = getLogoAttachment();
+    const attachments = logoAttachment ? [logoAttachment] : [];
+
+    const userHtml = buildPendingUserEmail({
+      user: newUser,
+      frontendUrl,
+      logoCid: logoAttachment ? logoAttachment.cid : null
+    });
+
+    const adminHtml = adminEmail
+      ? buildAdminPendingEmail({
+          user: newUser,
+          dashboardUrl: `${frontendUrl}/dashboard`,
+          logoCid: logoAttachment ? logoAttachment.cid : null
+        })
+      : null;
+
+    await Promise.allSettled([
+      sendMail(newUser.email, 'Inscription en attente de validation', userHtml, true, undefined, attachments),
+      adminHtml ? sendMail(adminEmail, "Nouvelle demande d'inscription", adminHtml, true, undefined, attachments) : Promise.resolve()
+    ]);
+
     res.status(201).json({
-      message: 'Compte créé avec succès !',
+      message: 'Inscription enregistree. En attente d\'approbation.',
       user: {
         id: newUser._id,
         nom: newUser.nom,
         prenom: newUser.prenom,
         email: newUser.email,
         role: newUser.role,
-        isActive: newUser.isActive
+        isActive: newUser.isActive,
+        status: newUser.status
       }
     });
   } catch (error) {

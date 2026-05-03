@@ -14,11 +14,16 @@ const performanceRoutes = require('./routes/performanceRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const idssRoutes          = require('./routes/idssRoutes');
+const aiRoutes            = require('./routes/aiRoutes');
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  exposedHeaders: ['Content-Disposition']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -36,6 +41,8 @@ app.use('/performances', performanceRoutes);
 app.use('/password', passwordRoutes);
 app.use('/chat', chatRoutes);
 app.use('/notifications', notificationRoutes);
+app.use('/idss',          idssRoutes);
+app.use('/ai',            aiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

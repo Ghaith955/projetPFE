@@ -11,6 +11,7 @@
     "myPerformance": "أدائي",
     "cotisations": "الاشتراكات",
     "settings": "الإعدادات",
+    "simulation": "محاكاة الذكاء",
     "mySwimmers": "سباحي",
     "themeDark": "الوضع الداكن",
     "themeLight": "الوضع الفاتح",
@@ -56,7 +57,7 @@
       "swimmerPerformance": "السباحون المتابعون",
       "levelEstimate": "تقدير المستوى",
       "dss": {
-        "title": "DSS Insights",
+        "title": "IDSS Insights",
         "alerts": "تنبيهات",
         "alertsSub": "{{count}} سباح في تراجع",
         "topPerformers": "أفضل الأداء",
@@ -131,7 +132,7 @@
       "send": "إرسال",
       "competitionTag": "منافسة إقليمية",
       "dss": {
-        "title": "DSS Insights",
+        "title": "IDSS Insights",
         "trend": "اتجاه الأداء",
         "fatigue": "خطر الإجهاد",
         "recommendation": "توصية",

@@ -3,11 +3,12 @@ const jwt = require('jsonwebtoken');
 const authenticateToken = (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'] || req.headers['x-auth-token'];
-    if (!authHeader) {
+    const queryToken = req.query?.token;
+    if (!authHeader && !queryToken) {
       return res.status(401).json({ message: 'Authentification requise : aucun token fourni.' });
     }
 
-    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+    const token = queryToken || (authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader);
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {

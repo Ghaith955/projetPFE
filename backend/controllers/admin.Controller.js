@@ -6,6 +6,8 @@ const Entrainement = require('../models/entrainement.model');
 const Cotisation = require('../models/cotisation.model');
 const Demande = require('../models/demande.model');
 const bcrypt = require('bcryptjs');
+const { sendMail } = require('../utils/sendEmail');
+const { buildApprovalEmail, getLogoAttachment } = require('../utils/emailTemplates');
 
 const adminController = {};
 
@@ -52,7 +54,8 @@ adminController.createUser = async (req, res) => {
       password: hashedPassword,
       phone, imageprofile,
       role: role || 'NAGEUR',
-      isActive: isActive !== undefined ? isActive : true
+      isActive: isActive !== undefined ? isActive : true,
+      status: isActive === false ? 'PENDING' : 'APPROVED'
     });
     await newUser.save();
 
@@ -72,7 +75,10 @@ adminController.updateUser = async (req, res) => {
     if (email !== undefined) updateData.email = email;
     if (phone !== undefined) updateData.phone = phone;
     if (role !== undefined) updateData.role = role;
-    if (isActive !== undefined) updateData.isActive = isActive;
+    if (isActive !== undefined) {
+      updateData.isActive = isActive;
+      updateData.status = isActive ? 'APPROVED' : 'PENDING';
+    }
     if (req.file) updateData.imageprofile = `/uploads/${req.file.filename}`;
 
     const user = await User.findByIdAndUpdate(
@@ -95,6 +101,7 @@ adminController.toggleActive = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé.' });
 
     user.isActive = !user.isActive;
+    user.status = user.isActive ? 'APPROVED' : 'PENDING';
     await user.save();
 
     res.status(200).json({
@@ -182,7 +189,12 @@ adminController.getStats = async (req, res) => {
 // GET /admin/pending-registrations - Get users awaiting approval
 adminController.getPendingRegistrations = async (req, res) => {
   try {
-    const pendingUsers = await User.find({ isActive: false })
+    const pendingUsers = await User.find({
+      $or: [
+        { status: 'PENDING' },
+        { status: { $exists: false }, isActive: false }
+      ]
+    })
       .select('-password -resetPasswordToken -resetPasswordExpires')
       .sort({ createdAt: -1 });
 
@@ -212,8 +224,23 @@ adminController.approvePendingRegistration = async (req, res) => {
 
     if (action === 'approve') {
       user.isActive = true;
+      user.status = 'APPROVED';
       await user.save();
-      res.json({ message: 'Inscription approuvée !', user: { id: user._id, isActive: true } });
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+      const logoAttachment = getLogoAttachment();
+      const attachments = logoAttachment ? [logoAttachment] : [];
+      const approvalHtml = buildApprovalEmail({
+        user,
+        loginUrl: `${frontendUrl}/login`,
+        logoCid: logoAttachment ? logoAttachment.cid : null
+      });
+
+      await Promise.allSettled([
+        sendMail(user.email, 'Votre compte est approuve', approvalHtml, true, undefined, attachments)
+      ]);
+
+      res.json({ message: 'Inscription approuvée !', user: { id: user._id, isActive: true, status: user.status } });
     } else if (action === 'reject') {
       // Delete the user and associated data
       await Nageur.deleteMany({ utilisateur: user._id });

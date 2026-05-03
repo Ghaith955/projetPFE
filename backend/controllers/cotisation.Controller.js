@@ -1,6 +1,9 @@
+const path = require('path');
+const fs = require('fs');
 const Cotisation = require('../models/cotisation.model');
 const Nageur = require('../models/nageur.model');
 const { notifyNageurs } = require('../utils/notificationHelper');
+const { generateCotisationFacture } = require('../utils/factureGenerator');
 
 const cotisationController = {};
 
@@ -49,6 +52,16 @@ cotisationController.createCotisation = async (req, res) => {
     const cotisation = new Cotisation({ nageur, montant, dateDebut, dateFin, statut, modePaiement, notes });
     await cotisation.save();
 
+    if (cotisation.statut === 'Payé') {
+      const enriched = await Cotisation.findById(cotisation._id)
+        .populate({ path: 'nageur', populate: { path: 'utilisateur', select: 'nom prenom email' } });
+      const facture = await generateCotisationFacture(enriched);
+      cotisation.facturePath = facture.facturePath;
+      cotisation.factureNumber = facture.factureNumber;
+      cotisation.paidAt = facture.paidAt;
+      await cotisation.save();
+    }
+
     await notifyNageurs({
       nageurIds: [nageur],
       title: 'Nouvelle cotisation',
@@ -69,12 +82,28 @@ cotisationController.createCotisation = async (req, res) => {
 cotisationController.updateCotisation = async (req, res) => {
   try {
     const { nageur, montant, dateDebut, dateFin, statut, modePaiement, notes } = req.body;
-    const cotisation = await Cotisation.findByIdAndUpdate(
+    const existing = await Cotisation.findById(req.params.id);
+    if (!existing) return res.status(404).json({ message: 'Cotisation non trouvée.' });
+
+    let cotisation = await Cotisation.findByIdAndUpdate(
       req.params.id,
       { nageur, montant, dateDebut, dateFin, statut, modePaiement, notes },
       { new: true }
     ).populate({ path: 'nageur', populate: { path: 'utilisateur', select: 'nom prenom email' } });
-    if (!cotisation) return res.status(404).json({ message: 'Cotisation non trouvée.' });
+
+    const shouldGenerate = cotisation.statut === 'Payé' && (!cotisation.facturePath || existing.statut !== 'Payé');
+    if (shouldGenerate) {
+      const facture = await generateCotisationFacture(cotisation);
+      cotisation = await Cotisation.findByIdAndUpdate(
+        cotisation._id,
+        {
+          facturePath: facture.facturePath,
+          factureNumber: facture.factureNumber,
+          paidAt: facture.paidAt
+        },
+        { new: true }
+      ).populate({ path: 'nageur', populate: { path: 'utilisateur', select: 'nom prenom email' } });
+    }
 
     await notifyNageurs({
       nageurIds: [cotisation.nageur?._id || nageur],
@@ -89,6 +118,58 @@ cotisationController.updateCotisation = async (req, res) => {
     res.status(200).json({ message: 'Cotisation mise à jour!', cotisation });
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la mise à jour.', error: error.message });
+  }
+};
+
+// GET facture PDF
+cotisationController.getFacturePdf = async (req, res) => {
+  try {
+    const filter = { _id: req.params.id };
+    if (req.user?.role === 'NAGEUR') {
+      const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
+      if (!nageur) return res.status(404).json({ message: 'Facture non trouvée.' });
+      filter.nageur = nageur._id;
+    }
+
+    let cotisation = await Cotisation.findOne(filter)
+      .populate({ path: 'nageur', populate: { path: 'utilisateur', select: 'nom prenom email' } });
+
+    if (!cotisation || cotisation.statut !== 'Payé') {
+      return res.status(404).json({ message: 'Facture non disponible.' });
+    }
+
+    // Check if PDF exists on disk; if not, regenerate it
+    let absolutePath = cotisation.facturePath
+      ? path.resolve(__dirname, '..', cotisation.facturePath)
+      : null;
+
+    if (!absolutePath || !fs.existsSync(absolutePath)) {
+      // Regenerate the facture PDF
+      const facture = await generateCotisationFacture(cotisation);
+      cotisation = await Cotisation.findByIdAndUpdate(
+        cotisation._id,
+        {
+          facturePath: facture.facturePath,
+          factureNumber: facture.factureNumber,
+          paidAt: facture.paidAt
+        },
+        { new: true, returnDocument: 'after' }
+      );
+      absolutePath = path.resolve(__dirname, '..', facture.facturePath);
+    }
+
+    if (!fs.existsSync(absolutePath)) {
+      return res.status(500).json({ message: 'Erreur lors de la génération de la facture.' });
+    }
+
+    const filename = `facture-${cotisation.factureNumber || cotisation._id}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    const fileStream = fs.createReadStream(absolutePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('Facture download error:', error);
+    res.status(500).json({ message: 'Erreur lors du telechargement.', error: error.message });
   }
 };
 
