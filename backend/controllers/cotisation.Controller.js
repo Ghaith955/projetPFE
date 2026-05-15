@@ -4,6 +4,7 @@ const Cotisation = require('../models/cotisation.model');
 const Nageur = require('../models/nageur.model');
 const { notifyNageurs } = require('../utils/notificationHelper');
 const { generateCotisationFacture } = require('../utils/factureGenerator');
+const { ensureCoachSwimmerAccess, getCoachSwimmerIds } = require('../utils/coachScope');
 
 const cotisationController = {};
 
@@ -15,6 +16,11 @@ cotisationController.getAllCotisations = async (req, res) => {
       const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
       if (!nageur) return res.status(200).json([]);
       filter.nageur = nageur._id;
+    }
+    if (req.user?.role === 'ENTRAINEUR') {
+      const swimmerIds = await getCoachSwimmerIds(req.user.userId);
+      if (!swimmerIds.length) return res.status(200).json([]);
+      filter.nageur = { $in: swimmerIds };
     }
 
     const cotisations = await Cotisation.find(filter)
@@ -35,6 +41,11 @@ cotisationController.getCotisationById = async (req, res) => {
       if (!nageur) return res.status(404).json({ message: 'Cotisation non trouvée.' });
       filter.nageur = nageur._id;
     }
+    if (req.user?.role === 'ENTRAINEUR') {
+      const swimmerIds = await getCoachSwimmerIds(req.user.userId);
+      if (!swimmerIds.length) return res.status(404).json({ message: 'Cotisation non trouvée.' });
+      filter.nageur = { $in: swimmerIds };
+    }
 
     const cotisation = await Cotisation.findOne(filter)
       .populate({ path: 'nageur', populate: { path: 'utilisateur', select: 'nom prenom email' } });
@@ -49,6 +60,10 @@ cotisationController.getCotisationById = async (req, res) => {
 cotisationController.createCotisation = async (req, res) => {
   try {
     const { nageur, montant, dateDebut, dateFin, statut, modePaiement, notes } = req.body;
+    if (req.user?.role === 'ENTRAINEUR') {
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, nageur);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const cotisation = new Cotisation({ nageur, montant, dateDebut, dateFin, statut, modePaiement, notes });
     await cotisation.save();
 
@@ -84,6 +99,11 @@ cotisationController.updateCotisation = async (req, res) => {
     const { nageur, montant, dateDebut, dateFin, statut, modePaiement, notes } = req.body;
     const existing = await Cotisation.findById(req.params.id);
     if (!existing) return res.status(404).json({ message: 'Cotisation non trouvée.' });
+    if (req.user?.role === 'ENTRAINEUR') {
+      const targetId = existing.nageur?._id || existing.nageur || nageur;
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, targetId);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
 
     let cotisation = await Cotisation.findByIdAndUpdate(
       req.params.id,
@@ -129,6 +149,11 @@ cotisationController.getFacturePdf = async (req, res) => {
       const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
       if (!nageur) return res.status(404).json({ message: 'Facture non trouvée.' });
       filter.nageur = nageur._id;
+    }
+    if (req.user?.role === 'ENTRAINEUR') {
+      const swimmerIds = await getCoachSwimmerIds(req.user.userId);
+      if (!swimmerIds.length) return res.status(404).json({ message: 'Facture non trouvée.' });
+      filter.nageur = { $in: swimmerIds };
     }
 
     let cotisation = await Cotisation.findOne(filter)
@@ -176,6 +201,13 @@ cotisationController.getFacturePdf = async (req, res) => {
 // DELETE
 cotisationController.deleteCotisation = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const existing = await Cotisation.findById(req.params.id);
+      if (!existing) return res.status(404).json({ message: 'Cotisation non trouvée.' });
+      const targetId = existing.nageur?._id || existing.nageur;
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, targetId);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const cotisation = await Cotisation.findByIdAndDelete(req.params.id);
     if (!cotisation) return res.status(404).json({ message: 'Cotisation non trouvée.' });
     res.status(200).json({ message: 'Cotisation supprimée!' });
@@ -192,6 +224,11 @@ cotisationController.getStats = async (req, res) => {
       const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
       if (!nageur) return res.status(200).json({ total: 0, totalMontant: 0, paye: 0, enAttente: 0, enRetard: 0, montantPercu: 0 });
       filter.nageur = nageur._id;
+    }
+    if (req.user?.role === 'ENTRAINEUR') {
+      const swimmerIds = await getCoachSwimmerIds(req.user.userId);
+      if (!swimmerIds.length) return res.status(200).json({ total: 0, totalMontant: 0, paye: 0, enAttente: 0, enRetard: 0, montantPercu: 0 });
+      filter.nageur = { $in: swimmerIds };
     }
 
     const all = await Cotisation.find(filter);

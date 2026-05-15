@@ -109,13 +109,48 @@ def detect_fatigue_single(swimmer_id: str, use_ml: bool = False) -> dict:
     else:
         fatigue_level = "LOW"
     
-    # Recommendation
+    # Recommendation — try LLM first, then fallback to rules
     recommendations = {
         "CRITICAL": "Repos obligatoire 48h. Réduire charge de 40%. Consultation médicale si symptômes.",
         "HIGH": "Réduire intensité de 30%. Ajouter 1 jour de repos cette semaine.",
         "MEDIUM": "Surveiller. Maintenir charge actuelle sans augmentation.",
         "LOW": "Continuer le plan actuel. Possibilité d'augmenter progressivement (+10%/sem max)."
     }
+
+    # Build data payload for LLM
+    llm_data = {
+        "name": info.get("name", "Inconnu"),
+        "fatigue_level": fatigue_level,
+        "fatigue_score": fatigue_score,
+        "acwr": acwr,
+        "sessions_last7d": features.get("sessions_last7d", 0),
+        "trend_slope": features.get("trend_slope", 0),
+        "attendance_rate": features.get("attendance_rate", 1.0),
+        "personal_best_sec": features.get("personal_best_sec"),
+        "avg_time_last5": features.get("avg_time_last5"),
+        "total_load_7d": features.get("total_load_7d", 0),
+        "total_load_28d": features.get("total_load_28d", 0),
+        "consecutive_days": consec,
+        "age": features.get("age", 18),
+    }
+
+    try:
+        from modules.llm_recommendation import generate_smart_recommendation
+        llm_result = generate_smart_recommendation(llm_data)
+        recommendation_text = llm_result.get("recommendation", recommendations[fatigue_level])
+        athlete_advice = llm_result.get("athlete_advice", "")
+        rec_source = llm_result.get("source", "RULE_BASED")
+    except Exception:
+        recommendation_text = recommendations[fatigue_level]
+        athlete_advice = _build_athlete_advice(
+            fatigue_level, acwr, avg_fatigue, consec, load_7d, sessions_7d
+        )
+        rec_source = "RULE_BASED"
+
+    if not athlete_advice:
+        athlete_advice = _build_athlete_advice(
+            fatigue_level, acwr, avg_fatigue, consec, load_7d, sessions_7d
+        )
     
     return {
         "swimmer_id": swimmer_id,
@@ -127,9 +162,10 @@ def detect_fatigue_single(swimmer_id: str, use_ml: bool = False) -> dict:
         "avg_fatigue_reported": round(avg_fatigue, 1),
         "sessions_last7d": features.get("sessions_last7d", 0),
         "total_load_7d_km": round(features.get("total_load_7d", 0), 1),
-        "recommendation": recommendations[fatigue_level],
+        "recommendation": recommendation_text,
+        "athlete_advice": athlete_advice,
         "triggered_rules": triggered_rules,
-        "confidence": "RULE_BASED",
+        "confidence": rec_source,
         "explanation": _build_explanation(fatigue_level, fatigue_score, triggered_rules)
     }
 
@@ -169,3 +205,26 @@ def _build_explanation(level: str, score: int, rules: list) -> str:
     
     parts = [r["message"] for r in rules]
     return f"Fatigue {level} (score {score}/100). Facteurs: {'; '.join(parts)}."
+
+
+def _build_athlete_advice(level: str, acwr: float, avg_fatigue: float,
+                          consec: int, load_7d: float, sessions_7d: int) -> str:
+    advice = []
+
+    if level in ("CRITICAL", "HIGH"):
+        advice.append("Priorise le sommeil (8h+) et une recuperation active legere.")
+    elif level == "MEDIUM":
+        advice.append("Stabilise la charge et dors regulierement.")
+    else:
+        advice.append("Bonne forme. Maintiens sommeil, hydratation et etirements.")
+
+    if acwr > 1.3:
+        advice.append("Charge elevee: hydrate-toi davantage et integre une journee plus facile.")
+    if consec >= 4:
+        advice.append("Plusieurs jours consecutifs: ajoute un jour de repos.")
+    if avg_fatigue >= 6:
+        advice.append("Fatigue ressentie elevee: baisse l intensite et surveille la recuperation.")
+    if load_7d > 30 or sessions_7d >= 6:
+        advice.append("Charge hebdo importante: allonge l echauffement et la recuperation post-seance.")
+
+    return " ".join(advice)

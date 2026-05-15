@@ -17,6 +17,7 @@ router.patch('/users/:id/toggle-active', adminController.toggleActive);
 router.delete('/users/:id', adminController.deleteUser);
 router.post('/assign-entraineur', adminController.assignNageurToEntraineur);
 router.get('/stats', adminController.getStats);
+router.get('/idss-evaluations/latest', adminController.getLatestIdssEvaluation);
 router.get('/pending-registrations', adminController.getPendingRegistrations);
 router.patch('/pending-registrations/:id', adminController.approvePendingRegistration);
 

@@ -10,6 +10,7 @@ export class ApiService {
 
   // Admin
   getStats(): Observable<any> { return this.http.get(`${this.baseUrl}/admin/stats`); }
+  getLatestIdssEvaluation(): Observable<any> { return this.http.get(`${this.baseUrl}/admin/idss-evaluations/latest`); }
   getAllUsers(): Observable<any> { return this.http.get(`${this.baseUrl}/admin/users`); }
   getUserById(id: string): Observable<any> { return this.http.get(`${this.baseUrl}/admin/users/${id}`); }
   createUser(data: any): Observable<any> { return this.http.post(`${this.baseUrl}/admin/users`, data); }
@@ -40,6 +41,18 @@ export class ApiService {
   createCompetition(data: any): Observable<any> { return this.http.post(`${this.baseUrl}/competitions`, data); }
   updateCompetition(id: string, data: any): Observable<any> { return this.http.put(`${this.baseUrl}/competitions/${id}`, data); }
   deleteCompetition(id: string): Observable<any> { return this.http.delete(`${this.baseUrl}/competitions/${id}`); }
+
+  // Competition Results
+  addCompetitionResult(data: any): Observable<any> { return this.http.post(`${this.baseUrl}/competition-results`, data); }
+  getCompetitionResultsByUser(userId: string): Observable<any> { return this.http.get(`${this.baseUrl}/competition-results/user/${userId}`); }
+  getCompetitionResultsByCompetition(competitionId: string): Observable<any> { return this.http.get(`${this.baseUrl}/competition-results/competition/${competitionId}`); }
+
+  // Rankings
+  getLatestRanking(type = 'weekly'): Observable<any> { return this.http.get(`${this.baseUrl}/rankings/latest`, { params: { type } }); }
+  getRankingByPeriod(type: string, key: string): Observable<any> { return this.http.get(`${this.baseUrl}/rankings/by-period`, { params: { type, key } }); }
+  getRankingHistory(userId: string, type = 'weekly', limit = 12): Observable<any> {
+    return this.http.get(`${this.baseUrl}/rankings/history/${userId}`, { params: { type, limit } });
+  }
 
   // Entrainements (Planning)
   getAllEntrainements(): Observable<any> { return this.http.get(`${this.baseUrl}/planning`); }
@@ -108,6 +121,7 @@ export class ApiService {
 
   // Password
   requestPasswordReset(email: string): Observable<any> { return this.http.post(`${this.baseUrl}/password/request-reset`, { email }); }
+  verifyPasswordResetToken(token: string): Observable<any> { return this.http.get(`${this.baseUrl}/password/reset/${token}`); }
   resetPassword(token: string, data: any): Observable<any> { return this.http.post(`${this.baseUrl}/password/reset/${token}`, data); }
 
   // Chatbot
@@ -187,5 +201,10 @@ export class ApiService {
   /** Team-wide training planning */
   aiTeamPlan(): Observable<any> {
     return this.http.get(`${this.baseUrl}/ai/team-plan`);
+  }
+
+  /** AI-weighted MVP ranking (weekly/monthly) */
+  aiMvpRanking(period: string = 'weekly'): Observable<any> {
+    return this.http.get(`${this.baseUrl}/ai/ranking/mvp`, { params: { period } });
   }
 }

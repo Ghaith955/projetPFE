@@ -1,0 +1,353 @@
+{
+  "timestamp": "2026-05-04T10:04:21.530429",
+  "passed": 19,
+  "failed": 0,
+  "total_time_ms": 4929.9,
+  "tests": [
+    {
+      "test": "MongoDB Connection",
+      "status": "PASS",
+      "time_ms": 814.4,
+      "detail": {
+        "db": "PFE_NATATION",
+        "collections": [
+          "idssdecisions",
+          "competitions",
+          "users",
+          "demandes",
+          "entraineurs",
+          "nageurs",
+          "entrainements",
+          "roles",
+          "swimmerbaselines",
+          "notifications",
+          "cotisations",
+          "performances"
+        ]
+      }
+    },
+    {
+      "test": "Data Counts",
+      "status": "PASS",
+      "time_ms": 7.1,
+      "detail": {
+        "nageurs": 5,
+        "performances": 15,
+        "entrainements": 5,
+        "users": 16,
+        "competitions": 4,
+        "idssdecisions": 20
+      }
+    },
+    {
+      "test": "Swimmer IDs Retrieval",
+      "status": "PASS",
+      "time_ms": 886.5,
+      "detail": {
+        "count": 5,
+        "sample": [
+          "69dc40ed04f2b85fcbd3f8b8",
+          "69dcb549a1e1caf442412146",
+          "69e7b7b08b09217d12c7d430"
+        ]
+      }
+    },
+    {
+      "test": "Feature Extraction (Single)",
+      "status": "PASS",
+      "time_ms": 34.4,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "age": 25,
+        "personal_best_sec": 51.0,
+        "avg_time_last5": 59.666666666666664,
+        "sessions_count": 3,
+        "trend_slope": -1.4999999999999922,
+        "consistency_std": 12.503332889007368,
+        "avg_fatigue_reported": 7.333333333333333,
+        "avg_intensity": 7.333333333333333,
+        "sessions_last7d": 0,
+        "sessions_last14d": 0,
+        "total_load_7d": 0.0,
+        "total_load_14d": 0.0,
+        "total_load_28d": 0.0,
+        "acwr": 0.0,
+        "consecutive_days": 0,
+        "avg_training_intensity": 5.0,
+        "attendance_rate": 1.0
+      }
+    },
+    {
+      "test": "Full Feature Pipeline (All Swimmers)",
+      "status": "PASS",
+      "time_ms": 145.3,
+      "detail": {
+        "success": 5,
+        "fail": 0,
+        "samples": [
+          {
+            "name": "Jamai Raed",
+            "sessions": 3,
+            "acwr": 0.0,
+            "trend": -1.4999999999999922
+          },
+          {
+            "name": "Issaoui Ridha",
+            "sessions": 3,
+            "acwr": 3.02,
+            "trend": 7.225000000000008
+          },
+          {
+            "name": "Zied mr",
+            "sessions": 1,
+            "acwr": 0.0,
+            "trend": 0.0
+          },
+          {
+            "name": "Test Mail",
+            "sessions": 1,
+            "acwr": 4.0,
+            "trend": 0.0
+          },
+          {
+            "name": "Ghaith Chaabi",
+            "sessions": 0,
+            "acwr": 0.0,
+            "trend": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "test": "Data Pipeline Extraction",
+      "status": "PASS",
+      "time_ms": 97.4,
+      "detail": {
+        "performances_extracted": 15,
+        "trainings_extracted": 5,
+        "feature_matrix_rows": 5,
+        "feature_matrix_cols": 19
+      }
+    },
+    {
+      "test": "Fatigue Detection (Single)",
+      "status": "PASS",
+      "time_ms": 17.0,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "fatigue_level": "LOW",
+        "fatigue_score": 10,
+        "acwr": 0.0,
+        "consecutive_days": 0,
+        "avg_fatigue_reported": 7.3,
+        "sessions_last7d": 0,
+        "total_load_7d_km": 0.0,
+        "recommendation": "Continuer le plan actuel. Possibilité d'augmenter progressivement (+10%/sem max).",
+        "athlete_advice": "Bonne forme. Maintiens sommeil, hydratation et etirements. Fatigue ressentie elevee: baisse l intensite et surveille la recuperation.",
+        "triggered_rules": [
+          {
+            "rule": "MODERATE_FATIGUE",
+            "severity": "WARN",
+            "message": "Fatigue déclarée modérée: 7.3/10"
+          }
+        ],
+        "confidence": "RULE_BASED"
+      }
+    },
+    {
+      "test": "Fatigue Detection (Batch)",
+      "status": "PASS",
+      "time_ms": 64.1,
+      "detail": {
+        "total": 5,
+        "distribution": {
+          "LOW": 3,
+          "MEDIUM": 0,
+          "HIGH": 2,
+          "CRITICAL": 0
+        },
+        "at_risk": 2
+      }
+    },
+    {
+      "test": "Performance Analysis",
+      "status": "PASS",
+      "time_ms": 1570.4,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "period_days": 180,
+        "sessions_analyzed": 3,
+        "trend": "improving",
+        "slope_per_session_sec": -1.5,
+        "personal_best_sec": 51.0,
+        "avg_time_last5_sec": 59.67,
+        "improvement_pct": 0.0,
+        "consistency_score": 0,
+        "explanation": "Performance en amélioration de 1.50s par séance sur 180 jours."
+      }
+    },
+    {
+      "test": "Performance Prediction (ML)",
+      "status": "PASS",
+      "time_ms": 29.1,
+      "detail": {
+        "swimmer_id": "69dc40ed04f2b85fcbd3f8b8",
+        "name": "Jamai Raed",
+        "predicted_time_sec": 48.45,
+        "current_best_sec": 51.0,
+        "delta_sec": -2.55,
+        "confidence": "LOW",
+        "r_squared": 1.0,
+        "model_used": "LinearRegression",
+        "feature_importance": {
+          "progression": -1.5,
+          "intensity": 0.0015,
+          "session_load": 0.0895,
+          "fatigue_level": 0.0015,
+          "duration": 0.0
+        }
+      }
+    },
+    {
+      "test": "Competition Recommendation",
+      "status": "PASS",
+      "time_ms": 54.7,
+      "detail": {
+        "total_evaluated": 4,
+        "top3": [
+          {
+            "name": "Jamai Raed",
+            "score": 0.808
+          },
+          {
+            "name": "Zied mr",
+            "score": 0.713
+          },
+          {
+            "name": "Test Mail",
+            "score": 0.365
+          }
+        ]
+      }
+    },
+    {
+      "test": "Scenario Simulation",
+      "status": "PASS",
+      "time_ms": 27.4,
+      "detail": {
+        "current_acwr": 0.0,
+        "projected_acwr": 1.0,
+        "delta_sec": -45.3,
+        "fatigue_change": "LOW --> MEDIUM",
+        "warnings": 1
+      }
+    },
+    {
+      "test": "Explainability Layer",
+      "status": "PASS",
+      "time_ms": 14.6,
+      "detail": {
+        "data_quality": "FAIBLE",
+        "method": "Système expert à base de règles avec scoring pondéré (ACWR, RPE, charge, tendance)",
+        "chain_steps": 6
+      }
+    },
+    {
+      "test": "Training Plan Generation",
+      "status": "PASS",
+      "time_ms": 42.2,
+      "detail": {
+        "phase": "BASE",
+        "weeks": 4,
+        "load_direction": "INCREASE"
+      }
+    },
+    {
+      "test": "ML Training Pipeline",
+      "status": "PASS",
+      "time_ms": 795.9,
+      "detail": {
+        "models_trained": 3,
+        "models_skipped": 0,
+        "total_models": 3
+      }
+    },
+    {
+      "test": "Decision Logging & Audit",
+      "status": "PASS",
+      "time_ms": 69.1,
+      "detail": {
+        "decisions_logged": 5,
+        "errors": 0,
+        "total_in_db": 25,
+        "distribution": {
+          "CRITICAL": 11,
+          "LOW": 10,
+          "HIGH": 4
+        }
+      }
+    },
+    {
+      "test": "Response Time Benchmarks",
+      "status": "PASS",
+      "time_ms": 105.7,
+      "detail": {
+        "batch_fatigue_ms": 52.6,
+        "recommendation_ms": 53.1,
+        "acceptable": true
+      }
+    },
+    {
+      "test": "Multi-Scenario Decision Sweep",
+      "status": "PASS",
+      "time_ms": 92.6,
+      "detail": [
+        {
+          "scenario": "Light",
+          "delta_sec": -17.85,
+          "acwr": 1.0,
+          "fatigue": "LOW",
+          "warnings": 1
+        },
+        {
+          "scenario": "Moderate",
+          "delta_sec": -36.15,
+          "acwr": 1.0,
+          "fatigue": "LOW",
+          "warnings": 1
+        },
+        {
+          "scenario": "Intense",
+          "delta_sec": -60.45,
+          "acwr": 1.0,
+          "fatigue": "MEDIUM",
+          "warnings": 1
+        },
+        {
+          "scenario": "Extreme",
+          "delta_sec": -105.6,
+          "acwr": 1.0,
+          "fatigue": "MEDIUM",
+          "warnings": 2
+        }
+      ]
+    },
+    {
+      "test": "Decision Quality Validation",
+      "status": "PASS",
+      "time_ms": 62.0,
+      "detail": {
+        "all_consistent": true,
+        "checks": {
+          "all_have_level": true,
+          "scores_in_range": true,
+          "critical_has_rules": true,
+          "low_has_low_score": true,
+          "all_have_recommendation": true
+        }
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 const Entrainement = require('../models/entrainement.model');
 const Nageur = require('../models/nageur.model');
+const Entraineur = require('../models/entraineur.model');
 const { notifyNageurs } = require('../utils/notificationHelper');
 
 const entrainementController = {};
@@ -12,6 +13,14 @@ entrainementController.getAllEntrainements = async (req, res) => {
       const nageur = await Nageur.findOne({ utilisateur: req.user.userId });
       if (!nageur) return res.status(200).json([]);
       filter.nageurs = nageur._id;
+    }
+    if (req.user?.role === 'ENTRAINEUR') {
+      const coach = await Entraineur.findOne({ utilisateur: req.user.userId });
+      if (!coach) return res.status(200).json([]);
+      filter.$or = [
+        { entraineur: coach._id },
+        { nageurs: { $in: coach.nageurs || [] } }
+      ];
     }
 
     const entrainements = await Entrainement.find(filter)
@@ -33,6 +42,14 @@ entrainementController.getEntrainementById = async (req, res) => {
       if (!nageur) return res.status(404).json({ message: 'Entraînement non trouvé.' });
       filter.nageurs = nageur._id;
     }
+    if (req.user?.role === 'ENTRAINEUR') {
+      const coach = await Entraineur.findOne({ utilisateur: req.user.userId });
+      if (!coach) return res.status(404).json({ message: 'Entraînement non trouvé.' });
+      filter.$or = [
+        { entraineur: coach._id },
+        { nageurs: { $in: coach.nageurs || [] } }
+      ];
+    }
 
     const entrainement = await Entrainement.findOne(filter)
       .populate('entraineur')
@@ -48,8 +65,21 @@ entrainementController.getEntrainementById = async (req, res) => {
 entrainementController.createEntrainement = async (req, res) => {
   try {
     const { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut, nageurs } = req.body;
+    let coach = null;
+    if (req.user?.role === 'ENTRAINEUR') {
+      coach = await Entraineur.findOne({ utilisateur: req.user.userId });
+      const swimmerIds = coach?.nageurs || [];
+      const requested = Array.isArray(nageurs) ? nageurs : [];
+      const allowed = requested.every((id) => swimmerIds.some((sid) => String(sid) === String(id)));
+      if (!coach || !allowed) {
+        return res.status(403).json({ message: 'Acces interdit.' });
+      }
+    }
     const entrainement = new Entrainement({
-      titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, entraineur, statut, nageurs
+      titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description,
+      entraineur: req.user?.role === 'ENTRAINEUR' ? coach?._id : entraineur,
+      statut,
+      nageurs
     });
     await entrainement.save();
 
@@ -73,6 +103,20 @@ entrainementController.createEntrainement = async (req, res) => {
 entrainementController.updateEntrainement = async (req, res) => {
   try {
     const { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, statut, nageurs } = req.body;
+    if (req.user?.role === 'ENTRAINEUR') {
+      const coach = await Entraineur.findOne({ utilisateur: req.user.userId });
+      const swimmerIds = coach?.nageurs || [];
+      const requested = Array.isArray(nageurs) ? nageurs : [];
+      const allowed = requested.every((id) => swimmerIds.some((sid) => String(sid) === String(id)));
+      if (!coach || !allowed) {
+        return res.status(403).json({ message: 'Acces interdit.' });
+      }
+      const match = await Entrainement.findOne({
+        _id: req.params.id,
+        $or: [{ entraineur: coach._id }, { nageurs: { $in: coach.nageurs || [] } }]
+      });
+      if (!match) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const entrainement = await Entrainement.findByIdAndUpdate(
       req.params.id,
       { titre, date, heureDebut, heureFin, type, intensite, duree, lieu, description, statut, nageurs },
@@ -88,6 +132,15 @@ entrainementController.updateEntrainement = async (req, res) => {
 // DELETE
 entrainementController.deleteEntrainement = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const coach = await Entraineur.findOne({ utilisateur: req.user.userId });
+      if (!coach) return res.status(404).json({ message: 'Entraînement non trouvé.' });
+      const match = await Entrainement.findOne({
+        _id: req.params.id,
+        $or: [{ entraineur: coach._id }, { nageurs: { $in: coach.nageurs || [] } }]
+      });
+      if (!match) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const entrainement = await Entrainement.findByIdAndDelete(req.params.id);
     if (!entrainement) return res.status(404).json({ message: 'Entraînement non trouvé.' });
     res.status(200).json({ message: 'Entraînement supprimé!' });

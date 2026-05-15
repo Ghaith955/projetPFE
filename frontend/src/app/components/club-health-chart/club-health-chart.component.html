@@ -1,0 +1,105 @@
+<div class="health-chart-container" id="club-health-chart">
+  <!-- Header -->
+  <div class="hc-header">
+    <div class="hc-title-area">
+      <div class="hc-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 12h5l2-4 3 8 3-6 2 2h5"/>
+        </svg>
+        <span class="hc-pulse"></span>
+      </div>
+      <div>
+        <h3 class="hc-title">{{ title }}</h3>
+        <span class="hc-subtitle">AI-Powered Club Intelligence Monitor</span>
+      </div>
+    </div>
+    <div class="hc-score-area">
+      <div class="hc-score-ring">
+        <svg viewBox="0 0 44 44" class="hc-ring-svg">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+          <circle cx="22" cy="22" r="18" fill="none"
+            [attr.stroke]="scoreColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            [attr.stroke-dasharray]="(currentScore / 100 * 113) + ' 113'"
+            transform="rotate(-90 22 22)"
+            class="hc-ring-fill"/>
+        </svg>
+        <span class="hc-ring-val" [style.color]="scoreColor">{{ currentScore }}</span>
+      </div>
+      <div class="hc-score-info">
+        <span class="hc-score-label">Health Score</span>
+        <span class="hc-score-status" [style.color]="scoreColor">{{ scoreStatus }}</span>
+      </div>
+      <div class="hc-trend" [style.borderColor]="trend.color + '33'" [style.background]="trend.color + '12'">
+        <span class="hc-trend-icon" [style.color]="trend.color">{{ trend.icon }}</span>
+        <span class="hc-trend-label" [style.color]="trend.color">{{ trend.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Canvas -->
+  <div class="hc-canvas-wrap" (mouseleave)="hideTooltip()">
+    <canvas #healthCanvas></canvas>
+
+    <!-- Custom Tooltip -->
+    <div class="hc-tooltip" *ngIf="activeTooltip"
+         [style.left.px]="tooltipX"
+         [style.top.px]="tooltipY - 10">
+      <div class="hc-tt-header">
+        <span class="hc-tt-date">{{ activeTooltip.label }}</span>
+        <span class="hc-tt-score" [style.color]="scoreColor">{{ activeTooltip.healthScore }}%</span>
+      </div>
+      <div class="hc-tt-event" *ngIf="activeTooltip.event"
+           [attr.data-type]="activeTooltip.event.type">
+        <span>{{ getEventIcon(activeTooltip.event.type) }}</span>
+        <span>{{ activeTooltip.event.text }}</span>
+      </div>
+      <div class="hc-tt-metrics">
+        <div class="hc-tt-metric">
+          <span class="hc-tt-ml">Attendance</span>
+          <div class="hc-tt-bar"><div class="hc-tt-fill att" [style.width.%]="getMetricBar(activeTooltip.attendance)"></div></div>
+          <span class="hc-tt-mv">{{ activeTooltip.attendance }}%</span>
+        </div>
+        <div class="hc-tt-metric">
+          <span class="hc-tt-ml">Progression</span>
+          <div class="hc-tt-bar"><div class="hc-tt-fill prog" [style.width.%]="getMetricBar(activeTooltip.progression)"></div></div>
+          <span class="hc-tt-mv">{{ activeTooltip.progression }}%</span>
+        </div>
+        <div class="hc-tt-metric">
+          <span class="hc-tt-ml">Recovery</span>
+          <div class="hc-tt-bar"><div class="hc-tt-fill rec" [style.width.%]="getMetricBar(100 - activeTooltip.fatigue)"></div></div>
+          <span class="hc-tt-mv">{{ 100 - activeTooltip.fatigue }}%</span>
+        </div>
+        <div class="hc-tt-metric">
+          <span class="hc-tt-ml">Safety</span>
+          <div class="hc-tt-bar"><div class="hc-tt-fill safe" [style.width.%]="getMetricBar(100 - activeTooltip.injuryRisk)"></div></div>
+          <span class="hc-tt-mv">{{ 100 - activeTooltip.injuryRisk }}%</span>
+        </div>
+        <div class="hc-tt-metric">
+          <span class="hc-tt-ml">Discipline</span>
+          <div class="hc-tt-bar"><div class="hc-tt-fill disc" [style.width.%]="getMetricBar(activeTooltip.discipline)"></div></div>
+          <span class="hc-tt-mv">{{ activeTooltip.discipline }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend & AI Events -->
+  <div class="hc-footer">
+    <div class="hc-legend">
+      <span class="hc-leg-item"><span class="hc-leg-dot health"></span> Health Score</span>
+      <span class="hc-leg-item"><span class="hc-leg-dot recovery"></span> Recovery Index</span>
+      <span class="hc-leg-item"><span class="hc-leg-dot safety"></span> Safety Score</span>
+    </div>
+    <div class="hc-events" *ngIf="aiEvents.length">
+      <span class="hc-events-label">AI Events</span>
+      <div class="hc-event-chips">
+        <span class="hc-event-chip" *ngFor="let ev of aiEvents"
+              [attr.data-type]="ev.event?.type">
+          {{ getEventIcon(ev.event!.type) }} {{ ev.event!.text }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

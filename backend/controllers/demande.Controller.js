@@ -66,6 +66,15 @@ demandeController.respond = async (req, res) => {
       return res.status(400).json({ message: 'Statut invalide.' });
     }
 
+    if (req.user?.role === 'ENTRAINEUR') {
+      const entraineur = await Entraineur.findOne({ utilisateur: req.user.userId });
+      if (!entraineur) return res.status(403).json({ message: 'Acces interdit.' });
+      const existing = await Demande.findById(req.params.id).select('nageur');
+      if (!existing) return res.status(404).json({ message: 'Demande introuvable.' });
+      const allowed = entraineur.nageurs.some((id) => String(id) === String(existing.nageur));
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
+
     const demande = await Demande.findByIdAndUpdate(
       req.params.id,
       {

@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-05-04T10:19:04.347803",
+  "models": {
+    "fatigue_classifier": {
+      "status": "OK",
+      "model": "RandomForestClassifier",
+      "n_samples": 5,
+      "n_features": 11,
+      "classes": [
+        "HIGH",
+        "LOW"
+      ],
+      "train_accuracy": 1.0,
+      "cv_accuracy": 0.75,
+      "feature_importance": {
+        "sessions_last7d": 0.2071,
+        "acwr": 0.1832,
+        "total_load_7d": 0.1598,
+        "total_load_14d": 0.1407,
+        "avg_training_intensity": 0.0591
+      },
+      "model_path": "C:\\Users\\GIGABYTE\\projetPFE\\ai-service\\training\\models\\fatigue_classifier.joblib"
+    },
+    "performance_predictor": {
+      "status": "OK",
+      "model": "RidgeRegression",
+      "n_samples": 8,
+      "n_features": 5,
+      "train_r2": 0.16740265735629956,
+      "train_rmse": 9.406,
+      "train_mae": 8.091,
+      "cv_r2": NaN,
+      "coefficients": {
+        "session_index": -1.2118,
+        "intensity": 0.0009,
+        "session_load": 0.0533,
+        "fatigue_level": 0.0009,
+        "duration": 0.0
+      },
+      "model_path": "C:\\Users\\GIGABYTE\\projetPFE\\ai-service\\training\\models\\performance_predictor.joblib"
+    },
+    "readiness_scorer": {
+      "status": "OK",
+      "model": "GradientBoostingRegressor",
+      "n_samples": 4,
+      "n_features": 10,
+      "train_r2": 0.9999734386011124,
+      "train_mae": 0.0006,
+      "feature_importance": {
+        "trend_slope": 0.4725,
+        "sessions_last7d": 0.2968,
+        "total_load_7d": 0.1441,
+        "age": 0.0661,
+        "avg_fatigue_reported": 0.0109
+      },
+      "model_path": "C:\\Users\\GIGABYTE\\projetPFE\\ai-service\\training\\models\\readiness_scorer.joblib"
+    }
+  },
+  "summary": {
+    "models_trained": 3,
+    "models_skipped": 0,
+    "total_models": 3
+  }
+}

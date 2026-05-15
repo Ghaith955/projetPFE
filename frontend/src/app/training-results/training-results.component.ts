@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
-import { forkJoin } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { TrainingType, CoachFeedback, AttendanceStatus } from '../models/training-result.model';
 
 interface TrainingResultRow {
@@ -33,6 +35,12 @@ export class TrainingResultsComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   isSubmitting = false;
+  aiLoading = false;
+  aiError = '';
+  aiFatigueSummary: { total: number; atRisk: number; avgAcwr: number } | null = null;
+  aiRecommendation: any = null;
+  aiPrediction: any = null;
+  aiExplanation: any = null;
 
   trainingTypes = [
     { value: 'endurance' as TrainingType, label: 'Endurance' },
@@ -67,12 +75,84 @@ export class TrainingResultsComponent implements OnInit {
   tableRows: TrainingResultRow[] = [];
 
   constructor(
-    private api: ApiService
+    private api: ApiService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadSwimmers();
     this.loadSessions();
+    this.loadAiInsights();
+  }
+
+  loadAiInsights(): void {
+    this.aiLoading = true;
+    this.aiError = '';
+
+    const dashboard$ = this.api.aiDashboard().pipe(
+      catchError((err) => {
+        this.aiError = this.aiError || this.buildAiError(err);
+        return of(null);
+      })
+    );
+    const recommendation$ = this.api.aiRecommendSwimmers(undefined, undefined, undefined, undefined, 3).pipe(
+      catchError((err) => {
+        this.aiError = this.aiError || this.buildAiError(err);
+        return of(null);
+      })
+    );
+    const explanation$ = this.api.aiExplain('recommendation', undefined, { top_n: 3 }).pipe(
+      catchError((err) => {
+        this.aiError = this.aiError || this.buildAiError(err);
+        return of(null);
+      })
+    );
+
+    forkJoin({ dashboard: dashboard$, recommendation: recommendation$, explanation: explanation$ }).subscribe({
+      next: ({ dashboard, recommendation, explanation }) => {
+        const decisions = dashboard?.decisions || dashboard?.results || [];
+        const atRisk = decisions.filter((s: any) => s.fatigue_level === 'HIGH' || s.fatigue_level === 'CRITICAL').length;
+        const acwrVals = decisions.map((s: any) => Number(s.acwr || 0)).filter((v: number) => v > 0);
+        const avgAcwr = acwrVals.length ? +(acwrVals.reduce((a: number, b: number) => a + b, 0) / acwrVals.length).toFixed(2) : 0;
+        this.aiFatigueSummary = { total: decisions.length, atRisk, avgAcwr };
+        this.aiRecommendation = recommendation || null;
+        this.aiExplanation = explanation || null;
+
+        const ranked = Array.isArray(recommendation?.ranked_swimmers) ? recommendation.ranked_swimmers : [];
+        const topSwimmerId = ranked[0]?.swimmer_id;
+        if (!topSwimmerId) {
+          this.aiPrediction = null;
+          this.aiLoading = false;
+          return;
+        }
+
+        this.api.aiPredictTime(topSwimmerId).pipe(
+          catchError((err) => {
+            this.aiError = this.aiError || this.buildAiError(err);
+            return of(null);
+          })
+        ).subscribe((prediction) => {
+          this.aiPrediction = prediction ? this.normalizeAiPrediction(prediction) : null;
+          this.aiLoading = false;
+        });
+      },
+      error: (err) => {
+        this.aiError = this.buildAiError(err);
+        this.aiLoading = false;
+      }
+    });
+  }
+
+  private buildAiError(err: any): string {
+    const status = err?.status;
+    const message = err?.error?.detail || err?.error?.message || err?.message || '';
+    if (status === 502 || status === 503 || status === 504) {
+      return 'Service IA indisponible. Verifiez que le service Python tourne.';
+    }
+    if (message?.includes('timeout')) {
+      return 'Timeout IA — requete trop lente. Reessayez dans quelques secondes.';
+    }
+    return message ? `Erreur IA: ${message}` : 'Impossible de charger les insights IA.';
   }
 
   setView(mode: 'single' | 'multi'): void {
@@ -82,7 +162,8 @@ export class TrainingResultsComponent implements OnInit {
   loadSwimmers(): void {
     this.api.getAllNageurs().subscribe({
       next: data => {
-        this.swimmers = Array.isArray(data) ? data : [];
+        const raw = Array.isArray(data) ? data : [];
+        this.swimmers = this.filterCoachSwimmers(raw);
         this.buildRows();
       },
       error: () => {
@@ -303,5 +384,19 @@ export class TrainingResultsComponent implements OnInit {
     const minutes = Math.floor(duration);
     const seconds = '00';
     return `${minutes}:${seconds}`;
+  }
+
+  private normalizeAiPrediction(prediction: any): any {
+    if (!prediction) return null;
+    const predictedTime = prediction.predicted_time ?? prediction.predicted_time_sec ?? null;
+    if (predictedTime == null) return null;
+    return { ...prediction, predicted_time: predictedTime };
+  }
+
+  private filterCoachSwimmers(list: any[]): any[] {
+    if (!this.auth.isCoach) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((n: any) => allowed.has(String(this.resolveNageurId(n))));
   }
 }

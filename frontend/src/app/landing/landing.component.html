@@ -47,10 +47,6 @@
           <span>Commencer maintenant</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
-        <a class="hero-cta secondary" href="#features">
-          <span>Découvrir</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </a>
       </div>
     </div>
 
@@ -63,31 +59,6 @@
   </section>
 
   <div class="sections-wrap">
-    <!-- ── Features ── -->
-    <section class="features-section" id="features">
-      <div class="features-wrap">
-        <div class="section-header">
-          <span class="section-kicker">Fonctionnalités</span>
-          <h2 class="section-title section-title-glow">Tout ce dont votre club a besoin</h2>
-          <p class="section-desc section-desc-muted">Des outils puissants pour chaque membre de l'équipe</p>
-        </div>
-        <div class="features-grid">
-          <div class="feature-card feature-card-glass" *ngFor="let f of features; let i = index" [style.animation-delay]="i * 0.1 + 's'">
-            <div class="fc-icon fc-icon-glass" [ngClass]="{ 'icon-cyan': i === 0, 'icon-blue': i === 1, 'icon-amber': i === 2, 'icon-purple': i === 3 }">
-              <svg [attr.viewBox]="'0 0 24 24'" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" [innerHTML]="f.iconPath"></svg>
-            </div>
-            <h3 class="fc-title">{{ f.title }}</h3>
-            <p class="fc-desc">{{ f.desc }}</p>
-            <div class="fc-glow" [ngClass]="f.colorClass" aria-hidden="true"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-
-   
-
     <!-- ── Footer ── -->
     <footer class="landing-footer">
       <p class="footer-copy">&copy; 2026 IDSS Natation. Tous droits réservés.</p>

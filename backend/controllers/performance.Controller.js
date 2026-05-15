@@ -3,6 +3,7 @@ const Nageur = require('../models/nageur.model');
 const { evaluateRules }  = require('../utils/idssRuleEngine');
 const { updateBaseline } = require('../utils/idssBaselineUpdater');
 const IDSSDecision       = require('../models/idssDecision.model');
+const { getCoachSwimmerIds, ensureCoachSwimmerAccess } = require('../utils/coachScope');
 
 const performanceController = {};
 
@@ -66,7 +67,24 @@ const resolveRoleFilter = async (req) => {
     }
   }
 
-  if (req.query.nageurId) filter.nageur = req.query.nageurId;
+  if (req.user.role === 'ENTRAINEUR') {
+    const swimmerIds = await getCoachSwimmerIds(req.user.userId);
+    if (!swimmerIds.length) {
+      filter.nageur = { $in: [] };
+    } else if (req.query.nageurId) {
+      const allowed = swimmerIds.some((id) => String(id) === String(req.query.nageurId));
+      if (!allowed) {
+        const err = new Error('Acces interdit.');
+        err.status = 403;
+        throw err;
+      }
+      filter.nageur = req.query.nageurId;
+    } else {
+      filter.nageur = { $in: swimmerIds };
+    }
+  }
+
+  if (req.query.nageurId && req.user.role !== 'ENTRAINEUR') filter.nageur = req.query.nageurId;
   if (req.query.type) filter.type = req.query.type;
 
   return filter;
@@ -88,7 +106,7 @@ performanceController.getAll = async (req, res) => {
 
     res.json(performances);
   } catch (error) {
-    res.status(500).json({ message: 'Erreur.', error: error.message });
+    res.status(error.status || 500).json({ message: 'Erreur.', error: error.message });
   }
 };
 
@@ -130,7 +148,7 @@ performanceController.getTrends = async (req, res) => {
       count: points.length
     });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors du chargement des tendances.', error: error.message });
+    res.status(error.status || 500).json({ message: 'Erreur lors du chargement des tendances.', error: error.message });
   }
 };
 
@@ -224,7 +242,7 @@ performanceController.getInsights = async (req, res) => {
       aiReadyCount: records.filter((record) => record.predictionReady).length
     });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de l analyse intelligente.', error: error.message });
+    res.status(error.status || 500).json({ message: 'Erreur lors de l analyse intelligente.', error: error.message });
   }
 };
 
@@ -254,6 +272,11 @@ performanceController.create = async (req, res) => {
       analysisStatus,
       predictionReady
     } = req.body;
+
+    if (req.user?.role === 'ENTRAINEUR') {
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, nageur);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
 
     const perf = new Performance({
       nageur,
@@ -335,6 +358,11 @@ performanceController.createTrainingResult = async (req, res) => {
       return res.status(400).json({ message: 'nageur, epreuve et temps sont obligatoires.' });
     }
 
+    if (req.user?.role === 'ENTRAINEUR') {
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, nageur);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
+
     const perf = new Performance({
       nageur,
       entrainement,
@@ -390,6 +418,12 @@ performanceController.createTrainingResult = async (req, res) => {
 // PUT /performances/:id
 performanceController.update = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const existing = await Performance.findById(req.params.id).select('nageur');
+      if (!existing) return res.status(404).json({ message: 'Performance introuvable.' });
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, existing.nageur);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const perf = await Performance.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!perf) return res.status(404).json({ message: 'Performance introuvable.' });
     res.json({ message: 'Performance mise à jour !', performance: perf });
@@ -401,6 +435,12 @@ performanceController.update = async (req, res) => {
 // DELETE /performances/:id
 performanceController.delete = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const existing = await Performance.findById(req.params.id).select('nageur');
+      if (!existing) return res.status(404).json({ message: 'Performance introuvable.' });
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, existing.nageur);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const perf = await Performance.findByIdAndDelete(req.params.id);
     if (!perf) return res.status(404).json({ message: 'Performance introuvable.' });
     res.json({ message: 'Performance supprimée !' });

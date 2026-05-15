@@ -305,6 +305,23 @@ def team_plan():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/ranking/mvp")
+def ranking_mvp(period: str = "weekly"):
+    """
+    Compute AI-weighted MVP ranking for the week or month.
+    Returns Top 3 swimmers with score breakdown.
+    Query params: ?period=weekly or ?period=monthly
+    """
+    try:
+        from modules.ranking import compute_mvp_ranking
+        if period not in ("weekly", "monthly"):
+            period = "weekly"
+        return compute_mvp_ranking(period)
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── Training & Decision Logging Endpoints ───────────────────────
 
 @app.post("/train")
@@ -362,5 +379,6 @@ def validate():
 
 if __name__ == "__main__":
     print(f"[IDSS AI] Starting on port {PORT}...")
-    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)
+    reload_enabled = os.getenv("AI_RELOAD", "0") == "1"
+    uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=reload_enabled)
 

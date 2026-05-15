@@ -34,7 +34,10 @@
     },
     "common": {
       "fatigueHigh": "High fatigue",
-      "fatigueMedium": "Moderate fatigue"
+      "fatigueMedium": "Moderate fatigue",
+      "noData": "No data available",
+      "close": "Close",
+      "confidence": "Confidence"
     },
     "admin": {
       "title": "Admin Dashboard",
@@ -56,6 +59,8 @@
       "emptyRequests": "No pending requests",
       "swimmerPerformance": "Tracked swimmers",
       "levelEstimate": "Estimated level",
+      "coaches": "Coaches",
+      "noCoachFound": "No coach found",
       "dss": {
         "title": "IDSS Insights",
         "alerts": "Alerts",
@@ -66,7 +71,64 @@
         "explanationText": "Selection based on improvement and average fatigue",
         "competitionBadgeTitle": "Regional competition",
         "competitionBadgeDate": "April 2024"
-      }
+      },
+      "op": {
+        "aiOnline": "AI Online",
+        "aiOffline": "AI Offline",
+        "activeSwimmers": "Active Swimmers",
+        "activeCoaches": "Active Coaches",
+        "totalUsers": "Total Users",
+        "trainings": "Trainings",
+        "competitions": "Competitions",
+        "cotisations": "Fees",
+        "pending": "Pending",
+        "coachSwimmerRatio": "Coach : Swimmer Ratio",
+        "aiMonitored": "AI Monitored",
+        "atRisk": "At Risk",
+        "avgAcwr": "Avg ACWR"
+      },
+      "ai": {
+        "strategicCenter": "AI Strategic Center",
+        "strategicSub": "Strategic assistant for club administration",
+        "smartAlerts": "Smart Alerts System",
+        "recommendations": "AI Recommendations Engine",
+        "todaySummary": "Today AI Summary",
+        "coachAnalytics": "Coach Analytics",
+        "aiEfficiency": "AI efficiency",
+        "attendanceImpact": "Attendance impact",
+        "swimmerProgression": "Swimmer progression",
+        "trainingConsistency": "Training consistency",
+        "workloadBalance": "Workload balance",
+        "noCoachAnalytics": "No coach analytics available yet.",
+        "attendanceEvolution": "Attendance evolution",
+        "bestGroup": "Best performing group",
+        "weakestProgression": "Weakest progression",
+        "fatigueIndicators": "Fatigue indicators",
+        "globalReadiness": "Global readiness score",
+        "recommendation": "Recommendation",
+        "aiExplanation": "AI Explanation",
+        "globalClubIntelligence": "Global club intelligence",
+        "strategicDecisions": "Strategic decisions",
+        "coachAnalyticsTag": "Coach analytics",
+        "overallMonitoring": "Overall monitoring",
+        "operationalOptimization": "Operational optimization",
+        "riskManagement": "Risk management"
+      },
+      "eval": {
+        "title": "IDSS Evaluation (Latest)",
+        "swimmersAnalyzed": "Swimmers analyzed",
+        "decisionsLogged": "Decisions logged",
+        "errors": "Errors"
+      },
+      "pendingTag": "Pending",
+      "swimmerTag": "Swimmer",
+      "coachTag": "Coach",
+      "profileTitle": "Profile",
+      "phone": "Phone",
+      "birthDate": "Birth date",
+      "category": "Category",
+      "level": "Level",
+      "club": "Club"
     },
     "coach": {
       "title": "Hello Coach {{name}}.",
@@ -104,6 +166,33 @@
           "steady": "Maintaining level",
           "down": "Consistency drop"
         }
+      },
+      "ai": {
+        "brainTitle": "AI Brain — Coach Dashboard",
+        "mlLoading": "ML analysis in progress...",
+        "noSwimmer": "No swimmer",
+        "noSwimmerSub": "No swimmer assigned to this coach. Add a swimmer to activate analysis.",
+        "aiSurveillance": "AI Surveillance",
+        "atRiskMsg": "{{atRisk}} swimmer(s) at risk out of {{total}} analyzed",
+        "acwrGlobal": "ACWR Global",
+        "fatigueAbove60": "Fatigue > 60%",
+        "overtrainingRisk": "Overtraining Risk",
+        "simulateImpact": "Simulate impact",
+        "noAnomaly": "✅ AI Engine: No anomaly detected",
+        "urgentPriority": "Urgent Priority",
+        "levelLabel": "Level: {{level}} · Score {{score}}%",
+        "sessionsLabel": "ACWR: {{acwr}} · Sessions 7d: {{sessions}}",
+        "analysisBySwimmer": "Analysis by swimmer",
+        "selectSwimmer": "Select a swimmer",
+        "noSwimmerToAnalyze": "No swimmer to analyze at the moment.",
+        "aiAnalysisLoading": "AI analysis in progress...",
+        "recommendationLabel": "Recommendation",
+        "alertsLabel": "Alerts",
+        "explanationLabel": "Explanation",
+        "fatigueLabel": "Fatigue: {{level}} · {{score}}%",
+        "mvpWeekly": "🏆 AI MVP — Weekly",
+        "classicAlerts": "Classic Alerts",
+        "unacknowledged": "{{count}} unacknowledged"
       }
     },
     "swimmer": {
@@ -148,6 +237,32 @@
         "shape": "Inverted Triangle\nBody Shape",
         "explanation": "Explanation",
         "explanationText": "Selection based on improvement and moderate fatigue"
+      },
+      "ai": {
+        "brainTitle": "AI Brain — My Analysis",
+        "inferenceLoading": "AI inference in progress...",
+        "fatigueScore": "Fatigue Score (ML)",
+        "levelLabel": "Level",
+        "prediction": "Prediction & Trend",
+        "predictedTime": "Predicted time (100m)",
+        "insufficientData": "Insufficient data for time prediction.",
+        "aiRecommendation": "AI Recommendation",
+        "adviceLoading": "Advice being generated.",
+        "weekMetrics": "Weekly Metrics",
+        "acuteLoad": "Acute Load (7d)",
+        "chronicLoad": "Chronic Load (28d)",
+        "sleepQuality": "Sleep Quality",
+        "stressLevel": "Stress Level",
+        "bmiTitle": "BMI",
+        "bmiIndex": "Body Mass Index",
+        "bmiUnderweight": "Underweight",
+        "bmiNormal": "Normal",
+        "bmiOverweight": "Overweight",
+        "bmiObese": "Obese",
+        "silhouette": "Silhouette",
+        "aiRecommendationPanel": "AI Recommendation",
+        "explanationPanel": "Explanation",
+        "noExplanation": "No explanation available."
       }
     },
     "modals": {

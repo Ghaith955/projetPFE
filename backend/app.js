@@ -7,6 +7,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const nageurRoutes = require('./routes/nageurRoutes');
 const entraineurRoutes = require('./routes/entraineurRoutes');
 const competitionRoutes = require('./routes/competitionRoutes');
+const competitionResultRoutes = require('./routes/competitionResultRoutes');
 const entrainementRoutes = require('./routes/entrainementRoutes');
 const cotisationRoutes = require('./routes/cotisationRoutes');
 const demandeRoutes = require('./routes/demandeRoutes');
@@ -16,6 +17,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const idssRoutes          = require('./routes/idssRoutes');
 const aiRoutes            = require('./routes/aiRoutes');
+const rankingRoutes       = require('./routes/rankingRoutes');
 
 const app = express();
 
@@ -34,6 +36,7 @@ app.use('/admin', adminRoutes);
 app.use('/nageurs', nageurRoutes);
 app.use('/entraineurs', entraineurRoutes);
 app.use('/competitions', competitionRoutes);
+app.use('/competition-results', competitionResultRoutes);
 app.use('/planning', entrainementRoutes);
 app.use('/cotisations', cotisationRoutes);
 app.use('/demandes', demandeRoutes);
@@ -43,6 +46,7 @@ app.use('/chat', chatRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/idss',          idssRoutes);
 app.use('/ai',            aiRoutes);
+app.use('/rankings',      rankingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

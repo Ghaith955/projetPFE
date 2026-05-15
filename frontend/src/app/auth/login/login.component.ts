@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   email = '';
   password = '';
   rememberSession = false;
+  acceptRules = false;
   errorMessage = '';
   isLoading = false;
   isScanning = false;
@@ -25,9 +26,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    if (this.auth.isLoggedIn) {
-      this.router.navigate(['/dashboard']);
-    }
+    // Always show the login form — no auto-redirect
+    // After successful login, the user will be sent to /dashboard
   }
 
   ngOnDestroy(): void {
@@ -66,6 +66,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     if (!this.isValidEmail(this.email)) {
       this.errorMessage = 'Veuillez entrer une adresse email valide.';
+      return;
+    }
+
+    if (!this.acceptRules) {
+      this.errorMessage = 'Veuillez accepter les regles de la plateforme.';
       return;
     }
 

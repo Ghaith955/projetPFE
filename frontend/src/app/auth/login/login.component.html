@@ -89,6 +89,13 @@
           <a routerLink="/forgot-password" class="text-link">Mot de passe oublie ?</a>
         </div>
 
+        <div class="form-helper">
+          <label class="check-inline">
+            <input type="checkbox" [(ngModel)]="acceptRules" name="acceptRules" />
+            <span>J'accepte les regles de la plateforme</span>
+          </label>
+        </div>
+
         <div class="status status--error" *ngIf="errorMessage" role="alert">
           {{ errorMessage }}
         </div>

@@ -9,6 +9,11 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private router: Router) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Don't intercept external API calls (e.g. Groq) — only touch local backend
+    if (!req.url.startsWith('http://localhost')) {
+      return next.handle(req);
+    }
+
     const token = localStorage.getItem('token');
 
     let authReq = req;
@@ -20,7 +25,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        // Only auto-redirect on 401 for NON-auth endpoints.
+        // Auth endpoints (login, register) return 401 for invalid credentials
+        // and should be handled by the component, not the interceptor.
+        const isAuthEndpoint = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+        if (error.status === 401 && !isAuthEndpoint) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           this.router.navigate(['/login']);

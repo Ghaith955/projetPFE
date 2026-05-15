@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 import { TrainingResult, TrainingType, CoachFeedback, AttendanceStatus } from '../models/training-result.model';
 
 @Component({
@@ -19,25 +20,79 @@ export class TrainingAnalyticsComponent implements OnInit {
   totalDistance = 0;
   avgIntensity = 0;
   attendanceRate = 0;
+  aiLoading = false;
+  aiError = '';
+  aiFatigueSummary: { total: number; atRisk: number; avgAcwr: number } | null = null;
+  aiRecommendation: any = null;
+  aiPrediction: any = null;
+  aiExplanation: any = null;
+  rankingSnapshot: any = null;
+  rankingEntries: any[] = [];
 
   constructor(
-    private api: ApiService
+    private api: ApiService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
     this.api.getAllNageurs().subscribe({
-      next: data => { this.swimmers = Array.isArray(data) ? data : []; },
+      next: data => {
+        const raw = Array.isArray(data) ? data : [];
+        this.swimmers = this.filterCoachSwimmers(raw);
+      },
       error: () => { this.swimmers = []; }
     });
 
     this.loadResults();
+    this.loadAiInsights();
+  }
+
+  loadAiInsights(): void {
+    this.aiLoading = true;
+    this.aiError = '';
+    this.loadRankingCascade(['weekly', 'monthly', 'yearly']);
+  }
+
+  /** Try each period type in order until one returns entries */
+  private loadRankingCascade(periods: string[]): void {
+    if (!periods.length) {
+      this.rankingSnapshot = null;
+      this.rankingEntries = [];
+      this.aiLoading = false;
+      return;
+    }
+
+    const [current, ...remaining] = periods;
+    this.api.getLatestRanking(current).subscribe({
+      next: (snapshot: any) => {
+        const entries = Array.isArray(snapshot?.entries) ? snapshot.entries : [];
+        if (entries.length > 0) {
+          this.rankingSnapshot = snapshot;
+          this.rankingEntries = entries.slice(0, 10);
+          this.aiLoading = false;
+        } else {
+          // No entries for this period, try the next one
+          this.loadRankingCascade(remaining);
+        }
+      },
+      error: () => {
+        // If this period failed, try the next one before giving up
+        if (remaining.length > 0) {
+          this.loadRankingCascade(remaining);
+        } else {
+          this.aiError = 'Impossible de charger le classement IDSS.';
+          this.aiLoading = false;
+        }
+      }
+    });
   }
 
   loadResults(): void {
     this.api.getAllPerformances({ type: 'Entrainement' }).subscribe({
       next: data => {
         const items = Array.isArray(data) ? data : [];
-        this.results = items.map(item => this.mapPerformance(item));
+        const mapped = items.map(item => this.mapPerformance(item));
+        this.results = this.filterCoachResults(mapped);
         this.applyFilters();
       },
       error: () => {
@@ -132,5 +187,26 @@ export class TrainingAnalyticsComponent implements OnInit {
     if (!value) return null;
     const match = value.match(/attendance\s*[:=]\s*(present|absent)/i);
     return match ? (match[1].toLowerCase() as AttendanceStatus) : null;
+  }
+
+  private normalizeAiPrediction(prediction: any): any {
+    if (!prediction) return null;
+    const predictedTime = prediction.predicted_time ?? prediction.predicted_time_sec ?? null;
+    if (predictedTime == null) return null;
+    return { ...prediction, predicted_time: predictedTime };
+  }
+
+  private filterCoachSwimmers(list: any[]): any[] {
+    if (!this.auth.isCoach) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((n: any) => allowed.has(String(this.resolveNageurId(n))));
+  }
+
+  private filterCoachResults(list: TrainingResult[]): TrainingResult[] {
+    if (!this.auth.isCoach) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((r) => allowed.has(String(r.swimmerId)));
   }
 }

@@ -70,12 +70,6 @@
              [class.has-events]="day.events?.length > 0"
              (click)="selectDay(day)">
           <span class="cal-num" *ngIf="!day.empty">{{ day.day }}</span>
-          <div class="cal-dots" *ngIf="day.events?.length > 0">
-            <span class="cal-dot"
-                  *ngFor="let e of day.events.slice(0, 3)"
-                  [style.background]="getTypeColor(e.type)">
-            </span>
-          </div>
         </div>
       </div>
 

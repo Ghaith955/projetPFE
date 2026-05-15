@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 export class RegisterComponent {
   nom = ''; prenom = ''; email = ''; phone = '';
   password = ''; confirmPassword = '';
+  acceptRules = false;
   selectedRole: string = 'NAGEUR';
   isLoading = false;
   errorMessage = '';
@@ -126,6 +127,10 @@ export class RegisterComponent {
 
     if (this.password.length < 6) {
       this.errorMessage = 'Le mot de passe doit contenir au moins 6 caractères.'; return;
+    }
+
+    if (!this.acceptRules) {
+      this.errorMessage = 'Veuillez accepter les regles de la plateforme.'; return;
     }
 
     this.isLoading = true;

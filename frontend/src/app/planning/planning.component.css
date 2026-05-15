@@ -332,11 +332,12 @@
   box-shadow: 0 12px 24px rgba(37, 99, 235, 0.3);
 }
 .cal-cell.selected .cal-num { color: white; }
-.cal-cell.has-events .cal-num { font-weight: 700; }
+.cal-cell.has-events {
+  background: rgba(129, 140, 248, 0.16);
+  border-color: rgba(129, 140, 248, 0.28);
+}
+.cal-cell.has-events .cal-num { font-weight: 700; color: #c7d2fe; }
 .cal-num { font-size: 12px; color: var(--text-primary); font-weight: 600; }
-.cal-dots { display: flex; gap: 3px; margin-top: 3px; }
-.cal-dot { width: 4px; height: 4px; border-radius: 50%; }
-.cal-cell.selected .cal-dot { background: rgba(255, 255, 255, 0.7) !important; }
 
 /* Day Detail */
 .day-detail {

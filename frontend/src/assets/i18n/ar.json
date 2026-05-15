@@ -34,7 +34,10 @@
     },
     "common": {
       "fatigueHigh": "إجهاد مرتفع",
-      "fatigueMedium": "إجهاد متوسط"
+      "fatigueMedium": "إجهاد متوسط",
+      "noData": "لا توجد بيانات متاحة",
+      "close": "إغلاق",
+      "confidence": "الثقة"
     },
     "admin": {
       "title": "لوحة الإدارة",
@@ -56,6 +59,8 @@
       "emptyRequests": "لا توجد طلبات معلقة",
       "swimmerPerformance": "السباحون المتابعون",
       "levelEstimate": "تقدير المستوى",
+      "coaches": "المدربون",
+      "noCoachFound": "لم يتم العثور على مدرب",
       "dss": {
         "title": "IDSS Insights",
         "alerts": "تنبيهات",
@@ -66,7 +71,64 @@
         "explanationText": "اختيار بناء على التحسن ومتوسط الإجهاد",
         "competitionBadgeTitle": "منافسة إقليمية",
         "competitionBadgeDate": "أبريل 2024"
-      }
+      },
+      "op": {
+        "aiOnline": "الذكاء الاصطناعي متصل",
+        "aiOffline": "الذكاء الاصطناعي غير متصل",
+        "activeSwimmers": "السباحون النشطون",
+        "activeCoaches": "المدربون النشطون",
+        "totalUsers": "إجمالي المستخدمين",
+        "trainings": "التدريبات",
+        "competitions": "المنافسات",
+        "cotisations": "الاشتراكات",
+        "pending": "قيد الانتظار",
+        "coachSwimmerRatio": "نسبة مدرب : سباح",
+        "aiMonitored": "مراقبة IA",
+        "atRisk": "في خطر",
+        "avgAcwr": "متوسط ACWR"
+      },
+      "ai": {
+        "strategicCenter": "المركز الاستراتيجي للذكاء الاصطناعي",
+        "strategicSub": "مساعد استراتيجي لإدارة النادي",
+        "smartAlerts": "نظام التنبيهات الذكية",
+        "recommendations": "محرك توصيات الذكاء الاصطناعي",
+        "todaySummary": "ملخص الذكاء الاصطناعي لليوم",
+        "coachAnalytics": "تحليلات المدربين",
+        "aiEfficiency": "كفاءة الذكاء الاصطناعي",
+        "attendanceImpact": "تأثير الحضور",
+        "swimmerProgression": "تقدم السباحين",
+        "trainingConsistency": "انتظام التدريب",
+        "workloadBalance": "توازن العبء",
+        "noCoachAnalytics": "لا تتوفر تحليلات المدربين بعد.",
+        "attendanceEvolution": "تطور الحضور",
+        "bestGroup": "أفضل مجموعة أداء",
+        "weakestProgression": "أضعف تقدم",
+        "fatigueIndicators": "مؤشرات الإجهاد",
+        "globalReadiness": "درجة الاستعداد الشامل",
+        "recommendation": "توصية",
+        "aiExplanation": "تفسير الذكاء الاصطناعي",
+        "globalClubIntelligence": "ذكاء النادي الشامل",
+        "strategicDecisions": "قرارات استراتيجية",
+        "coachAnalyticsTag": "تحليلات المدربين",
+        "overallMonitoring": "المراقبة الشاملة",
+        "operationalOptimization": "تحسين العمليات",
+        "riskManagement": "إدارة المخاطر"
+      },
+      "eval": {
+        "title": "تقييم IDSS (الأخير)",
+        "swimmersAnalyzed": "سباحون تم تحليلهم",
+        "decisionsLogged": "قرارات مسجلة",
+        "errors": "أخطاء"
+      },
+      "pendingTag": "قيد الانتظار",
+      "swimmerTag": "سباح",
+      "coachTag": "مدرب",
+      "profileTitle": "الملف الشخصي",
+      "phone": "الهاتف",
+      "birthDate": "تاريخ الميلاد",
+      "category": "الفئة",
+      "level": "المستوى",
+      "club": "النادي"
     },
     "coach": {
       "title": "مرحبا المدرب {{name}}.",
@@ -104,6 +166,33 @@
           "steady": "مستوى ثابت",
           "down": "انخفاض في الانتظام"
         }
+      },
+      "ai": {
+        "brainTitle": "AI Brain — لوحة المدرب",
+        "mlLoading": "تحليل ML قيد التنفيذ...",
+        "noSwimmer": "لا يوجد سباح",
+        "noSwimmerSub": "لا يوجد سباح مرتبط بهذا المدرب. أضف سباحًا لتفعيل التحليل.",
+        "aiSurveillance": "مراقبة الذكاء الاصطناعي",
+        "atRiskMsg": "{{atRisk}} سباح(ين) في خطر من أصل {{total}} تم تحليلهم",
+        "acwrGlobal": "ACWR الشامل",
+        "fatigueAbove60": "إجهاد > 60%",
+        "overtrainingRisk": "خطر الإفراط في التدريب",
+        "simulateImpact": "محاكاة التأثير",
+        "noAnomaly": "✅ محرك IA: لم يتم اكتشاف أي خلل",
+        "urgentPriority": "أولوية عاجلة",
+        "levelLabel": "المستوى: {{level}} · الدرجة {{score}}%",
+        "sessionsLabel": "ACWR: {{acwr}} · حصص 7 أيام: {{sessions}}",
+        "analysisBySwimmer": "التحليل حسب السباح",
+        "selectSwimmer": "اختر سباحًا",
+        "noSwimmerToAnalyze": "لا يوجد سباح للتحليل حاليًا.",
+        "aiAnalysisLoading": "تحليل الذكاء الاصطناعي قيد التنفيذ...",
+        "recommendationLabel": "توصية",
+        "alertsLabel": "تنبيهات",
+        "explanationLabel": "تفسير",
+        "fatigueLabel": "إجهاد: {{level}} · {{score}}%",
+        "mvpWeekly": "🏆 MVP IA — أسبوعي",
+        "classicAlerts": "تنبيهات كلاسيكية",
+        "unacknowledged": "{{count}} غير مقرّة"
       }
     },
     "swimmer": {
@@ -148,6 +237,32 @@
         "shape": "مثلث مقلوب\nشكل الجسم",
         "explanation": "تفسير",
         "explanationText": "اختيار بناء على التحسن وإجهاد متوسط"
+      },
+      "ai": {
+        "brainTitle": "AI Brain — تحليلي",
+        "inferenceLoading": "استدلال AI قيد التنفيذ...",
+        "fatigueScore": "درجة الإجهاد (ML)",
+        "levelLabel": "المستوى",
+        "prediction": "التنبؤ والاتجاه",
+        "predictedTime": "الزمن المتوقع (100م)",
+        "insufficientData": "بيانات غير كافية للتنبؤ بالزمن.",
+        "aiRecommendation": "توصية الذكاء الاصطناعي",
+        "adviceLoading": "النصائح قيد الإنشاء.",
+        "weekMetrics": "مقاييس الأسبوع",
+        "acuteLoad": "الحمل الحاد (7 أيام)",
+        "chronicLoad": "الحمل المزمن (28 يوم)",
+        "sleepQuality": "جودة النوم",
+        "stressLevel": "مستوى التوتر",
+        "bmiTitle": "مؤشر كتلة الجسم",
+        "bmiIndex": "مؤشر كتلة الجسم",
+        "bmiUnderweight": "نقص الوزن",
+        "bmiNormal": "طبيعي",
+        "bmiOverweight": "زيادة الوزن",
+        "bmiObese": "سمنة",
+        "silhouette": "الصورة الظلية",
+        "aiRecommendationPanel": "توصية الذكاء الاصطناعي",
+        "explanationPanel": "تفسير",
+        "noExplanation": "لا يوجد تفسير متاح."
       }
     },
     "modals": {

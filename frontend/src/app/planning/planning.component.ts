@@ -56,7 +56,8 @@ export class PlanningComponent implements OnInit {
   loadNageurs() {
     this.api.getAllNageurs().subscribe({
       next: (data) => {
-        this.allNageurs = Array.isArray(data) ? data : [];
+        const raw = Array.isArray(data) ? data : [];
+        this.allNageurs = this.filterCoachSwimmers(raw);
       }
     });
   }
@@ -65,7 +66,8 @@ export class PlanningComponent implements OnInit {
     this.isLoading = true;
     this.api.getAllEntrainements().subscribe({
       next: (data) => {
-        this.entrainements = Array.isArray(data) ? data : [];
+        const raw = Array.isArray(data) ? data : [];
+        this.entrainements = this.filterCoachEntrainements(raw);
         this.buildCalendar();
         this.isLoading = false;
       },
@@ -239,6 +241,23 @@ export class PlanningComponent implements OnInit {
   avatarUrl(n: any): string {
     const img = n?.utilisateur?.imageprofile || n?.imageprofile;
     return img ? 'http://localhost:3300' + img : '';
+  }
+
+  private filterCoachSwimmers(list: any[]): any[] {
+    if (!this.isEntraineur) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((n: any) => allowed.has(String(n?._id || n?.id || n)));
+  }
+
+  private filterCoachEntrainements(list: any[]): any[] {
+    if (!this.isEntraineur) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((e: any) => {
+      const nageurs = Array.isArray(e?.nageurs) ? e.nageurs : [];
+      return nageurs.some((n: any) => allowed.has(String(n?._id || n?.id || n)));
+    });
   }
 
   getInitials(n: any): string {

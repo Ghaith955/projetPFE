@@ -93,10 +93,15 @@ def train_fatigue_classifier() -> Dict:
     )
 
     if len(X) >= 4:
-        # Cross-validation
-        cv = min(len(X), 5)
-        scores = cross_val_score(model, X, y_encoded, cv=cv, scoring="accuracy")
-        cv_accuracy = float(scores.mean())
+        # Cross-validation (bounded by smallest class size)
+        unique, counts = np.unique(y_encoded, return_counts=True)
+        min_class = int(counts.min()) if len(counts) else 1
+        cv = min(len(X), 5, min_class)
+        if cv >= 2:
+            scores = cross_val_score(model, X, y_encoded, cv=cv, scoring="accuracy")
+            cv_accuracy = float(scores.mean())
+        else:
+            cv_accuracy = None
     else:
         cv_accuracy = None
 

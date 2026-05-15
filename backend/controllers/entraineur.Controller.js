@@ -7,7 +7,18 @@ const entraineurController = {};
 // GET /entraineurs
 entraineurController.getAllEntraineurs = async (req, res) => {
   try {
-    const entraineurs = await Entraineur.find()
+    if (!req.user?.role) {
+      return res.status(403).json({ message: 'Acces interdit.' });
+    }
+
+    const baseQuery = {};
+    if (req.user.role === 'ENTRAINEUR') {
+      baseQuery.utilisateur = req.user.userId;
+    } else if (req.user.role !== 'RESPONSABLE') {
+      return res.status(403).json({ message: 'Acces interdit.' });
+    }
+
+    const entraineurs = await Entraineur.find(baseQuery)
       .populate('utilisateur', 'nom prenom email phone imageprofile isActive')
       .populate({ path: 'nageurs', populate: { path: 'utilisateur', select: 'nom prenom' } });
     res.status(200).json(entraineurs);
@@ -23,6 +34,15 @@ entraineurController.getEntraineurById = async (req, res) => {
       .populate('utilisateur', 'nom prenom email phone imageprofile')
       .populate({ path: 'nageurs', populate: { path: 'utilisateur', select: 'nom prenom email' } });
     if (!entraineur) return res.status(404).json({ message: 'Entraîneur non trouvé.' });
+
+    if (req.user?.role === 'ENTRAINEUR') {
+      if (String(entraineur.utilisateur) !== String(req.user.userId)) {
+        return res.status(403).json({ message: 'Acces interdit.' });
+      }
+    } else if (req.user?.role !== 'RESPONSABLE') {
+      return res.status(403).json({ message: 'Acces interdit.' });
+    }
+
     res.status(200).json(entraineur);
   } catch (error) {
     res.status(500).json({ message: 'Erreur.', error: error.message });

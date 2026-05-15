@@ -5,7 +5,7 @@
     <span class="page-subtitle">Gestion des nageurs</span>
   </div>
   <div class="topbar-right">
-    <button class="btn-primary-sm" (click)="openAddModal()">+ Ajouter un nageur</button>
+    <button class="btn-primary-sm" *ngIf="isAdmin" (click)="openAddModal()">+ Ajouter un nageur</button>
   </div>
 </header>
 
@@ -66,6 +66,29 @@
           <span class="meta-item"><span class="meta-label">Âge</span>{{ n.age || '—' }} ans</span>
           <span class="meta-item"><span class="meta-label">Poids</span>{{ n.poid || '—' }} kg</span>
           <span class="meta-item"><span class="meta-label">Téléphone</span>{{ n.utilisateur?.phone || '—' }}</span>
+        </div>
+        <div class="coach-assign" *ngIf="isAdmin">
+          <button
+            type="button"
+            class="coach-toggle"
+            [class.is-assigned]="!!n.entraineur"
+            (click)="toggleCoachPicker(n._id)">
+            {{ n.entraineur ? getCoachLabel(n) : 'Choisir un entraineur' }}
+          </button>
+          <div class="coach-list" *ngIf="openCoachPickerFor === n._id">
+            <button
+              type="button"
+              class="coach-card"
+              *ngFor="let e of getMatchingEntraineurs(n)"
+              (click)="assignNageur(n, e._id)">
+              <span class="coach-avatar">{{ getCoachInitials(e) }}</span>
+              <span class="coach-info">
+                <span class="coach-fullname">{{ e.utilisateur?.prenom }} {{ e.utilisateur?.nom }}</span>
+                <span class="coach-meta">{{ (e.specialites || []).join(', ') || 'Specialites non definies' }}</span>
+              </span>
+            </button>
+            <div class="coach-empty" *ngIf="getMatchingEntraineurs(n).length === 0">Aucun entraineur disponible</div>
+          </div>
         </div>
       </div>
       <div class="profile-footer">
@@ -157,6 +180,27 @@
             <option value="">-- Choisir --</option>
             <option *ngFor="let s of specialiteOptions" [value]="s">{{ s }}</option>
           </select>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="isAdmin">
+        <div class="field-group field-group--full">
+          <label>Entraineur</label>
+          <div class="coach-list coach-list--modal">
+            <button
+              type="button"
+              class="coach-card"
+              *ngFor="let e of getMatchingEntraineurs({ specialite: [form.specialite] })"
+              [class.active]="modalCoachId === e._id"
+              (click)="setModalCoach(e._id)">
+              <span class="coach-avatar">{{ getCoachInitials(e) }}</span>
+              <span class="coach-info">
+                <span class="coach-fullname">{{ e.utilisateur?.prenom }} {{ e.utilisateur?.nom }}</span>
+                <span class="coach-meta">{{ (e.specialites || []).join(', ') || 'Specialites non definies' }}</span>
+              </span>
+            </button>
+            <div class="coach-empty" *ngIf="getMatchingEntraineurs({ specialite: [form.specialite] }).length === 0">Aucun entraineur disponible</div>
+          </div>
         </div>
       </div>
     </div>

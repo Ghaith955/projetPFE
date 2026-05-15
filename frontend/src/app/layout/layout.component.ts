@@ -123,8 +123,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
         { labelKey: 'sidebar.competitions', route: '/competitions', icon: this.icons['trophy'] },
         { labelKey: 'sidebar.planning', route: '/planning', icon: this.icons['calendar'] },
         { labelKey: 'sidebar.trainingAnalytics', route: '/training-analytics', icon: this.icons['analytics'] },
-        { labelKey: 'sidebar.cotisations', route: '/cotisations', icon: this.icons['wallet'] },
-        { labelKey: 'sidebar.simulation', route: '/simulation', icon: this.icons['simulation'] }
+        { labelKey: 'sidebar.cotisations', route: '/cotisations', icon: this.icons['wallet'] }
       );
     } else if (this.isEntraineur) {
       items.push(

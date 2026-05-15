@@ -33,6 +33,24 @@ export class AuthService {
   get token(): string | null { return localStorage.getItem('token'); }
   get isLoggedIn(): boolean { return !!this.token; }
   get role(): string | null { return this.currentUser?.role || null; }
+  get isCoach(): boolean { return this.role === 'ENTRAINEUR'; }
+
+  getCoachSwimmerIds(): string[] {
+    if (!this.isCoach) return [];
+    const nageurs = this.currentUser?.roleData?.nageurs || [];
+    if (!Array.isArray(nageurs)) return [];
+    return nageurs
+      .map((n: any) => n?._id || n?.id || n)
+      .filter((id: any) => !!id)
+      .map((id: any) => String(id));
+  }
+
+  hasCoachAccess(nageurId: string): boolean {
+    if (!this.isCoach) return true;
+    if (!nageurId) return false;
+    const swimmerIds = this.getCoachSwimmerIds();
+    return swimmerIds.includes(String(nageurId));
+  }
 
   login(email: string, password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, { email, password }).pipe(

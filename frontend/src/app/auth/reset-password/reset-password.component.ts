@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-reset-password',
@@ -24,12 +23,11 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
     private router: Router, 
     private route: ActivatedRoute,
-    private api: ApiService,
-    private http: HttpClient
+    private api: ApiService
   ) {}
 
   ngOnInit() {
-    this.token = this.route.snapshot.paramMap.get('token') || '';
+    this.token = this.getTokenFromRoute();
 
     if (this.token) {
       this.verifyToken();
@@ -39,8 +37,14 @@ export class ResetPasswordComponent implements OnInit {
     }
   }
 
+  private getTokenFromRoute(): string {
+    return this.route.snapshot.paramMap.get('token')
+      || this.route.snapshot.queryParamMap.get('token')
+      || '';
+  }
+
   verifyToken() {
-    this.http.get(`http://localhost:3300/password/reset/${this.token}`).subscribe({
+    this.api.verifyPasswordResetToken(this.token).subscribe({
       next: (data: any) => {
         this.isTokenValid = data.isTokenValid !== false;
         if (!this.isTokenValid) {
@@ -98,4 +102,4 @@ export class ResetPasswordComponent implements OnInit {
   goToLogin() {
     this.router.navigate(['/login']);
   }
-}
+}

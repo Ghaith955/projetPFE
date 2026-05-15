@@ -1,3 +1,5 @@
+/* Fonts loaded globally in styles.css */
+
 :host {
   --nav-bg: rgba(8, 23, 36, 0.96);
   --nav-bg-strong: rgba(8, 24, 39, 0.98);
@@ -76,18 +78,32 @@
 
 .sidebar-top-brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin: 2px 4px 14px;
-  padding-left: 4px;
+  justify-content: center;
+  text-align: center;
+  gap: 2px;
+  margin: 4px 4px 14px;
 }
 
-.brand-text {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
+.brand-wordmark {
+  font-family: 'Audiowide', 'Outfit', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
   text-transform: lowercase;
   color: var(--nav-text-strong);
-  font-family: 'Outfit', sans-serif;
+  text-shadow: 0 10px 20px rgba(4, 18, 30, 0.35);
+}
+
+.brand-submark {
+  font-family: 'Audiowide', 'Outfit', sans-serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(200, 230, 255, 0.85);
+  opacity: 0.9;
 }
 
 .sidebar-nav {

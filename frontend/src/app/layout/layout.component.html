@@ -1,7 +1,8 @@
 <div class="layout">
   <aside class="sidebar">
-    <div class="sidebar-top-brand">
-      <div class="brand-text" aria-label="IDSS">idss</div>
+    <div class="sidebar-top-brand" aria-label="IDSS NATATION">
+      <span class="brand-wordmark">idss</span>
+      <span class="brand-submark">NATATION</span>
     </div>
 
     <nav class="sidebar-nav">
@@ -64,20 +65,20 @@
 
         <div class="notif-panel" *ngIf="showNotifications">
           <div class="notif-header">
-            <span>Notifications</span>
+            <span>{{ 'layout.notifications' | translate }}</span>
             <button
               type="button"
               class="notif-clear"
               (click)="markAllNotificationsAsRead()"
               [disabled]="unreadCount === 0"
             >
-              Tout marquer comme lu
+              {{ 'layout.markAllRead' | translate }}
             </button>
           </div>
 
-          <div class="notif-loading" *ngIf="notificationsLoading">Chargement...</div>
+          <div class="notif-loading" *ngIf="notificationsLoading">{{ 'layout.loading' | translate }}</div>
           <div class="notif-empty" *ngIf="!notificationsLoading && notifications.length === 0">
-            Aucune notification.
+            {{ 'layout.noNotifications' | translate }}
           </div>
 
           <div class="notif-list" *ngIf="!notificationsLoading && notifications.length > 0">

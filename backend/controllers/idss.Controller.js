@@ -4,6 +4,7 @@ const Nageur          = require('../models/nageur.model');
 const Performance     = require('../models/performance.model');
 const { evaluateRules }  = require('../utils/idssRuleEngine');
 const { updateBaseline } = require('../utils/idssBaselineUpdater');
+const { ensureCoachSwimmerAccess, getCoachSwimmerIds } = require('../utils/coachScope');
 
 const idssController = {};
 
@@ -53,7 +54,18 @@ idssController.analyzePerformance = async (req, res) => {
 idssController.getDecisions = async (req, res) => {
   try {
     const filter = {};
-    if (req.query.nageurId) filter.nageur = req.query.nageurId;
+    if (req.user?.role === 'ENTRAINEUR') {
+      const swimmerIds = await getCoachSwimmerIds(req.user.userId);
+      if (!swimmerIds.length) return res.json([]);
+      if (req.query.nageurId) {
+        const allowed = swimmerIds.some((id) => String(id) === String(req.query.nageurId));
+        if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+        filter.nageur = req.query.nageurId;
+      } else {
+        filter.nageur = { $in: swimmerIds };
+      }
+    }
+    if (req.query.nageurId && req.user?.role !== 'ENTRAINEUR') filter.nageur = req.query.nageurId;
     if (req.query.level)    filter.fatigueLevel = req.query.level;
     if (req.query.acknowledged !== undefined)
       filter.acknowledged = req.query.acknowledged === 'true';
@@ -77,6 +89,10 @@ idssController.getDecisions = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 idssController.getLatestDecision = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, req.params.nageurId);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const decision = await IDSSDecision.findOne({ nageur: req.params.nageurId })
       .sort({ createdAt: -1 })
       .populate('performance', 'date intensity distance fatigueLevel feedback');
@@ -93,12 +109,21 @@ idssController.getLatestDecision = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 idssController.getSummary = async (req, res) => {
   try {
+    let swimmerIds = null;
+    if (req.user?.role === 'ENTRAINEUR') {
+      swimmerIds = await getCoachSwimmerIds(req.user.userId);
+      if (!swimmerIds.length) {
+        return res.json({ totalAnalyzed: 0, levelCounts: { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 }, atRiskSwimmers: [], pendingAlerts: 0 });
+      }
+    }
     // Get the latest decision per swimmer
-    const latest = await IDSSDecision.aggregate([
-      { $sort: { createdAt: -1 } },
+    const pipeline = [{ $sort: { createdAt: -1 } }];
+    if (swimmerIds) pipeline.push({ $match: { nageur: { $in: swimmerIds } } });
+    pipeline.push(
       { $group: { _id: '$nageur', doc: { $first: '$$ROOT' } } },
       { $replaceRoot: { newRoot: '$doc' } }
-    ]);
+    );
+    const latest = await IDSSDecision.aggregate(pipeline);
 
     const counts = { LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0 };
     const atRisk = [];
@@ -168,6 +193,10 @@ idssController.getMyStatus = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 idssController.getBaseline = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, req.params.nageurId);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const baseline = await SwimmerBaseline.findOne({ nageur: req.params.nageurId });
     res.json(baseline || null);
   } catch (err) {
@@ -181,6 +210,10 @@ idssController.getBaseline = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 idssController.updateBaseline = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const hasAccess = await ensureCoachSwimmerAccess(req.user.userId, req.params.nageurId);
+      if (!hasAccess) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const allowed = ['personalBests', 'weeklyLoadTargetKm', 'maxConsecutiveTrainingDays'];
     const update = {};
     for (const key of allowed) {
@@ -203,6 +236,12 @@ idssController.updateBaseline = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 idssController.acknowledgeDecision = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const decision = await IDSSDecision.findById(req.params.id).select('nageur');
+      if (!decision) return res.status(404).json({ message: 'Décision non trouvée.' });
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, decision.nageur);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const decision = await IDSSDecision.findByIdAndUpdate(
       req.params.id,
       {
@@ -228,6 +267,10 @@ idssController.acknowledgeDecision = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 idssController.getHistory = async (req, res) => {
   try {
+    if (req.user?.role === 'ENTRAINEUR') {
+      const allowed = await ensureCoachSwimmerAccess(req.user.userId, req.params.nageurId);
+      if (!allowed) return res.status(403).json({ message: 'Acces interdit.' });
+    }
     const limit = parseInt(req.query.limit) || 30;
     const decisions = await IDSSDecision.find({ nageur: req.params.nageurId })
       .sort({ createdAt: -1 })

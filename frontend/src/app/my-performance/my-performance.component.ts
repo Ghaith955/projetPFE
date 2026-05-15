@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 import { TrainingResult, TrainingType, CoachFeedback, AttendanceStatus } from '../models/training-result.model';
 
 @Component({
@@ -12,13 +14,91 @@ export class MyPerformanceComponent implements OnInit {
   totalDistance = 0;
   avgIntensity = 0;
   attendanceRate = 0;
+  aiLoading = false;
+  aiError = '';
+  aiFatigue: any = null;
+  aiPrediction: any = null;
+  aiExplainFatigue: any = null;
+  aiExplainPrediction: any = null;
 
   constructor(
-    private api: ApiService
+    private api: ApiService,
+    private auth: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadResults();
+    this.loadAiInsights();
+  }
+
+  loadAiInsights(): void {
+    this.aiLoading = true;
+    this.aiError = '';
+
+    this.auth.getMe().subscribe({
+      next: (user: any) => {
+        const nageurId = user?.roleData?._id;
+        if (!nageurId) {
+          this.aiLoading = false;
+          return;
+        }
+
+        forkJoin({
+          fatigue: this.api.aiFatigueDetection([nageurId]),
+          prediction: this.api.aiPredictTime(nageurId),
+          explainFatigue: this.api.aiExplain('fatigue', nageurId),
+          explainPrediction: this.api.aiExplain('prediction', nageurId)
+        }).subscribe({
+          next: ({ fatigue, prediction, explainFatigue, explainPrediction }) => {
+            this.aiFatigue = this.normalizeAiDecision(fatigue);
+            this.aiPrediction = this.normalizeAiPrediction(prediction);
+            this.aiExplainFatigue = explainFatigue || null;
+            this.aiExplainPrediction = explainPrediction || null;
+            this.aiLoading = false;
+          },
+          error: () => {
+            this.aiError = "Impossible de charger les insights IA.";
+            this.aiLoading = false;
+          }
+        });
+      },
+      error: () => {
+        this.aiError = "Impossible de recuperer le profil nageur.";
+        this.aiLoading = false;
+      }
+    });
+  }
+
+  private normalizeAiDecision(decision: any): any {
+    if (!decision) return null;
+    return {
+      ...decision,
+      fatigue_level: decision.fatigue_level || decision.fatigueLevel,
+      fatigue_score: decision.fatigue_score ?? decision.fatigueScore ?? 0,
+      acwr: decision.acwr ?? 0
+    };
+  }
+
+  private normalizeAiPrediction(prediction: any): any {
+    if (!prediction) return null;
+    const predictedTime = prediction.predicted_time ?? prediction.predicted_time_sec ?? null;
+    if (predictedTime == null) return null;
+    return { ...prediction, predicted_time: predictedTime };
+  }
+
+  getSwimmerAdvice(level: string | undefined): string {
+    switch (level) {
+      case 'CRITICAL':
+        return 'Repos total 48h. Prioriser le sommeil, hydratation et recuperation active douce.';
+      case 'HIGH':
+        return 'Reduire l intensite aujourd hui. Dormir 8h+, bien s hydrater, et etirer 10-15 min.';
+      case 'MEDIUM':
+        return 'Stabiliser la charge. Dors mieux, hydratation reguliere, et nutrition complete.';
+      case 'LOW':
+        return 'Bonne forme. Maintiens sommeil, hydratation, et une recuperation legere.';
+      default:
+        return 'Suivi en cours. Concentre toi sur le sommeil, hydratation et recuperation.';
+    }
   }
 
   loadResults(): void {

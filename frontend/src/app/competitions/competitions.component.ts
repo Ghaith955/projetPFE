@@ -17,6 +17,7 @@ export class CompetitionsComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   showModal = false;
+  showResultModal = false;
   isEditMode = false;
   selectedId = '';
   allNageurs: any[] = [];
@@ -24,6 +25,23 @@ export class CompetitionsComponent implements OnInit {
   form = {
     nom: '', date: '', lieu: '',
     description: '', niveauRequis: 'Intermédiaire', statut: 'À venir', nageurs: [] as string[]
+  };
+
+  resultForm = {
+    competitionId: '',
+    nageurId: '',
+    score: '',
+    rank: '',
+    time: '',
+    distance: '',
+    stroke: '',
+    category: '',
+    techniqueScore: '',
+    enduranceScore: '',
+    sprintScore: '',
+    strokeEfficiency: '',
+    consistencyScore: '',
+    notes: ''
   };
 
   niveaux = ['Débutant', 'Intermédiaire', 'Confirmé', 'Expert'];
@@ -37,6 +55,7 @@ export class CompetitionsComponent implements OnInit {
 
   get isAdmin() { return this.auth.role === 'RESPONSABLE'; }
   get canManageCompetitions() { return this.auth.role === 'RESPONSABLE' || this.auth.role === 'ENTRAINEUR'; }
+  get isCoach() { return this.auth.role === 'ENTRAINEUR'; }
 
   ngOnInit() { 
     this.loadCompetitions(); 
@@ -46,7 +65,8 @@ export class CompetitionsComponent implements OnInit {
   loadNageurs() {
     this.api.getAllNageurs().subscribe({
       next: (data) => {
-        this.allNageurs = Array.isArray(data) ? data : [];
+        const raw = Array.isArray(data) ? data : [];
+        this.allNageurs = this.filterCoachSwimmers(raw);
       }
     });
   }
@@ -55,7 +75,8 @@ export class CompetitionsComponent implements OnInit {
     this.isLoading = true;
     this.api.getAllCompetitions().subscribe({
       next: (data) => {
-        this.competitions = Array.isArray(data) ? data : [];
+        const raw = Array.isArray(data) ? data : [];
+        this.competitions = this.filterCoachCompetitions(raw);
         this.applyFilters();
         this.isLoading = false;
       },
@@ -76,6 +97,23 @@ export class CompetitionsComponent implements OnInit {
       result = result.filter(c => c.statut === this.filterStatut);
     }
     this.filteredCompetitions = result;
+  }
+
+  private filterCoachSwimmers(list: any[]): any[] {
+    if (!this.isCoach) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((n: any) => allowed.has(String(n?._id || n?.id || n)));
+  }
+
+  private filterCoachCompetitions(list: any[]): any[] {
+    if (!this.isCoach) return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((c: any) => {
+      const nageurs = Array.isArray(c?.nageurs) ? c.nageurs : [];
+      return nageurs.some((n: any) => allowed.has(String(n?._id || n?.id || n)));
+    });
   }
 
   openAddModal() {
@@ -100,11 +138,39 @@ export class CompetitionsComponent implements OnInit {
   }
 
   closeModal() { this.showModal = false; this.resetForm(); }
+  closeResultModal() { this.showResultModal = false; this.resetResultForm(); }
 
   resetForm() {
     this.form = { nom: '', date: '', lieu: '', description: '', niveauRequis: 'Intermédiaire', statut: 'À venir', nageurs: [] };
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  resetResultForm() {
+    this.resultForm = {
+      competitionId: '',
+      nageurId: '',
+      score: '',
+      rank: '',
+      time: '',
+      distance: '',
+      stroke: '',
+      category: '',
+      techniqueScore: '',
+      enduranceScore: '',
+      sprintScore: '',
+      strokeEfficiency: '',
+      consistencyScore: '',
+      notes: ''
+    };
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  openResultModal(c: any) {
+    this.resetResultForm();
+    this.resultForm.competitionId = c._id;
+    this.showResultModal = true;
   }
 
   onSubmit() {
@@ -134,6 +200,42 @@ export class CompetitionsComponent implements OnInit {
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });
     }
+  }
+
+  submitResult() {
+    this.errorMessage = '';
+    if (!this.resultForm.competitionId || !this.resultForm.nageurId || !this.resultForm.score || !this.resultForm.rank) {
+      this.errorMessage = 'Veuillez remplir les champs obligatoires du résultat.';
+      return;
+    }
+
+    const payload = {
+      competitionId: this.resultForm.competitionId,
+      nageurId: this.resultForm.nageurId,
+      score: this.resultForm.score,
+      rank: this.resultForm.rank,
+      time: this.resultForm.time,
+      distance: this.resultForm.distance,
+      stroke: this.resultForm.stroke,
+      category: this.resultForm.category,
+      performanceMetrics: {
+        techniqueScore: this.resultForm.techniqueScore,
+        enduranceScore: this.resultForm.enduranceScore,
+        sprintScore: this.resultForm.sprintScore,
+        strokeEfficiency: this.resultForm.strokeEfficiency,
+        consistencyScore: this.resultForm.consistencyScore
+      },
+      notes: this.resultForm.notes
+    };
+
+    this.api.addCompetitionResult(payload).subscribe({
+      next: () => {
+        this.closeResultModal();
+        this.successMessage = 'Résultat enregistré !';
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
+    });
   }
 
   deleteCompetition(id: string, nom: string) {

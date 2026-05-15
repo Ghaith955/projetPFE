@@ -45,63 +45,42 @@
     </div>
   </section>
 
-  <section class="glass-card table-card">
-    <div class="table-head">
-      <h2>Detail des seances</h2>
-      <span>{{ filtered.length }} resultats</span>
+  <section class="glass-card ai-card">
+    <div class="ai-head">
+      <h2>Zone IDSS - Classement des Nageurs</h2>
+      <p>Classement IA basé sur le système d'évaluation en temps réel.</p>
     </div>
-    <div class="table-wrap">
+    <div *ngIf="aiLoading" class="ai-state">Chargement du moteur IA...</div>
+    <div *ngIf="!aiLoading && aiError" class="ai-state error">{{ aiError }}</div>
+
+    <div class="table-wrap" *ngIf="!aiLoading && !aiError && rankingEntries.length">
       <table>
         <thead>
           <tr>
+            <th>Rang</th>
             <th>Nageur</th>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Duree</th>
-            <th>Distance</th>
-            <th>Intensite</th>
-            <th>Presence</th>
-            <th>Feedback</th>
+            <th>Score Global</th>
+            <th>Score moyen</th>
+            <th>Meilleur rang</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of filtered">
-            <td>{{ r.swimmerName || getSwimmerName(r.swimmerId) }}</td>
-            <td>{{ r.date | date:'dd MMM yyyy' }}</td>
-            <td>{{ r.type | titlecase }}</td>
-            <td>{{ r.duration }} min</td>
-            <td>{{ r.distance }} m</td>
-            <td>{{ r.intensity }}</td>
-            <td>{{ r.attendance | titlecase }}</td>
-            <td>{{ r.feedback | titlecase }}</td>
+          <tr *ngFor="let s of rankingEntries; let i = index">
+            <td>
+              <strong [ngStyle]="{'color': i === 0 ? '#ffd700' : (i === 1 ? '#c0c0c0' : (i === 2 ? '#cd7f32' : 'inherit'))}">
+                #{{ i + 1 }} {{ i === 0 ? '🏆' : '' }}
+              </strong>
+            </td>
+            <td><strong>{{ s.nageur?.utilisateur?.prenom }} {{ s.nageur?.utilisateur?.nom || 'Nageur' }}</strong></td>
+            <td>{{ s.globalScore != null ? s.globalScore.toFixed(2) : '—' }}</td>
+            <td>{{ s.avgScore != null ? s.avgScore.toFixed(2) : '—' }}</td>
+            <td>{{ s.bestRank || '—' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section class="glass-card ai-card">
-    <div class="ai-head">
-      <h2>Zone IDSS</h2>
-      <p>Placeholders pour insights IA a venir.</p>
-    </div>
-    <div class="ai-grid">
-      <div class="ai-tile">
-        <span>Fatigue</span>
-        <strong>Placeholder</strong>
-      </div>
-      <div class="ai-tile">
-        <span>Prediction</span>
-        <strong>Placeholder</strong>
-      </div>
-      <div class="ai-tile">
-        <span>Recommandations</span>
-        <strong>Placeholder</strong>
-      </div>
-      <div class="ai-tile">
-        <span>Explications</span>
-        <strong>Placeholder</strong>
-      </div>
+    <div *ngIf="!aiLoading && !aiError && !rankingEntries.length" class="ai-state">
+      Aucun classement disponible.
     </div>
   </section>
 </div>

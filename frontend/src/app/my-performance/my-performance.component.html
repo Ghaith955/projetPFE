@@ -51,24 +51,34 @@
   <section class="glass-card ai-card">
     <div class="ai-head">
       <h2>Zone IDSS</h2>
-      <p>Placeholders pour les insights IA a venir.</p>
+      <p>Insights IA personnalises en temps reel.</p>
     </div>
-    <div class="ai-grid">
+    <div *ngIf="aiLoading" class="ai-state">Chargement du moteur IA...</div>
+    <div *ngIf="!aiLoading && aiError" class="ai-state error">{{ aiError }}</div>
+
+    <div class="ai-grid" *ngIf="!aiLoading && !aiError">
       <div class="ai-tile">
         <span>Fatigue</span>
-        <strong>Placeholder</strong>
+        <strong>{{ aiFatigue?.fatigue_score || 0 }}%</strong>
+        <small>Niveau: {{ aiFatigue?.fatigue_level || 'N/A' }}</small>
+        <small>ACWR: {{ aiFatigue?.acwr || 'N/A' }}</small>
       </div>
       <div class="ai-tile">
         <span>Prediction</span>
-        <strong>Placeholder</strong>
+        <strong *ngIf="aiPrediction">{{ aiPrediction?.predicted_time | number:'1.2-2' }} s</strong>
+        <strong *ngIf="!aiPrediction">N/A</strong>
+        <small *ngIf="aiPrediction">Confiance: {{ aiPrediction?.confidence || 'N/A' }}</small>
+        <small *ngIf="!aiPrediction">Donnees insuffisantes</small>
       </div>
       <div class="ai-tile">
         <span>Recommandations</span>
-        <strong>Placeholder</strong>
+        <strong>{{ aiFatigue?.athlete_advice || 'Conseils en cours de generation.' }}</strong>
+        <small *ngIf="aiExplainFatigue?.data_quality">Qualite: {{ aiExplainFatigue?.data_quality }}</small>
       </div>
       <div class="ai-tile">
         <span>Explications</span>
-        <strong>Placeholder</strong>
+        <strong>{{ aiExplainFatigue?.summary || aiExplainPrediction?.summary || 'N/A' }}</strong>
+        <small *ngIf="aiExplainPrediction?.method">Modele: {{ aiExplainPrediction?.method }}</small>
       </div>
     </div>
   </section>

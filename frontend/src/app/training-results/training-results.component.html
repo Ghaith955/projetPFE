@@ -181,24 +181,32 @@
   <section class="glass-card ai-card">
     <div class="ai-head">
       <h2>Zone IDSS</h2>
-      <p>Reservee aux insights IA (a venir).</p>
+      <p>Insights IA equipes en temps reel.</p>
     </div>
-    <div class="ai-grid">
+    <div *ngIf="aiLoading" class="ai-state">Chargement du moteur IA...</div>
+    <div *ngIf="!aiLoading && aiError" class="ai-state error">{{ aiError }}</div>
+
+    <div class="ai-grid" *ngIf="!aiLoading && !aiError">
       <div class="ai-tile">
         <span>Fatigue</span>
-        <strong>Placeholder</strong>
+        <strong>{{ aiFatigueSummary?.atRisk || 0 }} / {{ aiFatigueSummary?.total || 0 }}</strong>
+        <small>ACWR moyen: {{ aiFatigueSummary?.avgAcwr || 0 }}</small>
       </div>
       <div class="ai-tile">
         <span>Prediction</span>
-        <strong>Placeholder</strong>
+        <strong *ngIf="aiPrediction">{{ aiPrediction?.predicted_time | number:'1.2-2' }} s</strong>
+        <strong *ngIf="!aiPrediction">N/A</strong>
+        <small *ngIf="aiPrediction">Confiance: {{ aiPrediction?.confidence || 'N/A' }}</small>
       </div>
       <div class="ai-tile">
         <span>Recommandations</span>
-        <strong>Placeholder</strong>
+        <strong *ngIf="aiRecommendation?.ranked_swimmers?.length">{{ aiRecommendation.ranked_swimmers[0]?.name || 'N/A' }}</strong>
+        <small *ngIf="aiRecommendation?.ranked_swimmers?.length > 1">#2 {{ aiRecommendation.ranked_swimmers[1]?.name || 'N/A' }}</small>
       </div>
       <div class="ai-tile">
         <span>Explications</span>
-        <strong>Placeholder</strong>
+        <strong>{{ aiExplanation?.summary || 'N/A' }}</strong>
+        <small *ngIf="aiExplanation?.method">Methode: {{ aiExplanation?.method }}</small>
       </div>
     </div>
   </section>

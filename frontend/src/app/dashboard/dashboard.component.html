@@ -1,3 +1,21 @@
+    <!-- RANKINGS -->
+    <section class="card" *ngIf="rankingWeekly">
+      <div class="card-top"><h3 class="card-h">Classement Hebdomadaire</h3></div>
+      <div class="profile-mini-grid ranking-grid">
+        <div class="profile-mini-card ranking-card" *ngFor="let e of rankingWeekly.entries.slice(0,3); let i = index">
+          <div class="profile-mini-body">
+            <span class="profile-mini-name">{{ e.user?.prenom }} {{ e.user?.nom }}</span>
+            <span class="profile-mini-sub">Score: {{ e.globalScore != null ? e.globalScore.toFixed(2) : '—' }} | Rang: {{ e.rank }}</span>
+            <span class="profile-mini-badge" [ngClass]="{'gold': i===0, 'silver': i===1, 'bronze': i===2}">
+              <svg *ngIf="i===0" width="18" height="18" viewBox="0 0 24 24" fill="#FFD700"><circle cx="12" cy="12" r="10"/></svg>
+              <svg *ngIf="i===1" width="18" height="18" viewBox="0 0 24 24" fill="#C0C0C0"><circle cx="12" cy="12" r="10"/></svg>
+              <svg *ngIf="i===2" width="18" height="18" viewBox="0 0 24 24" fill="#CD7F32"><circle cx="12" cy="12" r="10"/></svg>
+              {{ i===0 ? 'MVP' : (i===1 ? '2ème' : '3ème') }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
 <!-- ╔══════════════════════════════════════════════════════════════╗
      ║                    ADMIN DASHBOARD                           ║
      ╚══════════════════════════════════════════════════════════════╝ -->
@@ -15,38 +33,148 @@
     <!-- Welcome -->
     <section class="welcome-block">
       <div class="welcome-ava admin-ava">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <img *ngIf="currentUser?.imageprofile" [src]="'http://localhost:3300'+currentUser?.imageprofile" class="welcome-ava-img"/>
+        <span *ngIf="!currentUser?.imageprofile">{{ (currentUser?.prenom?.[0]||'')+(currentUser?.nom?.[0]||'')|uppercase }}</span>
       </div>
       <div><h2 class="welcome-h">{{ 'dashboard.admin.welcomeTitle' | translate }}</h2><p class="welcome-p">{{ 'dashboard.admin.welcomeSubtitle' | translate }}</p></div>
     </section>
 
-    <!-- Stats Row -->
-    <section class="stats-row">
-      <div class="stat-card">
-        <div class="stat-ico teal"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><path d="M5 17c2-1 4-2 7-2s5 1 7 2"/></svg></div>
-        <div class="stat-data"><span class="stat-num">{{ stats.nageurs || 0 }}</span><span class="stat-lbl">{{ 'dashboard.admin.stats.swimmers' | translate }}</span><span class="stat-sub">{{ 'dashboard.admin.stats.swimmersSub' | translate: { count: (stats.nageurs || 0) } }}</span></div>
+    <!-- Overall Performance -->
+    <section class="card overall-perf-card">
+      <div class="card-top">
+        <h3 class="card-h">{{ 'dashboard.admin.globalPerformance' | translate }}</h3>
+        <div class="op-status-dot" [class.online]="aiBrainOnline">
+          <span class="op-dot"></span>
+          <span class="op-status-txt">{{ aiBrainOnline ? ('dashboard.admin.op.aiOnline' | translate) : ('dashboard.admin.op.aiOffline' | translate) }}</span>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-ico amber"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-        <div class="stat-data"><span class="stat-num">{{ stats.entrainements || 0 }}</span><span class="stat-lbl">{{ 'dashboard.admin.stats.trainings' | translate }}</span><span class="stat-sub">{{ 'dashboard.admin.stats.trainingsSub' | translate }}</span></div>
+
+      <!-- Active Members Breakdown -->
+      <div class="op-members-grid">
+        <!-- Swimmers -->
+        <div class="op-member-block">
+          <div class="op-member-icon swimmers-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M5 20c2-1 4-2 7-2s5 1 7 2"/><path d="M5 17c2-1 4-2 7-2s5 1 7 2"/></svg>
+          </div>
+          <div class="op-member-data">
+            <span class="op-member-count">{{ nageurs.length }}</span>
+            <span class="op-member-label">{{ 'dashboard.admin.op.activeSwimmers' | translate }}</span>
+          </div>
+          <div class="op-member-bar">
+            <div class="op-bar-track"><div class="op-bar-fill swimmers-fill" [style.width.%]="nageurs.length > 0 ? 100 : 0"></div></div>
+          </div>
+        </div>
+
+        <!-- Coaches -->
+        <div class="op-member-block">
+          <div class="op-member-icon coaches-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="op-member-data">
+            <span class="op-member-count">{{ entraineurs.length }}</span>
+            <span class="op-member-label">{{ 'dashboard.admin.op.activeCoaches' | translate }}</span>
+          </div>
+          <div class="op-member-bar">
+            <div class="op-bar-track"><div class="op-bar-fill coaches-fill" [style.width.%]="entraineurs.length > 0 ? 100 : 0"></div></div>
+          </div>
+        </div>
+
+        <!-- Total Users -->
+        <div class="op-member-block">
+          <div class="op-member-icon users-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="op-member-data">
+            <span class="op-member-count">{{ stats.users || 0 }}</span>
+            <span class="op-member-label">{{ 'dashboard.admin.op.totalUsers' | translate }}</span>
+          </div>
+          <div class="op-member-bar">
+            <div class="op-bar-track"><div class="op-bar-fill users-fill" [style.width.%]="stats.users > 0 ? 100 : 0"></div></div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-ico blue-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
-        <div class="stat-data"><span class="stat-num">{{ stats.competitions || 0 }}</span><span class="stat-lbl">{{ 'dashboard.admin.stats.competitions' | translate }}</span><span class="stat-sub">{{ 'dashboard.admin.stats.competitionsSub' | translate }}</span></div>
+
+      <!-- Activity Metrics -->
+      <div class="op-activity-row">
+        <div class="op-metric">
+          <div class="op-metric-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="op-metric-val">{{ stats.entrainements || 0 }}</span>
+          </div>
+          <span class="op-metric-lbl">{{ 'dashboard.admin.op.trainings' | translate }}</span>
+        </div>
+        <div class="op-metric-divider"></div>
+        <div class="op-metric">
+          <div class="op-metric-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            <span class="op-metric-val">{{ stats.competitions || 0 }}</span>
+          </div>
+          <span class="op-metric-lbl">{{ 'dashboard.admin.op.competitions' | translate }}</span>
+        </div>
+        <div class="op-metric-divider"></div>
+        <div class="op-metric">
+          <div class="op-metric-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span class="op-metric-val">{{ stats.cotisations || 0 }}</span>
+          </div>
+          <span class="op-metric-lbl">{{ 'dashboard.admin.op.cotisations' | translate }}</span>
+        </div>
+        <div class="op-metric-divider"></div>
+        <div class="op-metric">
+          <div class="op-metric-top">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span class="op-metric-val">{{ pendingDemandes }}</span>
+          </div>
+          <span class="op-metric-lbl">{{ 'dashboard.admin.op.pending' | translate }}</span>
+        </div>
+      </div>
+
+      <!-- Coach-to-Swimmer Ratio & AI Stats -->
+      <div class="op-ratio-row">
+        <div class="op-ratio-card">
+          <span class="op-ratio-label">{{ 'dashboard.admin.op.teamStatus' | translate }}</span>
+          <span class="op-ratio-value" [ngClass]="'status-' + teamStatusClass">
+            {{ teamStatusLabel }}
+          </span>
+        </div>
+        <div class="op-ratio-card">
+          <span class="op-ratio-label">{{ 'dashboard.admin.op.aiMonitored' | translate }}</span>
+          <span class="op-ratio-value ai-value">{{ stats?.aiMonitored || 0 }}</span>
+        </div>
+        <div class="op-ratio-card">
+          <span class="op-ratio-label">{{ 'dashboard.admin.op.atRisk' | translate }}</span>
+          <span class="op-ratio-value" [class.risk-high]="(stats?.atRiskCount || 0) > 0">{{ stats?.atRiskCount || 0 }}</span>
+        </div>
+        <div class="op-ratio-card">
+          <span class="op-ratio-label">{{ 'dashboard.admin.op.avgAcwr' | translate }}</span>
+          <span class="op-ratio-value" [style.color]="getAcwrStatus(stats?.avgAcwr || 0).color">{{ stats?.avgAcwr || '—' }}</span>
+        </div>
       </div>
     </section>
 
-    <!-- Chart -->
-    <section class="card chart-card">
-      <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.globalPerformance' | translate }}</h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M4 19h16"/><path d="M6 16V8"/><path d="M12 16V4"/><path d="M18 16V12"/></svg></div>
-      <div class="bar-chart">
-        <div class="bar-y"><span>90%</span><span>60%</span><span>30%</span></div>
-        <div class="bar-group" *ngFor="let m of chartMonths; let i = index">
-          <div class="bars"><div class="bar b-att" [style.height.%]="chartAtt[i]"></div><div class="bar b-perf" [style.height.%]="chartPerf[i]"></div></div>
-          <span class="bar-lbl">{{ m | translate }}</span>
+    <!-- AI Evaluation Summary -->
+    <section class="card" *ngIf="aiEvaluationSummary">
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.eval.title' | translate }}</h3></div>
+      <div class="profile-mini-grid">
+        <div class="profile-mini-card">
+          <div class="profile-mini-body">
+            <span class="profile-mini-name">{{ 'dashboard.admin.eval.swimmersAnalyzed' | translate }}</span>
+            <span class="profile-mini-sub">{{ aiEvaluationSummary.swimmer_count || 0 }}</span>
+          </div>
+        </div>
+        <div class="profile-mini-card">
+          <div class="profile-mini-body">
+            <span class="profile-mini-name">{{ 'dashboard.admin.eval.decisionsLogged' | translate }}</span>
+            <span class="profile-mini-sub">{{ aiEvaluationSummary.decisions_logged?.fatigue || 0 }} fatigue · {{ aiEvaluationSummary.decisions_logged?.prediction || 0 }} prediction · {{ aiEvaluationSummary.decisions_logged?.plan || 0 }} plan</span>
+          </div>
+        </div>
+        <div class="profile-mini-card">
+          <div class="profile-mini-body">
+            <span class="profile-mini-name">{{ 'dashboard.admin.eval.errors' | translate }}</span>
+            <span class="profile-mini-sub">{{ aiEvaluationSummary.errors || 0 }}</span>
+          </div>
         </div>
       </div>
-      <div class="chart-leg"><span class="leg-i"><span class="leg-d att"></span> {{ 'dashboard.swimmer.legendAttendance' | translate }}</span><span class="leg-i"><span class="leg-d perf"></span> {{ 'dashboard.swimmer.legendPerformance' | translate }}</span></div>
     </section>
 
     <!-- Demandes de Comptes -->
@@ -59,7 +187,7 @@
           <div class="profile-mini-media">
             <img *ngIf="avatarUrl(u)" [src]="avatarUrl(u)" class="profile-mini-photo" />
             <div *ngIf="!avatarUrl(u)" class="profile-mini-photo profile-mini-fallback">{{ getInitials(u) }}</div>
-            <span class="profile-mini-tag">En attente</span>
+            <span class="profile-mini-tag">{{ 'dashboard.admin.pendingTag' | translate }}</span>
           </div>
           <div class="profile-mini-body">
             <span class="profile-mini-name">{{ u.prenom }} {{ u.nom }}</span>
@@ -85,14 +213,14 @@
           <div class="profile-mini-media">
             <img *ngIf="avatarUrl(n)" [src]="avatarUrl(n)" class="profile-mini-photo" />
             <div *ngIf="!avatarUrl(n)" class="profile-mini-photo profile-mini-fallback">{{ getInitials(n) }}</div>
-            <span class="profile-mini-tag">Nageur</span>
+            <span class="profile-mini-tag">{{ 'dashboard.admin.swimmerTag' | translate }}</span>
           </div>
           <div class="profile-mini-body">
             <span class="profile-mini-name">{{ fullName(n) }}</span>
             <span class="profile-mini-sub">{{ 'dashboard.admin.levelEstimate' | translate }}</span>
             <div class="profile-mini-meta">
               <span class="profile-mini-pill">{{ n.poid || '57.5' }}s</span>
-              <span class="profile-mini-pill red">0%</span>
+              <span class="profile-mini-pill" [ngClass]="getAiEstimateClass(getAiEstimatePercent(n))">{{ getAiEstimateLabel(n) }}</span>
             </div>
           </div>
         </article>
@@ -101,7 +229,7 @@
 
     <!-- Entraineurs -->
     <section class="card">
-      <div class="card-top"><h3 class="card-h">Entraîneurs</h3></div>
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.admin.coaches' | translate }}</h3></div>
       <div class="profile-mini-grid">
         <article class="profile-mini-card selectable" *ngFor="let e of entraineurs.slice(0,3)"
                  [class.selected]="selectedProfile?.source?._id === e._id"
@@ -109,7 +237,7 @@
           <div class="profile-mini-media">
             <img *ngIf="avatarUrl(e)" [src]="avatarUrl(e)" class="profile-mini-photo" />
             <div *ngIf="!avatarUrl(e)" class="profile-mini-photo profile-mini-fallback">{{ getInitials(e) }}</div>
-            <span class="profile-mini-tag">Coach</span>
+            <span class="profile-mini-tag">{{ 'dashboard.admin.coachTag' | translate }}</span>
           </div>
           <div class="profile-mini-body">
             <span class="profile-mini-name">{{ fullName(e) }}</span>
@@ -119,72 +247,152 @@
             </div>
           </div>
         </article>
-        <div class="empty-msg" *ngIf="entraineurs.length===0">Aucun entraîneur trouvé</div>
+        <div class="empty-msg" *ngIf="entraineurs.length===0">{{ 'dashboard.admin.noCoachFound' | translate }}</div>
       </div>
     </section>
 
   </div>
 
-  <aside class="dss">
-    <div class="dss-head"><span class="dss-t">AI Brain — Analyse Intelligente</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
-
-    <div *ngIf="aiBrainLoading" class="dss-sec" style="text-align:center; padding:30px 0;">
-      <span style="color:var(--dss-muted); font-size:13px;">Connexion au moteur d'IA...</span>
+  <aside class="dss strategic-center">
+    <div class="dss-head strategic-head">
+      <div>
+        <span class="dss-t">{{ 'dashboard.admin.ai.strategicCenter' | translate }}</span>
+        <span class="strategic-sub">{{ 'dashboard.admin.ai.strategicSub' | translate }}</span>
+      </div>
+      <button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
     </div>
 
-    <ng-container *ngIf="!aiBrainLoading && aiBrainOnline">
-      <!-- AI Global Status -->
-      <div class="dss-sec">
-        <div class="dss-st warn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Surveillance AI (ML)</div>
-        <p class="dss-sub">{{ aiBrainStats.atRisk }} nageur(s) nécessitant une attention · {{ aiBrainStats.total }} analysé(s)</p>
-        <div class="idss-stats-grid">
-          <div class="idss-stat">
-            <span class="is-val">{{ aiBrainStats.avgAcwr }}</span>
-            <span class="is-lbl">ACWR Moyen Club</span>
+    <div class="strategic-focus">
+      <span class="focus-pill">{{ 'dashboard.admin.ai.globalClubIntelligence' | translate }}</span>
+      <span class="focus-pill">{{ 'dashboard.admin.ai.strategicDecisions' | translate }}</span>
+      <span class="focus-pill">{{ 'dashboard.admin.ai.coachAnalyticsTag' | translate }}</span>
+      <span class="focus-pill">{{ 'dashboard.admin.ai.overallMonitoring' | translate }}</span>
+      <span class="focus-pill">{{ 'dashboard.admin.ai.operationalOptimization' | translate }}</span>
+      <span class="focus-pill">{{ 'dashboard.admin.ai.riskManagement' | translate }}</span>
+    </div>
+
+    <!-- Smart Alerts System -->
+    <div class="dss-sec">
+      <div class="dss-st muted-t">{{ 'dashboard.admin.ai.smartAlerts' | translate }}</div>
+      <div class="strategic-alert" *ngFor="let alert of adminAlerts" [attr.data-sev]="alert.severity">
+        <div class="alert-ico">
+          <svg *ngIf="alert.icon==='calendar'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg *ngIf="alert.icon==='pulse'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h5l2-4 3 8 3-6 2 2h5"/></svg>
+          <svg *ngIf="alert.icon==='shield'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/></svg>
+          <svg *ngIf="alert.icon==='users'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg *ngIf="alert.icon==='trend'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="19" cy="8" r="1"/></svg>
+          <svg *ngIf="alert.icon==='trophy'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        </div>
+        <div class="alert-info">
+          <div class="alert-row">
+            <span class="alert-title">{{ alert.title }}</span>
+            <span class="alert-time">{{ alert.timestamp }}</span>
           </div>
-          <div class="idss-stat">
-            <span class="is-val" [style.color]="aiBrainStats.highFatigue > 0 ? '#ef4444' : '#22c55e'">{{ aiBrainStats.highFatigue }}</span>
-            <span class="is-lbl">Fatigue Sévere (>60%)</span>
+          <span class="alert-expl">{{ alert.explanation }}</span>
+        </div>
+        <span class="alert-sev" [attr.data-sev]="alert.severity">{{ alert.severity }}</span>
+      </div>
+    </div>
+
+    <!-- AI Recommendations Engine -->
+    <div class="dss-sec">
+      <div class="dss-st muted-t">{{ 'dashboard.admin.ai.recommendations' | translate }}</div>
+      <div class="recommend-card" *ngFor="let rec of adminRecommendations">
+        <div class="rec-head">
+          <span class="rec-title">{{ rec.title }}</span>
+          <span class="rec-confidence">{{ rec.confidence }}% confidence</span>
+        </div>
+        <p class="rec-desc">{{ rec.description }}</p>
+        <div class="rec-actions">
+          <button class="rec-btn ghost" (click)="openRecommendation(rec)">{{ rec.secondaryAction }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today AI Summary -->
+    <div class="dss-sec" *ngIf="adminSummary">
+      <div class="dss-st muted-t">{{ 'dashboard.admin.ai.todaySummary' | translate }}</div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="summary-label">{{ 'dashboard.admin.ai.attendanceEvolution' | translate }}</span>
+          <span class="summary-value">{{ adminSummary.attendance }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">{{ 'dashboard.admin.ai.bestGroup' | translate }}</span>
+          <span class="summary-value">{{ adminSummary.bestGroup }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">{{ 'dashboard.admin.ai.weakestProgression' | translate }}</span>
+          <span class="summary-value">{{ adminSummary.weakestProgression }}</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">{{ 'dashboard.admin.ai.fatigueIndicators' | translate }}</span>
+          <span class="summary-value">{{ adminSummary.fatigueIndicators }}</span>
+        </div>
+        <div class="summary-card readiness">
+          <span class="summary-label">{{ 'dashboard.admin.ai.globalReadiness' | translate }}</span>
+          <span class="summary-value">{{ adminSummary.readinessScore }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coach Analytics -->
+    <div class="dss-sec">
+      <div class="dss-st muted-t">{{ 'dashboard.admin.ai.coachAnalytics' | translate }}</div>
+      <div class="coach-analytics" *ngFor="let coach of adminCoachAnalytics">
+        <div class="coach-row">
+          <span class="coach-name">{{ coach.name }}</span>
+          <span class="coach-score">{{ 'dashboard.admin.ai.aiEfficiency' | translate }} {{ coach.efficiency }}%</span>
+        </div>
+        <div class="coach-metrics">
+          <div class="coach-metric">
+            <span>{{ 'dashboard.admin.ai.attendanceImpact' | translate }}</span>
+            <div class="metric-bar"><span [style.width.%]="coach.attendanceImpact"></span></div>
+          </div>
+          <div class="coach-metric">
+            <span>{{ 'dashboard.admin.ai.swimmerProgression' | translate }}</span>
+            <div class="metric-bar"><span [style.width.%]="coach.progression"></span></div>
+          </div>
+          <div class="coach-metric">
+            <span>{{ 'dashboard.admin.ai.trainingConsistency' | translate }}</span>
+            <div class="metric-bar"><span [style.width.%]="coach.consistency"></span></div>
+          </div>
+          <div class="coach-metric">
+            <span>{{ 'dashboard.admin.ai.workloadBalance' | translate }}</span>
+            <div class="metric-bar"><span [style.width.%]="coach.workloadBalance"></span></div>
           </div>
         </div>
       </div>
-
-      <!-- AI At-risk swimmers -->
-      <div class="dss-sec">
-        <div class="dss-st muted-t">| Risque de Blessure / Surmenage</div>
-        <div class="dss-fat" *ngFor="let s of aiBrainAtRisk">
-          <div class="fat-bar" [class]="'sv-' + (s.fatigue_level === 'CRITICAL' ? 'critical' : 'high')"></div>
-          <div class="ava xs"><span>{{ s.name?.[0] || 'N' }}</span></div>
-          <div class="pk-info">
-            <span class="pk-n">{{ s.name }}</span>
-            <span class="pk-d" [style.color]="getAcwrStatus(s.acwr).color">{{ getAcwrStatus(s.acwr).icon }} ACWR: {{ s.acwr || 'N/A' }}</span>
-          </div>
-          <div class="fat-actions">
-            <span class="idss-score-pill" [style.background]="s.fatigue_level==='CRITICAL'?'rgba(239,68,68,0.15)':'rgba(245,158,11,0.15)'" [style.color]="s.fatigue_level==='CRITICAL'?'#ef4444':'#f59e0b'">{{ s.fatigue_score }}%</span>
-          </div>
-        </div>
-        <div class="empty-msg" *ngIf="!aiBrainAtRisk.length">✅ Moteur IA: Aucune anomalie détectée</div>
-      </div>
-
-      <!-- Explainable AI -->
-      <div class="dss-sec dss-exp">
-        <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> AI Brain (v2.0)</div>
-        <p class="dss-exp-txt">Prédictions basées sur Machine Learning. Analyse la charge aigue vs chronique (ACWR) et l'historique RPE pour calculer le risque biomécanique exact.</p>
-      </div>
-    </ng-container>
-
-    <!-- Fallback to IDSS rule engine if AI is offline -->
-    <ng-container *ngIf="!aiBrainLoading && !aiBrainOnline">
-      <div class="dss-sec">
-        <div class="dss-st warn">Alertes Actives (Règles)</div>
-        <p class="dss-sub">{{ idssPendingAlerts }} alerte(s) non acquittée(s)</p>
-        <div class="dss-alert" *ngFor="let a of dssAlerts">
-          <div class="al-info"><span class="al-name">{{ a.name }}</span><span class="al-det">{{ a.message }}</span></div>
-        </div>
-        <div class="empty-msg" *ngIf="!dssAlerts.length">✅ Aucun nageur à risque</div>
-      </div>
-    </ng-container>
+      <div class="empty-msg" *ngIf="!adminCoachAnalytics.length">{{ 'dashboard.admin.ai.noCoachAnalytics' | translate }}</div>
+    </div>
   </aside>
+</div>
+
+<!-- Recommendation Detail Modal -->
+<div class="rec-modal" *ngIf="showRecommendationModal">
+  <div class="rec-modal-backdrop" (click)="closeRecommendation()"></div>
+  <div class="rec-modal-card">
+    <div class="rec-modal-head">
+      <div>
+        <h3 class="rec-modal-title">{{ selectedRecommendation?.title }}</h3>
+        <span class="rec-modal-sub">Confidence: {{ selectedRecommendation?.confidence }}%</span>
+      </div>
+      <button class="rec-modal-close" (click)="closeRecommendation()">✕</button>
+    </div>
+    <div class="rec-modal-body">
+      <div class="rec-modal-section">
+        <span class="rec-modal-label">{{ 'dashboard.admin.ai.recommendation' | translate }}</span>
+        <p class="rec-modal-text">{{ selectedRecommendation?.description }}</p>
+      </div>
+      <div class="rec-modal-section">
+        <span class="rec-modal-label">{{ 'dashboard.admin.ai.aiExplanation' | translate }}</span>
+        <p class="rec-modal-text">{{ selectedRecommendation?.explanation }}</p>
+      </div>
+    </div>
+    <div class="rec-modal-actions">
+      <button class="rec-btn ghost" (click)="closeRecommendation()">{{ 'dashboard.common.close' | translate }}</button>
+    </div>
+  </div>
 </div>
 
 
@@ -264,32 +472,37 @@
 
   <!-- ── COACH DSS PANEL (AI BRAIN) ── -->
   <aside class="dss">
-    <div class="dss-head"><span class="dss-t">AI Brain — Tableau de Bord Coach</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+    <div class="dss-head"><span class="dss-t">{{ 'dashboard.coach.ai.brainTitle' | translate }}</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
 
     <div *ngIf="aiBrainLoading" class="dss-sec" style="text-align:center; padding:30px 0;">
-      <span style="color:var(--dss-muted); font-size:13px;">Analyse ML en cours...</span>
+      <span style="color:var(--dss-muted); font-size:13px;">{{ 'dashboard.coach.ai.mlLoading' | translate }}</span>
     </div>
 
-    <ng-container *ngIf="!aiBrainLoading && aiBrainOnline">
+    <div class="dss-sec" *ngIf="!aiBrainLoading && !aiBrainSwimmers.length">
+      <div class="dss-st muted-t">| {{ 'dashboard.coach.ai.noSwimmer' | translate }}</div>
+      <p class="dss-sub">{{ 'dashboard.coach.ai.noSwimmerSub' | translate }}</p>
+    </div>
+
+    <ng-container *ngIf="!aiBrainLoading && aiBrainOnline && aiBrainSwimmers.length">
       <!-- AI Global Status -->
       <div class="dss-sec">
-        <div class="dss-st warn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Surveillance AI</div>
-        <p class="dss-sub">{{ aiBrainStats.atRisk }} nageur(s) en danger sur {{ aiBrainStats.total }} analysés</p>
+        <div class="dss-st warn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> {{ 'dashboard.coach.ai.aiSurveillance' | translate }}</div>
+        <p class="dss-sub">{{ 'dashboard.coach.ai.atRiskMsg' | translate: { atRisk: aiBrainStats.atRisk, total: aiBrainStats.total } }}</p>
         <div class="idss-stats-grid">
           <div class="idss-stat">
             <span class="is-val">{{ aiBrainStats.avgAcwr }}</span>
-            <span class="is-lbl">ACWR Global</span>
+            <span class="is-lbl">{{ 'dashboard.coach.ai.acwrGlobal' | translate }}</span>
           </div>
           <div class="idss-stat">
             <span class="is-val" [style.color]="aiBrainStats.highFatigue > 0 ? '#ef4444' : '#22c55e'">{{ aiBrainStats.highFatigue }}</span>
-            <span class="is-lbl">Fatigue > 60%</span>
+            <span class="is-lbl">{{ 'dashboard.coach.ai.fatigueAbove60' | translate }}</span>
           </div>
         </div>
       </div>
 
       <!-- AI At-risk swimmers -->
       <div class="dss-sec">
-        <div class="dss-st muted-t">| Risque de Surmenage</div>
+        <div class="dss-st muted-t">| {{ 'dashboard.coach.ai.overtrainingRisk' | translate }}</div>
         <div class="dss-fat" *ngFor="let s of aiBrainAtRisk">
           <div class="fat-bar" [class]="'sv-' + (s.fatigue_level === 'CRITICAL' ? 'critical' : 'high')"></div>
           <div class="ava xs"><span>{{ s.name?.[0] || 'N' }}</span></div>
@@ -299,36 +512,78 @@
           </div>
           <div class="fat-actions">
             <span class="idss-score-pill" [style.background]="s.fatigue_level==='CRITICAL'?'rgba(239,68,68,0.15)':'rgba(245,158,11,0.15)'" [style.color]="s.fatigue_level==='CRITICAL'?'#ef4444':'#f59e0b'">{{ s.fatigue_score }}%</span>
-            <button class="ack-btn" title="Simuler l'impact">🧪</button>
+            <button class="ack-btn" [title]="'dashboard.coach.ai.simulateImpact' | translate">🧪</button>
           </div>
         </div>
-        <div class="empty-msg" *ngIf="!aiBrainAtRisk.length">✅ Moteur IA: Aucune anomalie détectée</div>
+        <div class="empty-msg" *ngIf="!aiBrainAtRisk.length">{{ 'dashboard.coach.ai.noAnomaly' | translate }}</div>
       </div>
 
-      <!-- AI Healthy swimmers overview -->
+      <!-- Urgent Recommendation (priority) -->
+      <div class="dss-sec" *ngIf="aiUrgentSwimmer">
+        <div class="dss-st warn">{{ 'dashboard.coach.ai.urgentPriority' | translate }}</div>
+        <div class="dss-alert" data-sev="1">
+          <div class="al-info">
+            <span class="al-name">{{ aiUrgentSwimmer.name }}</span>
+            <span class="al-det">Niveau: {{ aiUrgentSwimmer.fatigue_level }} · Score {{ aiUrgentSwimmer.fatigue_score }}%</span>
+            <span class="al-det">ACWR: {{ aiUrgentSwimmer.acwr || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coach AI Analysis by swimmer -->
       <div class="dss-sec">
-        <div class="dss-st muted-t">| Top Forme (Optimaux)</div>
-        <div class="dss-fat" *ngFor="let s of aiBrainHealthy.slice(0,3)">
-          <div class="fat-bar sv-low" style="background:#22c55e"></div>
+        <div class="dss-st muted-t">| {{ 'dashboard.coach.ai.analysisBySwimmer' | translate }}</div>
+        <select class="per-sel" [(ngModel)]="aiCoachSelectedId" (change)="onCoachSwimmerChange(aiCoachSelectedId)">
+          <option value="" disabled>{{ 'dashboard.coach.ai.selectSwimmer' | translate }}</option>
+          <option *ngFor="let n of nageurs" [value]="n._id">{{ fullName(n) }}</option>
+        </select>
+        <div *ngIf="!aiCoachLoading && !aiCoachError && !nageurs.length" class="dss-det">
+          {{ 'dashboard.coach.ai.noSwimmerToAnalyze' | translate }}
+        </div>
+        <div *ngIf="aiCoachLoading" class="dss-det">{{ 'dashboard.coach.ai.aiAnalysisLoading' | translate }}</div>
+        <div *ngIf="!aiCoachLoading && aiCoachError" class="dss-det">{{ aiCoachError }}</div>
+
+        <ng-container *ngIf="!aiCoachLoading && !aiCoachError && aiCoachFatigue">
+          <div class="dss-alert" [attr.data-sev]="aiCoachFatigue.fatigue_level==='CRITICAL' ? 1 : (aiCoachFatigue.fatigue_level==='HIGH' ? 2 : 3)">
+            <div class="al-info">
+              <span class="al-name">{{ aiCoachFatigue.name }}</span>
+              <span class="al-det">Fatigue: {{ aiCoachFatigue.fatigue_level }} · {{ aiCoachFatigue.fatigue_score }}%</span>
+              <span class="al-det">ACWR: {{ aiCoachFatigue.acwr || 'N/A' }} · Seances 7j: {{ aiCoachFatigue.sessions_last7d || 0 }}</span>
+            </div>
+          </div>
+          <div class="dss-exp" style="padding-top:8px;">
+            <div class="dss-st muted-t">{{ 'dashboard.coach.ai.recommendationLabel' | translate }}</div>
+            <p class="dss-exp-txt">{{ aiCoachPlan?.explanation || aiCoachFatigue.recommendation }}</p>
+            <p class="dss-exp-txt" *ngIf="aiCoachPlan?.warnings?.length">Alertes: {{ aiCoachPlan.warnings.join(' | ') }}</p>
+            <div class="dss-st muted-t" style="margin-top:8px;">{{ 'dashboard.coach.ai.explanationLabel' | translate }}</div>
+            <p class="dss-exp-txt">{{ aiCoachExplain?.summary || aiCoachFatigue.explanation }}</p>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- AI MVP Ranking (Coach Panel) -->
+      <div class="dss-sec" *ngIf="aiMvpWeekly?.top3?.length">
+        <div class="dss-st muted-t">| {{ 'dashboard.coach.ai.mvpWeekly' | translate }}</div>
+        <div class="dss-fat" *ngFor="let s of aiMvpWeekly.top3; let i = index">
+          <div class="fat-bar" [class]="'sv-' + (i === 0 ? 'critical' : (i === 1 ? 'high' : 'medium'))"></div>
           <div class="ava xs"><span>{{ s.name?.[0] || 'N' }}</span></div>
           <div class="pk-info">
             <span class="pk-n">{{ s.name }}</span>
-            <span class="pk-d" style="color:#22c55e">✓ ACWR Optimal ({{ s.acwr }})</span>
+            <span class="pk-d">Score: {{ (s.global_score * 100).toFixed(1) }}%</span>
+          </div>
+          <div class="fat-actions">
+            <span class="idss-score-pill" [style.background]="i===0?'rgba(255,215,0,0.15)':(i===1?'rgba(192,192,192,0.15)':'rgba(205,127,50,0.15)')" [style.color]="i===0?'#FFD700':(i===1?'#C0C0C0':'#CD7F32')">
+              {{ i === 0 ? '🥇 MVP' : (i === 1 ? '🥈 2ème' : '🥉 3ème') }}
+            </span>
           </div>
         </div>
-        <div class="empty-msg" *ngIf="!aiBrainHealthy.length">Aucun nageur dans la zone optimale.</div>
-      </div>
-
-      <div class="dss-sec dss-exp">
-        <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> AI Brain Actif</div>
-        <p class="dss-exp-txt">Prédictions basées sur l'algorithme Random Forest. Modèle prédictif de prévention de blessure (précision ~85%).</p>
       </div>
     </ng-container>
 
     <!-- Fallback to IDSS rule engine if AI is offline -->
-    <ng-container *ngIf="!aiBrainLoading && !aiBrainOnline">
+    <ng-container *ngIf="!aiBrainLoading && !aiBrainOnline && aiBrainSwimmers.length">
       <div class="dss-sec">
-        <div class="dss-st warn">Alertes Classique</div>
+        <div class="dss-st warn">{{ 'dashboard.coach.ai.classicAlerts' | translate }}</div>
         <p class="dss-sub">{{ idssPendingAlerts }} non acquittée(s)</p>
         <div class="dss-alert" *ngFor="let a of dssAlerts">
           <div class="al-info"><span class="al-name">{{ a.name }}</span><span class="al-det">{{ a.message }}</span></div>
@@ -377,16 +632,22 @@
 
     <!-- Performance Chart -->
     <section class="card chart-card">
-      <div class="card-top"><h3 class="card-h">{{ 'dashboard.swimmer.performanceAttendance' | translate }}</h3><select class="per-sel" [(ngModel)]="selectedPeriod"><option value="trimestre">{{ 'dashboard.swimmer.periodQuarter' | translate }}</option><option value="semestre">{{ 'dashboard.swimmer.periodSemester' | translate }}</option><option value="annee">{{ 'dashboard.swimmer.periodYear' | translate }}</option></select></div>
+      <div class="card-top"><h3 class="card-h">{{ 'dashboard.swimmer.performanceAttendance' | translate }}</h3><select class="per-sel" [(ngModel)]="selectedPeriod" (change)="loadSwimmerPerformanceTrends()"><option value="trimestre">{{ 'dashboard.swimmer.periodQuarter' | translate }}</option><option value="semestre">{{ 'dashboard.swimmer.periodSemester' | translate }}</option><option value="annee">{{ 'dashboard.swimmer.periodYear' | translate }}</option></select></div>
       <div class="svg-wrap">
         <svg class="svg-chart" viewBox="0 0 720 200" preserveAspectRatio="none">
           <defs><linearGradient id="gP" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(59,130,246,0.3)"/><stop offset="100%" stop-color="rgba(59,130,246,0)"/></linearGradient><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(245,158,11,0.25)"/><stop offset="100%" stop-color="rgba(245,158,11,0)"/></linearGradient></defs>
           <line x1="40" y1="40" x2="700" y2="40" stroke="#e5e7eb" stroke-width="0.5"/><line x1="40" y1="90" x2="700" y2="90" stroke="#e5e7eb" stroke-width="0.5"/><line x1="40" y1="140" x2="700" y2="140" stroke="#e5e7eb" stroke-width="0.5"/>
-          <polygon [attr.points]="'40,190 '+perfPts+' 700,190'" fill="url(#gP)"/><polyline [attr.points]="perfPts" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <polygon [attr.points]="'40,190 '+attPts+' 700,190'" fill="url(#gA)"/><polyline [attr.points]="attPts" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <ng-container *ngIf="perfPts">
+            <polygon [attr.points]="'40,190 '+perfPts+' 700,190'" fill="url(#gP)"/><polyline [attr.points]="perfPts" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </ng-container>
+          <ng-container *ngIf="attPts">
+            <polygon [attr.points]="'40,190 '+attPts+' 700,190'" fill="url(#gA)"/><polyline [attr.points]="attPts" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </ng-container>
           <text x="10" y="44" class="y-lbl">90%</text><text x="10" y="94" class="y-lbl">60%</text><text x="10" y="144" class="y-lbl">30%</text>
         </svg>
-        <div class="x-labels"><span>{{ 'months.jan' | translate }}</span><span>{{ 'months.feb' | translate }}</span><span>{{ 'months.mar' | translate }}</span><span>{{ 'months.apr' | translate }}</span><span>{{ 'months.may' | translate }}</span><span>{{ 'months.jun' | translate }}</span><span>{{ 'months.jul' | translate }}</span><span>{{ 'months.feb' | translate }}</span><span>{{ 'months.mar' | translate }}</span><span>{{ 'months.apr' | translate }}</span></div>
+        <div class="x-labels">
+          <span *ngFor="let lbl of chartLabels">{{ lbl }}</span>
+        </div>
       </div>
       <div class="chart-leg"><span class="leg-i"><span class="leg-d blue-d"></span> {{ 'dashboard.swimmer.legendPerformance' | translate }}</span><span class="leg-i"><span class="leg-d amber-d"></span> {{ 'dashboard.swimmer.legendAttendance' | translate }}</span></div>
       <div class="chart-dots"><span class="cdot on"></span><span class="cdot"></span><span class="cdot"></span></div>
@@ -419,16 +680,16 @@
 
   <!-- ── SWIMMER DSS PANEL (AI BRAIN) ── -->
   <aside class="dss sw-dss">
-    <div class="dss-head"><span class="dss-t">AI Brain — Mon Analyse</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+    <div class="dss-head"><span class="dss-t">{{ 'dashboard.swimmer.ai.brainTitle' | translate }}</span><button class="dss-menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
 
     <div *ngIf="aiMyLoading" class="dss-sec" style="text-align:center; padding:30px 0;">
-      <span style="color:var(--dss-muted); font-size:13px;">Inférence AI en cours...</span>
+      <span style="color:var(--dss-muted); font-size:13px;">{{ 'dashboard.swimmer.ai.inferenceLoading' | translate }}</span>
     </div>
 
     <ng-container *ngIf="!aiMyLoading && aiMyAnalysis">
       <!-- AI Fatigue Score -->
       <div class="dss-sec dss-fatigue-card">
-        <span class="dss-lbl">Score Fatigue (ML)</span>
+        <span class="dss-lbl">{{ 'dashboard.swimmer.ai.fatigueScore' | translate }}</span>
         <div class="fatigue-main">
           <div class="fatigue-left">
             <span class="fat-lvl"
@@ -437,7 +698,7 @@
               [class.green]="aiMyAnalysis.fatigue_level==='LOW'">
               {{ aiMyAnalysis.fatigue_score }}%
             </span>
-            <span class="fat-detail">Niveau: {{ aiMyAnalysis.fatigue_level }}</span>
+            <span class="fat-detail">{{ 'dashboard.swimmer.ai.levelLabel' | translate }}: {{ aiMyAnalysis.fatigue_level }}</span>
             <span class="fat-detail" [style.color]="getAcwrStatus(aiMyAnalysis.metrics?.acwr).color">{{ getAcwrStatus(aiMyAnalysis.metrics?.acwr).icon }} ACWR: {{ aiMyAnalysis.metrics?.acwr || 'N/A' }}</span>
           </div>
           <div class="gauge-wrap">
@@ -454,11 +715,11 @@
 
       <!-- AI Performance Trend & Prediction -->
       <div class="dss-sec dss-trend-card">
-        <span class="dss-lbl">Prédiction & Tendance</span>
+        <span class="dss-lbl">{{ 'dashboard.swimmer.ai.prediction' | translate }}</span>
         <div class="trend-main" *ngIf="aiMyPrediction">
           <div class="trend-left">
             <div class="trend-big">{{ aiMyPrediction.predicted_time | number:'1.2-2' }}<small>s</small></div>
-            <div class="trend-u">Chrono prévu (100m)</div>
+            <div class="trend-u">{{ 'dashboard.swimmer.ai.predictedTime' | translate }}</div>
             <div class="trend-u" style="margin-top:4px" [style.color]="getTrendColor(aiMyAnalysis.metrics?.performance_trend)">
               {{ getTrendLabel(aiMyAnalysis.metrics?.performance_trend) }}
             </div>
@@ -467,13 +728,13 @@
             <path d="M0,30 Q20,35 40,25 T80,15 T130,20" fill="none" [attr.stroke]="getTrendColor(aiMyAnalysis.metrics?.performance_trend)" stroke-width="3" stroke-linecap="round"/>
           </svg>
         </div>
-        <div *ngIf="!aiMyPrediction" class="dss-det">Données insuffisantes pour la prédiction de temps.</div>
+        <div *ngIf="!aiMyPrediction" class="dss-det">{{ 'dashboard.swimmer.ai.insufficientData' | translate }}</div>
       </div>
 
       <!-- AI Recommendation -->
       <div class="dss-sec dss-rec-card">
         <div class="rec-header">
-          <span class="dss-lbl">Recommandation AI</span>
+          <span class="dss-lbl">{{ 'dashboard.swimmer.ai.aiRecommendation' | translate }}</span>
           <svg class="rec-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="dss-rec" style="margin-top:8px">
@@ -483,30 +744,30 @@
             <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
           </svg>
           <div class="rec-text">
-            <span class="rec-main">{{ aiMyAnalysis.recommendation }}</span>
+            <span class="rec-main">{{ aiMyAnalysis?.athlete_advice || ('dashboard.swimmer.ai.adviceLoading' | translate) }}</span>
           </div>
         </div>
       </div>
 
       <!-- AI Training Metrics -->
       <div class="dss-sec">
-        <span class="dss-lbl">Métriques de la Semaine</span>
+        <span class="dss-lbl">{{ 'dashboard.swimmer.ai.weekMetrics' | translate }}</span>
         <div class="idss-stats-grid">
           <div class="idss-stat">
             <span class="is-val">{{ aiMyAnalysis.metrics?.recent_workload || 0 }}</span>
-            <span class="is-lbl">Charge Aiguë (7j)</span>
+            <span class="is-lbl">{{ 'dashboard.swimmer.ai.acuteLoad' | translate }}</span>
           </div>
           <div class="idss-stat">
             <span class="is-val">{{ aiMyAnalysis.metrics?.chronic_workload || 0 }}</span>
-            <span class="is-lbl">Charge Chronique (28j)</span>
+            <span class="is-lbl">{{ 'dashboard.swimmer.ai.chronicLoad' | translate }}</span>
           </div>
           <div class="idss-stat">
             <span class="is-val">{{ aiMyAnalysis.metrics?.sleep_quality?.toFixed(1) || '—' }}/10</span>
-            <span class="is-lbl">Qualité Sommeil</span>
+            <span class="is-lbl">{{ 'dashboard.swimmer.ai.sleepQuality' | translate }}</span>
           </div>
           <div class="idss-stat">
             <span class="is-val">{{ aiMyAnalysis.metrics?.stress_level?.toFixed(1) || '—' }}/10</span>
-            <span class="is-lbl">Niveau Stress</span>
+            <span class="is-lbl">{{ 'dashboard.swimmer.ai.stressLevel' | translate }}</span>
           </div>
         </div>
       </div>
@@ -515,16 +776,16 @@
     <!-- BMI (real data from profile) -->
     <div class="dss-sec dss-bmi-calc">
       <div class="bmi-calc-header">
-        <span class="bmi-calc-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg> IMC</span>
+        <span class="bmi-calc-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg> {{ 'dashboard.swimmer.ai.bmiTitle' | translate }}</span>
         <span class="bmi-period-tag">{{ weight }} kg · {{ height }} cm</span>
       </div>
       <div class="bmi-result-row">
         <div class="bmi-result-left">
-          <span class="bmi-result-title">Indice de Masse Corporelle</span>
+          <span class="bmi-result-title">{{ 'dashboard.swimmer.ai.bmiIndex' | translate }}</span>
           <span class="bmi-result-value">{{ bmi }}</span>
         </div>
         <span class="bmi-status-badge" [class.healthy]="bmi < 25" [class.overweight]="bmi >= 25 && bmi < 30" [class.obese]="bmi >= 30">
-          {{ bmi < 18.5 ? 'Insuffisant' : (bmi < 25 ? 'Normal' : (bmi < 30 ? 'Surpoids' : 'Obésité')) }}
+          {{ bmi < 18.5 ? ('dashboard.swimmer.ai.bmiUnderweight' | translate) : (bmi < 25 ? ('dashboard.swimmer.ai.bmiNormal' | translate) : (bmi < 30 ? ('dashboard.swimmer.ai.bmiOverweight' | translate) : ('dashboard.swimmer.ai.bmiObese' | translate))) }}
         </span>
       </div>
       <div class="bmi-scale">
@@ -536,7 +797,7 @@
     <!-- Body silhouette -->
     <div class="dss-sec dss-body-measurements">
       <div class="body-meas-header">
-        <span class="body-meas-title">Silhouette</span>
+        <span class="body-meas-title">{{ 'dashboard.swimmer.ai.silhouette' | translate }}</span>
         <span class="body-shape-badge">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="12,2 22,22 2,22"/></svg>
           {{ 'dashboard.swimmer.dss.shape' | translate }}
@@ -548,8 +809,12 @@
     </div>
 
     <div class="dss-sec dss-exp">
-      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Moteur AI Brain</div>
-      <p class="dss-exp-txt">Analyse automatique après chaque séance. Prédit les performances futures (100m Libre par défaut) et gère la fatigue avec précision Machine Learning.</p>
+      <div class="dss-st muted-t"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> {{ 'dashboard.swimmer.ai.aiRecommendationPanel' | translate }}</div>
+      <p class="dss-exp-txt">{{ aiMyAnalysis?.athlete_advice || ('dashboard.swimmer.ai.adviceLoading' | translate) }}</p>
+      <div class="dss-st muted-t" style="margin-top:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z"/><path d="M21 10.5v7.5L12 22l-9-4v-7.5"/></svg> {{ 'dashboard.swimmer.ai.explanationPanel' | translate }}</div>
+      <p class="dss-exp-txt" *ngIf="aiMyAnalysis?.explanation">{{ aiMyAnalysis.explanation }}</p>
+      <p class="dss-exp-txt" *ngIf="!aiMyAnalysis?.explanation && aiMyPrediction?.explanation">{{ aiMyPrediction.explanation }}</p>
+      <p class="dss-exp-txt" *ngIf="!aiMyAnalysis?.explanation && !aiMyPrediction?.explanation">{{ 'dashboard.swimmer.ai.noExplanation' | translate }}</p>
     </div>
   </aside>
 </div>
@@ -640,7 +905,7 @@
 <div class="modal-overlay" *ngIf="showProfileModal && selectedProfile" (click)="closeProfile()">
   <div class="modal profile-modal" (click)="$event.stopPropagation()">
     <div class="modal-head">
-      <h3>Profil</h3>
+      <h3>{{ 'dashboard.admin.profileTitle' | translate }}</h3>
       <button class="modal-close" (click)="closeProfile()">&times;</button>
     </div>
     <div class="modal-body">
@@ -657,23 +922,23 @@
       </div>
       <div class="profile-meta">
         <div class="meta-item" *ngIf="selectedProfile.user?.telephone">
-          <span class="meta-key">Téléphone</span>
+          <span class="meta-key">{{ 'dashboard.admin.phone' | translate }}</span>
           <span class="meta-val">{{ selectedProfile.user?.telephone }}</span>
         </div>
         <div class="meta-item" *ngIf="selectedProfile.user?.dateNaissance">
-          <span class="meta-key">Naissance</span>
+          <span class="meta-key">{{ 'dashboard.admin.birthDate' | translate }}</span>
           <span class="meta-val">{{ fmtDate(selectedProfile.user?.dateNaissance) }}</span>
         </div>
         <div class="meta-item" *ngIf="selectedProfile.source?.categorie">
-          <span class="meta-key">Catégorie</span>
+          <span class="meta-key">{{ 'dashboard.admin.category' | translate }}</span>
           <span class="meta-val">{{ selectedProfile.source?.categorie }}</span>
         </div>
         <div class="meta-item" *ngIf="selectedProfile.source?.niveau">
-          <span class="meta-key">Niveau</span>
+          <span class="meta-key">{{ 'dashboard.admin.level' | translate }}</span>
           <span class="meta-val">{{ selectedProfile.source?.niveau }}</span>
         </div>
         <div class="meta-item" *ngIf="selectedProfile.source?.club">
-          <span class="meta-key">Club</span>
+          <span class="meta-key">{{ 'dashboard.admin.club' | translate }}</span>
           <span class="meta-val">{{ selectedProfile.source?.club }}</span>
         </div>
       </div>

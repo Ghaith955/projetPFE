@@ -56,6 +56,9 @@
           <span class="niveau-badge" [class]="getNiveauClass(c.niveauRequis)">{{ c.niveauRequis }}</span>
         </div>
         <div class="comp-actions" *ngIf="canManageCompetitions">
+          <button class="svg-icon-btn result" *ngIf="isCoach" (click)="openResultModal(c)" title="Ajouter résultat">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6 4 4 6-6"/><path d="M20 7v6h-6"/></svg>
+          </button>
           <button class="svg-icon-btn edit" (click)="openEditModal(c)" title="Modifier">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
@@ -83,9 +86,8 @@
         </div>
       </div>
 
-      <div class="days-left" *ngIf="c.statut === 'À venir'">
-        <span *ngIf="getDaysLeft(c.date) > 0">Dans {{ getDaysLeft(c.date) }} jour(s)</span>
-        <span *ngIf="getDaysLeft(c.date) <= 0" class="today">Aujourd'hui !</span>
+      <div class="days-left">
+        <span [class.today]="getDaysLeft(c.date) === 0">{{ getCountdownLabel(c.date) }}</span>
       </div>
     </div>
   </div>
@@ -154,6 +156,98 @@
     <div class="modal-footer">
       <button class="btn-cancel" (click)="closeModal()">Annuler</button>
       <button class="btn-save" (click)="onSubmit()">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" *ngIf="showResultModal" (click)="closeResultModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Ajouter un résultat</h3>
+      <button class="modal-close" (click)="closeResultModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="errorMessage">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        {{ errorMessage }}
+      </div>
+
+      <div class="field-group full">
+        <label>Nageur *</label>
+        <select [(ngModel)]="resultForm.nageurId">
+          <option value="">Sélectionner un nageur</option>
+          <option *ngFor="let n of allNageurs" [value]="n._id">
+            {{ n.utilisateur?.nom }} {{ n.utilisateur?.prenom }}
+          </option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Score *</label>
+          <input type="number" [(ngModel)]="resultForm.score" placeholder="85" />
+        </div>
+        <div class="field-group">
+          <label>Classement *</label>
+          <input type="number" [(ngModel)]="resultForm.rank" placeholder="1" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Temps</label>
+          <input type="text" [(ngModel)]="resultForm.time" placeholder="1:02.34" />
+        </div>
+        <div class="field-group">
+          <label>Distance (m)</label>
+          <input type="number" [(ngModel)]="resultForm.distance" placeholder="100" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Style</label>
+          <input type="text" [(ngModel)]="resultForm.stroke" placeholder="Crawl" />
+        </div>
+        <div class="field-group">
+          <label>Catégorie</label>
+          <input type="text" [(ngModel)]="resultForm.category" placeholder="Senior" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Technique</label>
+          <input type="number" [(ngModel)]="resultForm.techniqueScore" placeholder="75" />
+        </div>
+        <div class="field-group">
+          <label>Endurance</label>
+          <input type="number" [(ngModel)]="resultForm.enduranceScore" placeholder="80" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Sprint</label>
+          <input type="number" [(ngModel)]="resultForm.sprintScore" placeholder="78" />
+        </div>
+        <div class="field-group">
+          <label>Efficacité</label>
+          <input type="number" [(ngModel)]="resultForm.strokeEfficiency" placeholder="82" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Consistance</label>
+          <input type="number" [(ngModel)]="resultForm.consistencyScore" placeholder="74" />
+        </div>
+        <div class="field-group">
+          <label>Notes</label>
+          <input type="text" [(ngModel)]="resultForm.notes" placeholder="Remarques coach" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeResultModal()">Annuler</button>
+      <button class="btn-save" (click)="submitResult()">Enregistrer</button>
     </div>
   </div>
 </div>

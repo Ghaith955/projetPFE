@@ -1,15 +1,21 @@
-<!-- Floating Action Button -->
-<button class="chatbot-fab" (click)="toggleChat()" [class.active]="isOpen" id="chatbot-toggle">
-  <span class="fab-pulse" *ngIf="!isOpen"></span>
-  <!-- Chat icon -->
-  <svg *ngIf="!isOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-  <!-- Close icon -->
-  <svg *ngIf="isOpen" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-</button>
+<!-- Command Palette (triggered by pressing /) -->
+<div class="cmd-backdrop" *ngIf="cmdOpen" (click)="closeCmd()"></div>
+<div class="cmd-palette" *ngIf="cmdOpen" id="cmd-palette">
+  <div class="cmd-prefix">/</div>
+  <input
+    #cmdInput
+    class="cmd-input"
+    type="text"
+    [(ngModel)]="cmdQuery"
+    placeholder="chat, chatbot, bot…"
+    (keydown)="onCmdKey($event)"
+    id="cmd-palette-input"
+    autocomplete="off"
+    autocorrect="off"
+    spellcheck="false"
+  />
+  <span class="cmd-hint">↵ pour confirmer · Esc pour fermer</span>
+</div>
 
 <!-- Chat Window -->
 <div class="chatbot-window" *ngIf="isOpen" id="chatbot-window">
@@ -27,6 +33,7 @@
       <div class="chatbot-header-name">IDSS Assistant</div>
       <div class="chatbot-header-status">En ligne</div>
     </div>
+    <div class="chatbot-kbd-hint">Appuyez sur <kbd>/</kbd> pour ouvrir</div>
     <button class="chatbot-close" (click)="toggleChat()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -49,7 +56,7 @@
     <input
       type="text"
       [(ngModel)]="userInput"
-      placeholder="Tapez votre message..."
+      placeholder="Tapez votre message…"
       (keydown)="onKeydown($event)"
       id="chatbot-input"
     />

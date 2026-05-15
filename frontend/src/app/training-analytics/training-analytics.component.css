@@ -124,6 +124,11 @@
 
 .ai-card {
   padding: 18px;
+  background: radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.08), transparent 40%),
+              radial-gradient(circle at 90% 20%, rgba(59, 130, 246, 0.12), transparent 45%),
+              linear-gradient(160deg, rgba(10, 14, 28, 0.9), rgba(12, 18, 32, 0.95));
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  box-shadow: 0 16px 36px rgba(3, 10, 20, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .ai-head {
@@ -133,8 +138,16 @@
   margin-bottom: 12px;
 }
 
+.ai-head h2 {
+  font-size: 18px;
+  letter-spacing: 0.3px;
+}
+
 .ai-head p {
   color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .ai-grid {
@@ -146,16 +159,67 @@
 .ai-tile {
   padding: 14px;
   border-radius: var(--radius);
-  background: rgba(15, 17, 36, 0.7);
-  border: 1px dashed rgba(99, 102, 241, 0.35);
+  background: linear-gradient(145deg, rgba(15, 20, 38, 0.9), rgba(9, 12, 22, 0.85));
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 8px 20px rgba(2, 6, 12, 0.5);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ai-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 35%, rgba(99, 102, 241, 0.12) 55%, transparent 75%);
+  opacity: 0;
+  transform: translateX(-20%);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ai-tile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 12px 24px rgba(2, 6, 12, 0.6);
+}
+
+.ai-tile:hover::after {
+  opacity: 1;
+  transform: translateX(0%);
 }
 
 .ai-tile span {
   color: var(--text-secondary);
   font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ai-tile strong {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.ai-tile small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.ai-state {
+  padding: 12px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  background: rgba(10, 14, 26, 0.7);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.ai-state.error {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.35);
 }
 
 @media (max-width: 960px) {

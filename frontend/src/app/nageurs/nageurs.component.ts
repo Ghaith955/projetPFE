@@ -11,6 +11,7 @@ import { ApiService } from '../services/api.service';
 export class NageursComponent implements OnInit {
   nageurs: any[] = [];
   filteredNageurs: any[] = [];
+  entraineurs: any[] = [];
   searchQuery = '';
   isLoading = true;
   errorMessage = '';
@@ -19,6 +20,9 @@ export class NageursComponent implements OnInit {
   showModal = false;
   isEditMode = false;
   selectedNageurId = '';
+  modalCoachId = '';
+  initialCoachId = '';
+  openCoachPickerFor: string | null = null;
 
   form = {
     nom: '', prenom: '', email: '', password: '',
@@ -36,13 +40,30 @@ export class NageursComponent implements OnInit {
 
   get isAdmin() { return this.auth.role === 'RESPONSABLE'; }
 
-  ngOnInit() { this.loadNageurs(); }
+  ngOnInit() {
+    this.loadNageurs();
+    if (this.isAdmin) {
+      this.loadEntraineurs();
+    }
+  }
+
+  loadEntraineurs() {
+    this.api.getAllEntraineurs().subscribe({
+      next: (data) => {
+        this.entraineurs = Array.isArray(data) ? data : [];
+      },
+      error: () => {
+        this.errorMessage = 'Erreur lors du chargement des entraineurs.';
+      }
+    });
+  }
 
   loadNageurs() {
     this.isLoading = true;
     this.api.getAllNageurs().subscribe({
       next: (data) => {
-        this.nageurs = Array.isArray(data) ? data : [];
+        const raw = Array.isArray(data) ? data : [];
+        this.nageurs = this.filterCoachSwimmers(raw);
         this.filteredNageurs = [...this.nageurs];
         this.isLoading = false;
       },
@@ -63,8 +84,53 @@ export class NageursComponent implements OnInit {
     });
   }
 
+  getCoachLabel(nageur: any): string {
+    const coach = nageur.entraineur?.utilisateur;
+    if (!coach) return 'En attente d\'affectation';
+    const fullName = `${coach.prenom || ''} ${coach.nom || ''}`.trim();
+    if (fullName) return fullName;
+    return 'Entraineur';
+  }
+
+  getCoachInitials(entraineur: any): string {
+    const nom = entraineur?.utilisateur?.nom || '?';
+    const prenom = entraineur?.utilisateur?.prenom || '';
+    return (nom[0] + (prenom[0] || '')).toUpperCase();
+  }
+
+  getMatchingEntraineurs(nageur: any): any[] {
+    const nageurSpecialites = (Array.isArray(nageur.specialite) ? nageur.specialite : []).filter((spec: string) => !!spec);
+    if (nageurSpecialites.length === 0) return this.entraineurs;
+    return this.entraineurs.filter((e) => {
+      const coachSpecs = Array.isArray(e.specialites) ? e.specialites : [];
+      return nageurSpecialites.some((spec: string) => coachSpecs.includes(spec));
+    });
+  }
+
+  assignNageur(nageur: any, entraineurId: string, onDone?: () => void) {
+    if (!entraineurId) {
+      this.errorMessage = 'Veuillez selectionner un entraineur.';
+      return;
+    }
+
+    this.api.assignNageurToEntraineur({ nageurId: nageur._id, entraineurId }).subscribe({
+      next: (res: any) => {
+        this.successMessage = 'Affectation mise a jour.';
+        this.loadNageurs();
+        setTimeout(() => (this.successMessage = ''), 3000);
+        if (onDone) onDone();
+        if (this.openCoachPickerFor === nageur._id) this.openCoachPickerFor = null;
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Erreur lors de l\'affectation.';
+      }
+    });
+  }
+
   openAddModal() {
     this.isEditMode = false;
+    this.modalCoachId = '';
+    this.initialCoachId = '';
     this.resetForm();
     this.showModal = true;
   }
@@ -72,6 +138,8 @@ export class NageursComponent implements OnInit {
   openEditModal(nageur: any) {
     this.isEditMode = true;
     this.selectedNageurId = nageur._id;
+    this.initialCoachId = nageur.entraineur?._id || '';
+    this.modalCoachId = this.initialCoachId;
     this.form = {
       nom: nageur.utilisateur?.nom || '', prenom: nageur.utilisateur?.prenom || '',
       email: nageur.utilisateur?.email || '', password: '',
@@ -89,6 +157,14 @@ export class NageursComponent implements OnInit {
     this.errorMessage = ''; this.successMessage = '';
   }
 
+  setModalCoach(entraineurId: string) {
+    this.modalCoachId = entraineurId;
+  }
+
+  toggleCoachPicker(nageurId: string) {
+    this.openCoachPickerFor = this.openCoachPickerFor === nageurId ? null : nageurId;
+  }
+
   onSubmit() {
     this.errorMessage = '';
     if (!this.form.nom || !this.form.prenom || !this.form.email || !this.form.age) {
@@ -98,9 +174,19 @@ export class NageursComponent implements OnInit {
     if (this.isEditMode) {
       this.api.updateNageur(this.selectedNageurId, this.form).subscribe({
         next: () => {
-          this.successMessage = 'Nageur mis à jour !';
-          this.loadNageurs();
-          setTimeout(() => this.closeModal(), 1500);
+          const shouldAssign = this.isAdmin && this.modalCoachId && this.modalCoachId !== this.initialCoachId;
+          if (shouldAssign) {
+            const nageur = this.nageurs.find((n) => n._id === this.selectedNageurId) || { _id: this.selectedNageurId };
+            this.assignNageur(nageur, this.modalCoachId, () => {
+              this.successMessage = 'Nageur mis a jour !';
+              this.loadNageurs();
+              setTimeout(() => this.closeModal(), 1500);
+            });
+          } else {
+            this.successMessage = 'Nageur mis a jour !';
+            this.loadNageurs();
+            setTimeout(() => this.closeModal(), 1500);
+          }
         },
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });
@@ -109,10 +195,19 @@ export class NageursComponent implements OnInit {
       Object.entries(this.form).forEach(([k, v]) => { if (v) formData.append(k, v as string); });
 
       this.api.registerNageur(formData).subscribe({
-        next: () => {
-          this.successMessage = 'Nageur ajouté !';
-          this.loadNageurs();
-          setTimeout(() => this.closeModal(), 1500);
+        next: (res: any) => {
+          const createdId = res?.nageur?._id;
+          if (this.isAdmin && createdId && this.modalCoachId) {
+            this.assignNageur({ _id: createdId }, this.modalCoachId, () => {
+              this.successMessage = 'Nageur ajoute !';
+              this.loadNageurs();
+              setTimeout(() => this.closeModal(), 1500);
+            });
+          } else {
+            this.successMessage = 'Nageur ajoute !';
+            this.loadNageurs();
+            setTimeout(() => this.closeModal(), 1500);
+          }
         },
         error: (err) => { this.errorMessage = err.error?.message || 'Erreur.'; }
       });
@@ -135,6 +230,13 @@ export class NageursComponent implements OnInit {
     const nom = nageur.utilisateur?.nom || '?';
     const prenom = nageur.utilisateur?.prenom || '';
     return (nom[0] + (prenom[0] || '')).toUpperCase();
+  }
+
+  private filterCoachSwimmers(list: any[]): any[] {
+    if (this.auth.role !== 'ENTRAINEUR') return list;
+    const allowed = new Set(this.auth.getCoachSwimmerIds());
+    if (!allowed.size) return list;
+    return list.filter((n: any) => allowed.has(String(n?._id || n?.id || n)));
   }
 
   navigate(route: string) { this.router.navigate([route]); }

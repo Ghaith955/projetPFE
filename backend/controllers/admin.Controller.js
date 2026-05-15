@@ -5,11 +5,25 @@ const Competition = require('../models/competition.model');
 const Entrainement = require('../models/entrainement.model');
 const Cotisation = require('../models/cotisation.model');
 const Demande = require('../models/demande.model');
+const IDSSDecision = require('../models/idssDecision.model');
+const Performance = require('../models/performance.model');
 const bcrypt = require('bcryptjs');
 const { sendMail } = require('../utils/sendEmail');
 const { buildApprovalEmail, getLogoAttachment } = require('../utils/emailTemplates');
 
 const adminController = {};
+
+// GET /admin/idss-evaluations/latest - Latest AI evaluation summary
+adminController.getLatestIdssEvaluation = async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const col = mongoose.connection.db.collection('idss_evaluations');
+    const docs = await col.find({}).sort({ timestamp: -1 }).limit(1).toArray();
+    res.json(docs[0] || null);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur récupération évaluation IDSS.', error: error.message });
+  }
+};
 
 // GET /admin/users - Get all users
 adminController.getAllUsers = async (req, res) => {
@@ -140,6 +154,17 @@ adminController.assignNageurToEntraineur = async (req, res) => {
     const entraineur = await Entraineur.findById(entraineurId);
     if (!entraineur) return res.status(404).json({ message: 'Entraîneur introuvable.' });
 
+    const nageurSpecialites = Array.isArray(nageur.specialite) ? nageur.specialite : [];
+    const coachSpecialites = Array.isArray(entraineur.specialites) ? entraineur.specialites : [];
+    const hasMatch = nageurSpecialites.some((spec) => coachSpecialites.includes(spec));
+    if (nageurSpecialites.length > 0 && coachSpecialites.length > 0 && !hasMatch) {
+      return res.status(400).json({ message: 'Specialite incompatible entre le nageur et l\'entraineur.' });
+    }
+
+    if (nageur.entraineur && String(nageur.entraineur) !== String(entraineur._id)) {
+      await Entraineur.findByIdAndUpdate(nageur.entraineur, { $pull: { nageurs: nageur._id } });
+    }
+
     nageur.entraineur = entraineur._id;
     await nageur.save();
 
@@ -148,7 +173,15 @@ adminController.assignNageurToEntraineur = async (req, res) => {
       await entraineur.save();
     }
 
-    res.status(200).json({ message: 'Nageur affecté avec succès !', nageur, entraineur });
+    const populatedNageur = await Nageur.findById(nageur._id)
+      .populate('utilisateur', 'nom prenom email phone imageprofile isActive')
+      .populate({
+        path: 'entraineur',
+        select: 'specialites utilisateur',
+        populate: { path: 'utilisateur', select: 'nom prenom email' }
+      });
+
+    res.status(200).json({ message: 'Nageur affecte avec succes !', nageur: populatedNageur, entraineur });
   } catch (error) {
     res.status(500).json({ message: 'Erreur serveur.', error: error.message });
   }
@@ -167,6 +200,59 @@ adminController.getStats = async (req, res) => {
       Demande.countDocuments({ status: 'pending' })
     ]);
 
+    const [aiMonitored, latestDecisions] = await Promise.all([
+      IDSSDecision.distinct('nageur').then((ids) => ids.length),
+      IDSSDecision.aggregate([
+        { $sort: { createdAt: -1 } },
+        { $group: { _id: '$nageur', doc: { $first: '$$ROOT' } } },
+        { $replaceRoot: { newRoot: '$doc' } }
+      ])
+    ]);
+
+    const atRiskCount = latestDecisions.filter((d) => d.fatigueLevel === 'HIGH' || d.fatigueLevel === 'CRITICAL').length;
+    const totalAnalyzed = latestDecisions.length;
+
+    const now = new Date();
+    const day7 = new Date(now); day7.setDate(now.getDate() - 7);
+    const day28 = new Date(now); day28.setDate(now.getDate() - 28);
+
+    const loadAgg = await Performance.aggregate([
+      { $match: { type: 'Entrainement', date: { $gte: day28 } } },
+      {
+        $group: {
+          _id: '$nageur',
+          load28: { $sum: { $ifNull: ['$distance', 0] } },
+          load7: {
+            $sum: {
+              $cond: [
+                { $gte: ['$date', day7] },
+                { $ifNull: ['$distance', 0] },
+                0
+              ]
+            }
+          }
+        }
+      }
+    ]);
+
+    const acwrVals = loadAgg
+      .map((d) => {
+        const chronic = (d.load28 || 0) / 4;
+        return chronic > 0 ? d.load7 / chronic : 0;
+      })
+      .filter((v) => v > 0);
+    const avgAcwr = acwrVals.length
+      ? +(acwrVals.reduce((a, b) => a + b, 0) / acwrVals.length).toFixed(2)
+      : 0;
+
+    const atRiskRatio = totalAnalyzed ? atRiskCount / totalAnalyzed : 0;
+    let teamStatus = { label: 'Bon', level: 'good' };
+    if (atRiskRatio >= 0.3 || avgAcwr >= 1.45) {
+      teamStatus = { label: 'Risque', level: 'bad' };
+    } else if (atRiskRatio >= 0.15 || avgAcwr >= 1.3) {
+      teamStatus = { label: 'Moyen', level: 'warn' };
+    }
+
     const recentUsers = await User.find().select('-password').sort({ createdAt: -1 }).limit(5);
     const upcomingCompetitions = await Competition.find({ date: { $gte: new Date() } }).sort({ date: 1 }).limit(5);
 
@@ -178,6 +264,10 @@ adminController.getStats = async (req, res) => {
       entrainements: entrainementsCount,
       cotisations: cotisationsCount,
       demandesPending: demandesCount,
+      aiMonitored,
+      atRiskCount,
+      avgAcwr,
+      teamStatus,
       recentUsers,
       upcomingCompetitions
     });
